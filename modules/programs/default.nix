@@ -32,21 +32,21 @@
    xdg-desktop-portal-hyprland
 #chatyGPT AI TOOLS
   nodejs
-  gemini-cli
+#   gemini-cli
 # LibreOffice (pełny pakiet)
     libreoffice-fresh
 # Grafika (paint + zaawansowane)
     gimp
     krita
 # Arduino IDE
-    arduino-ide
+#     arduino-ide
 
 # KDE Connect
-	kdePackages.kdeconnect-kde
+#	kdePackages.kdeconnect-kde
 # Nerd Fonts (cała kolekcja lub wybierz konkretne)
-pkgs.nerd-fonts.fira-code
-pkgs.nerd-fonts.jetbrains-mono
-pkgs.nerd-fonts.hack
+#pkgs.nerd-fonts.fira-code
+#pkgs.nerd-fonts.jetbrains-mono
+#pkgs.nerd-fonts.hack
 # LaTeX (pełny)
     texliveFull
 
@@ -66,22 +66,22 @@ pkgs.nerd-fonts.hack
     python3Packages.black
     google-java-format
     stylua
-    vscode-html-languageserver
-    vscode-css-languageserver
-    python3Packages.pyright
+    #vscode-html-languageserver
+    #vscode-css-languageserver
+    #python3Packages.pyright
     java-language-server
     python3Packages.debugpy
 
 # Hyprland related dependencies (from dotfiles analysis)
     cliphist
     swww
-    hypridle
+    #hypridle
     glava
     foot
     kitty
 
 # Additional Hyprland script dependencies
-    wal
+    #wal
     gawk
     coreutils
     eww

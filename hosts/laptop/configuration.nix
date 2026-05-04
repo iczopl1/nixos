@@ -11,7 +11,8 @@
       ../../modules/programs/default.nix
       ../../modules/system/default.nix
       ../../modules/services/default.nix
-    ];
+    ]; # Add semicolon here
+
 
 
 
