@@ -15,10 +15,17 @@ command ="${pkgs.hyprland}/bin/Hyprland";
 user = "iczo";
 };
 
-  # Enable the OpenSSH daemon.
-  services.openssh.enable = true;
+#pipewire audio control
+services.pipewire = {
+    enable = true;
+    pulse.enable = true;
+    alsa.enable = true;
+    wireplumber.enable = true;
+  };
 
-  # Open ports in the firewall.
+  # Enable the OpenSSH daemon.
+
+  #Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.

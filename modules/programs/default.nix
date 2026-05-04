@@ -70,7 +70,7 @@
     #vscode-css-languageserver
     #python3Packages.pyright
     java-language-server
-    python3Packages.debugpy
+    #python3Packages.debugpy
 
 # Hyprland related dependencies (from dotfiles analysis)
     cliphist
@@ -104,9 +104,4 @@
      enable = true;
      enableSSHSupport = true;
   };
-  programs.ssh.extraConfig = ''
-    Host github.com
-      IdentityFile ~/.ssh/github
-      IdentitiesOnly yes
-  '';
-}
+ }

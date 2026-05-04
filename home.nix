@@ -7,9 +7,7 @@
   #   firefox
   #   git
   # ];
-
   # Let Home Manager manage your dotfiles
   # programs.home-manager.enable = true;
-
   home.stateVersion = "23.11"; # Please adjust to your NixOS version
 }
