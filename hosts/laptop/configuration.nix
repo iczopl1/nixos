@@ -5,12 +5,12 @@
 { config, pkgs, lib, self, ... }:
 
 {
-  imports =
-    [ # Include the results of the hardware scan.
+  imports = [
+      # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      ../modules/programs
-      ../modules/system
-      ../modules/services
+      ../../modules/programs/default.nix
+      ../../modules/system/default.nix
+      ../../modules/services/default.nix
     ];
 
 
