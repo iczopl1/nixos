@@ -37,7 +37,10 @@
    neovim
    vscodium
    flutter
+      google-chrome
+    mesa-demos   # daje eglinfo
    android-tools
+  jdk17
    wget
    cava
    discord
@@ -95,7 +98,8 @@ pkgs.nerd-fonts.hack
     #python3Packages.pyright
     java-language-server
     #python3Packages.debugpy
-
+# dodatkowe 
+    anydesk
 #Terminal program
     p7zip
     tree
@@ -114,5 +118,14 @@ pkgs.nerd-fonts.hack
   programs.gnupg.agent = {
      enable = true;
      enableSSHSupport = true;
+  };
+
+   # potrzebne do uruchamiania binarek typu adb z SDK
+  programs.nix-ld.enable = true;
+
+  # opcjonalnie (ale pomaga)
+  environment.variables = {
+    JAVA_HOME = "${pkgs.jdk17}";
+    CHROME_EXECUTABLE = "${pkgs.google-chrome}/bin/google-chrome";
   };
  }

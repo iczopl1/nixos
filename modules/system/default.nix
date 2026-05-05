@@ -64,8 +64,14 @@
   };
 
   services.blueman.enable = true;
-
-
+#flutter setup
+environment.sessionVariables = {
+  XDG_DATA_DIRS = [
+    "/var/lib/flatpak/exports/share"
+    "$HOME/.local/share/flatpak/exports/share"
+    "/run/current-system/sw/share"
+  ];
+};
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave

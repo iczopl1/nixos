@@ -4,7 +4,9 @@
 
 ---@type ChadrcConfig
 local M = {}
-M.mason.pkgs = {"debugpy","codelldb","clangd","black" ,"pyright","mypy","clang-format"}
+M.mason = {
+  pkgs = {"debugpy","codelldb","clangd","black" ,"pyright","google-java-format", "clang-format"},
+}
 M.base46 = {
 	theme = "catppuccin",
 
