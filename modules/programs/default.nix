@@ -9,7 +9,7 @@
    waybar
    rofi
    grim
-   librewolf
+   brave
    mako
    dunst
    wl-clipboard
@@ -36,6 +36,8 @@
 #Main programy
    neovim
    vscodium
+   flutter
+   android-tools
    wget
    cava
    discord
@@ -58,9 +60,8 @@
 # Grafika (paint + zaawansowane)
     gimp
     krita
-# Arduino IDE
-#     arduino-ide
-
+#Gry 
+    prismlauncher
 # Nerd Fonts (cała kolekcja lub wybierz konkretne)
 pkgs.nerd-fonts.fira-code
 pkgs.nerd-fonts.jetbrains-mono
@@ -96,6 +97,7 @@ pkgs.nerd-fonts.hack
     #python3Packages.debugpy
 
 #Terminal program
+    p7zip
     tree
     fastfetch
   ];
