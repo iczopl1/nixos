@@ -40,7 +40,8 @@ services.syncthing = {
   openDefaultPorts = true; # Open ports in the firewall for Syncthing. (NOTE: this will not open syncthing gui port)
   user = "iczo";
 };
-
+#flatpak do niedziałających rzeczy
+services.flatpak.enable = true;
 
 
   # Enable the OpenSSH daemon.

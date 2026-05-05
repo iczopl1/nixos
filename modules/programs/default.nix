@@ -35,6 +35,7 @@
 
 #Main programy
    neovim
+   vscodium
    wget
    cava
    discord
@@ -96,6 +97,7 @@ pkgs.nerd-fonts.hack
 
 #Terminal program
     tree
+    fastfetch
   ];
   programs.thunar.enable = true;
   #hyprland
