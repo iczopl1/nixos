@@ -23,6 +23,26 @@ services.pipewire = {
     wireplumber.enable = true;
   };
 
+
+#tailscale ustawienia 
+services.tailscale = {
+    enable = true;
+    # Enable tailscale at startup
+
+    # If you would like to use a preauthorized key
+    #authKeyFile = "/run/secrets/tailscale_key";
+
+  };
+
+#syncthing sync z telefonem i pc
+services.syncthing = {
+  enable = true;
+  openDefaultPorts = true; # Open ports in the firewall for Syncthing. (NOTE: this will not open syncthing gui port)
+  user = "iczo";
+};
+
+
+
   # Enable the OpenSSH daemon.
 
   #Open ports in the firewall.

@@ -5,6 +5,7 @@
 #terminal
    alacritty
 #hyprland
+   hyprlock
    waybar
    rofi
    grim
@@ -14,6 +15,24 @@
    wl-clipboard
    wofi
    btop
+# Hyprland related dependencies (from dotfiles analysis)
+    cliphist
+    swww
+    hypridle
+    glava
+    foot
+    kitty
+# Additional Hyprland script dependencies
+    pywal
+    gawk
+    coreutils
+    eww
+    mpv
+    socat
+    ripgrep
+    procps
+
+
 #Main programy
    neovim
    wget
@@ -32,7 +51,7 @@
    xdg-desktop-portal-hyprland
 #chatyGPT AI TOOLS
   nodejs
-#   gemini-cli
+  gemini-cli
 # LibreOffice (pełny pakiet)
     libreoffice-fresh
 # Grafika (paint + zaawansowane)
@@ -41,12 +60,10 @@
 # Arduino IDE
 #     arduino-ide
 
-# KDE Connect
-#	kdePackages.kdeconnect-kde
 # Nerd Fonts (cała kolekcja lub wybierz konkretne)
-#pkgs.nerd-fonts.fira-code
-#pkgs.nerd-fonts.jetbrains-mono
-#pkgs.nerd-fonts.hack
+pkgs.nerd-fonts.fira-code
+pkgs.nerd-fonts.jetbrains-mono
+pkgs.nerd-fonts.hack
 # LaTeX (pełny)
     texliveFull
 
@@ -60,7 +77,12 @@
     python3Packages.matplotlib
 # ImageMagick (obróbka obrazów w LaTeX/pandoc)
     imagemagick
-
+#Hasełka 
+    keepassxc
+#słowniki do spellchceck
+  hunspell
+  hunspellDicts.en_US
+  hunspellDicts.pl_PL
 # Neovim dependencies (from dotfiles analysis)
     python3Packages.mypy
     python3Packages.black
@@ -72,23 +94,8 @@
     java-language-server
     #python3Packages.debugpy
 
-# Hyprland related dependencies (from dotfiles analysis)
-    cliphist
-    swww
-    #hypridle
-    glava
-    foot
-    kitty
-
-# Additional Hyprland script dependencies
-    #wal
-    gawk
-    coreutils
-    eww
-    mpv
-    socat
-    ripgrep
-    procps
+#Terminal program
+    tree
   ];
   programs.thunar.enable = true;
   #hyprland

@@ -8,6 +8,9 @@
   #   git
   # ];
   # Let Home Manager manage your dotfiles
-  # programs.home-manager.enable = true;
-  home.stateVersion = "23.11"; # Please adjust to your NixOS version
+  programs.home-manager.enable = true;
+
+#do hyprlock niezbedne
+  wayland.windowManager.hyprland.systemd.enable = false;
+  home.stateVersion = "25.11"; # Please adjust to your NixOS version
 }
