@@ -22,7 +22,7 @@
      fsType = "vfat";
   };
   fileSystems."/dane" =
-    { device = "/dev/disk/by-uuid/793441FB-FB93-4DBC-9F1C-146DEE937674";
+    { device = "/dev/disk/by-uuid/0C898D037C25A6FC";
       fsType = "ntfs";
     };
   swapDevices =

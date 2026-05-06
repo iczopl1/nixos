@@ -39,16 +39,20 @@
    flutter
       google-chrome
     mesa-demos   # daje eglinfo
+  android-studio
    android-tools
   jdk17
    wget
    cava
    discord
-   python3
+   python311
    python311Packages.pip
    python311Packages.virtualenv
+   python311Packages.pinocchio
 #programer tools
+  cyclonedds
    gcc
+   cmake
    gnumake
    gdb
    clang-tools
@@ -66,9 +70,11 @@
 #Gry 
     prismlauncher
 # Nerd Fonts (cała kolekcja lub wybierz konkretne)
-pkgs.nerd-fonts.fira-code
-pkgs.nerd-fonts.jetbrains-mono
-pkgs.nerd-fonts.hack
+    noto-fonts
+    noto-fonts-color-emoji
+    fira-code
+    jetbrains-mono
+    nerd-fonts.fira-code
 # LaTeX (pełny)
     texliveFull
 
@@ -97,7 +103,7 @@ pkgs.nerd-fonts.hack
     #vscode-css-languageserver
     #python3Packages.pyright
     java-language-server
-    #python3Packages.debugpy
+    python3Packages.debugpy
 # dodatkowe 
     anydesk
 #Terminal program
@@ -105,6 +111,15 @@ pkgs.nerd-fonts.hack
     tree
     fastfetch
   ];
+#opent tablet driver
+  # Enable OpenTabletDriver
+  hardware.opentabletdriver.enable = true;
+
+  # Required by OpenTabletDriver
+  hardware.uinput.enable = true;
+  boot.kernelModules = [ "uinput" ];
+#fonst 
+  fonts.fontconfig.enable = true;
   programs.thunar.enable = true;
   #hyprland
   programs.hyprland.enable = true;

@@ -23,7 +23,7 @@
     color: @lavender;
     border: 0;
     padding: 0;
-    /* font-family: "Fira Sans Semibold", "Font Awesome 4 Free", FontAwesome, Roboto, Helvetica, Arial, sans-serif; */
+    font-family: "JetBrainsMono Nerd Font", "Fira Sans Semibold", "Font Awesome 4 Free", FontAwesome, Roboto, Helvetica, Arial, sans-serif;
     font-size: 12px;
     margin: 0;
 }
