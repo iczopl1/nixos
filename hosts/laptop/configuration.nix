@@ -35,11 +35,17 @@ in
       ../../modules/programs/default.nix
       ../../modules/system/default.nix
       ../../modules/services/default.nix
-    ]; # Add semicolon here
+  };
+
+  fonts.fontDir.enable = true;
 
   environment.systemPackages = with pkgs; [
     python311
     gcc
+    nerdfonts
+    fira-fonts
+    font-awesome
+    ubuntu_font_family
   ] ++ runtimeLibs;
 
   environment.extraInit = ''
