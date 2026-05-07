@@ -3,8 +3,6 @@
 {
   # You can add your Home Manager configurations here
   home.packages = with pkgs; [
-    # firefox
-    # git
     zoxide
     brave
   ];

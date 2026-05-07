@@ -35,17 +35,20 @@ in
       ../../modules/programs/default.nix
       ../../modules/system/default.nix
       ../../modules/services/default.nix
-  };
+];
+  
 
   fonts.fontDir.enable = true;
 
   environment.systemPackages = with pkgs; [
     python311
     gcc
-    nerdfonts
-    fira-fonts
+    nerd-fonts.fira-code
+    nerd-fonts.jetbrains-mono
+  fira-code
+  fira-code-symbols
+  nerd-fonts.fira-code 
     font-awesome
-    ubuntu_font_family
   ] ++ runtimeLibs;
 
   environment.extraInit = ''
