@@ -162,8 +162,7 @@
               command -v zoxide >/dev/null 2>&1 && zoxide add "$$PWD" >/dev/null 2>&1 || true
               return
             else
-              cd "$${HOME}" || return # Fallback to HOME if fzf selection is empty
-              return
+              return # No directory selected, so don't change directory.
             fi
           else
             cd "$${HOME}" || return
