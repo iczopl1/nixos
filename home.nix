@@ -39,11 +39,31 @@
   programs.home-manager.enable = true;
 
   home.file = {
-    ".config/hypr".source = ./dotfiles/hypr;
-    ".config/waybar".source = ./dotfiles/waybar;
-    ".config/rofi".source = ./dotfiles/rofi;
-    ".config/cava".source = ./dotfiles/cava;
-    ".config/nvim".source = ./dotfiles/nvim;
+    ".config/hypr" = {
+      source = ./dotfiles/hypr;
+      recursive = true;
+      force = true;
+    };
+    ".config/waybar" = {
+      source = ./dotfiles/waybar;
+      recursive = true;
+      force = true;
+    };
+    ".config/rofi" = {
+      source = ./dotfiles/rofi;
+      recursive = true;
+      force = true;
+    };
+    ".config/cava" = {
+      source = ./dotfiles/cava;
+      recursive = true;
+      force = true;
+    };
+    ".config/nvim" = {
+      source = ./dotfiles/nvim;
+      recursive = true;
+      force = true;
+    };
   };
 
   programs.zoxide = {

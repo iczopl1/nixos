@@ -47,7 +47,9 @@ let
     '';
   };
 
-  ttsmakoAvrcpWatch = pkgs.writers.writePython3Bin "ttsmako-avrcp-watch" { } ''
+  ttsmakoAvrcpWatch = pkgs.writers.writePython3Bin "ttsmako-avrcp-watch" {
+    flakeIgnore = [ "E302" "E305" "E501" "W503" ];
+  } ''
     import os
     import pathlib
     import re
@@ -139,6 +141,7 @@ let
 
   ttsmakoListen = pkgs.writers.writePython3Bin "ttsmako-listen" {
     libraries = pkgs.piper-tts.propagatedBuildInputs;
+    flakeIgnore = [ "E302" "E305" "E501" "W503" ];
   } ''
     import codecs
     import datetime

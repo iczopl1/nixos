@@ -4,7 +4,8 @@
   imports = [
     ./tts-mako.nix
   ];
-
+#services.ttsMako.enable = true;
+services.ttsMako.enable = false;
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "pl";
@@ -41,11 +42,11 @@ services.tailscale = {
 #syncthing sync z telefonem i pc
 services.syncthing = {
   enable = true;
-  openDefaultPorts = true; # Open ports in the firewall for Syncthing. (NOTE: this will not open syncthing gui port)
+  openDefaultPorts = true;
   user = "iczo";
+  guiAddress = "127.0.0.1:8384";
 };
 
-services.ttsMako.enable = true;
 #flatpak do niedziałających rzeczy
 
 
