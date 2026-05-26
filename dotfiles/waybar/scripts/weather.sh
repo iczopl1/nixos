@@ -8,7 +8,8 @@ cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/waybar-weather"
 mkdir -p "$cache_dir"
 
 cities=(
-  "Rzeszywska|50.022954|22.983578"
+  "Rzeszów|50.0413|21.9990"
+  "Wiśniowa|49.867|21.633"
   "Stalowa Wola|49.729410|21.944869"
 )
 

@@ -34,7 +34,9 @@ The main modifier key (`$mainMod`) is set to the **SUPER (Windows) key**.
 | `$mainMod + 1-10`   | Switch to workspace 1-10                 |                                               |
 | `$mainMod + A`      | Switch to previous workspace             | Equivalent to `e-1`                           |
 | `$mainMod + S`      | Switch to next workspace                 | Equivalent to `e+1`                           |
-| `$mainMod + SHIFT + 1-10`| Move active window to workspace 1-10     |                                               |
+| `$mainMod + SHIFT + 0`  | Move active window to workspace 10       |
+| `$mainMod + SHIFT + CTRL + R` | Move active window to next empty workspace |
+| `$mainMod + SHIFT + L`  | Toggle dynamic 80/20 window layout       |
 | `$mainMod + mouse:272`| Move window (drag with left mouse button) |                                               |
 | `$mainMod + mouse:273`| Resize window (drag with right mouse button) |                                               |
 | `XF86AudioRaiseVolume`| Increase volume                          |                                               |
@@ -101,11 +103,35 @@ These aliases and functions are defined in `home.nix` under `programs.bash.shell
 | `h`               | `_histpick`                                                                                                  | Run `_histpick` function (interactive history)  |
 | `hist`            | `history`                                                                                                    | Show command history                            |
 
+## Configuration Details
+
+### Hyprland Autostart Programs
+
+The following programs are configured to autostart on specific workspaces upon Hyprland login:
+
+*   **Terminal** (Alacritty): Workspace 1
+*   **Brave** (Web Browser): Workspace 2
+*   **Discord**: Workspace 3
+
+### Waybar Weather Module
+
+The Waybar configuration includes a custom weather module that displays the temperature. It cycles through the following predefined locations:
+
+*   **Rzeszów**
+*   **Wiśniowa**
+*   **Stalowa Wola**
+
 ### Functions
 
 | Function          | Description                                                                                                                                                                                                                                                                                                                                 |
 | :---------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `uu [count]`      | Navigates up `count` directories. If `count` is not provided, it goes up one directory.                                                                                                                                                                                                                                                     |
 | `u [query]`       | Interactive directory changer. If `query` is a number, it behaves like `uu`. Otherwise, it uses `fzf` to let you select a parent directory to jump to. If `fzf` is not available, it lists parent directories.                                                                                                                                |
-| `z [query]`       | Smart directory changer. If `query` is empty, it changes to the home directory. If `query` matches a directory prefix, it changes to that directory. Otherwise, it uses `zoxide` to query and change to a frequently visited directory.                                                                                                    |
+| `z [query]`       | Smart directory changer. If `query` is empty, it opens an interactive `fzf` menu to quickly navigate to subdirectories. If `query` matches a directory prefix, it changes to that directory. Otherwise, it uses `zoxide` to query and change to a frequently visited directory.                                                          |
 | `_histpick`       | Interactive history picker. Uses `fzf` to let you select and execute a command from your bash history. If `fzf` is not available, it just prints the history.                                                                                                                                                                              |
+
+### Shell Enhancements
+
+| Keybinding          | Description                                                                                             |
+| :------------------ | :------------------------------------------------------------------------------------------------------ |
+| `Ctrl+R`            | Interactive history search (FZF-based). Allows fuzzy searching and selection of previous commands.      |

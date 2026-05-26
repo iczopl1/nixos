@@ -73,6 +73,7 @@
 
   programs.bash = {
     enable = true;
+    enableCompletion = true;
     shellAliases = {
       update = "sudo nixos-rebuild switch --flake /home/iczo/git/nixos#ThinkPadNIX";
       update-test = "sudo nixos-rebuild test --flake /home/iczo/git/nixos#ThinkPadNIX";
@@ -153,8 +154,21 @@
       z() {
         local query="$${1:-}"
         if [[ -z "$$query" ]]; then
-          cd "$${HOME}" || return
-          return
+          if command -v fzf >/dev/null 2>&1; then
+            local selected_dir
+            selected_dir="$(find . -mindepth 1 -maxdepth 1 -type d -print 2>/dev/null | fzf --prompt='sub-dir> ')"
+            if [[ -n "$$selected_dir" ]]; then
+              cd "$$selected_dir" || return
+              command -v zoxide >/dev/null 2>&1 && zoxide add "$$PWD" >/dev/null 2>&1 || true
+              return
+            else
+              cd "$${HOME}" || return # Fallback to HOME if fzf selection is empty
+              return
+            fi
+          else
+            cd "$${HOME}" || return
+            return
+          fi
         fi
 
         local target
@@ -179,6 +193,9 @@
           history
         fi
       }
+
+      # Source FZF history search widget
+      source ~/.config/bash/fzf_history_widget.sh
     '';
   };
 #do hyprlock niezbedne
