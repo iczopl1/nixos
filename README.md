@@ -89,7 +89,6 @@ These aliases and functions are defined in `home.nix` under `programs.bash.shell
 | `gpl`             | `git pull --ff-only`                                                                                         | Git pull (fast-forward only)                    |
 | `gsw`             | `git switch`                                                                                                 | Git switch branch                               |
 | `gb`              | `git branch`                                                                                                 | Git branch                                      |
-| `g`               | `gemini`                                                                                                     | Alias for gemini CLI                            |
 | `n`               | `nvim`                                                                                                       | Alias for Neovim                                |
 | `py`              | `python3`                                                                                                    | Alias for python3                               |
 | `venv`            | `python3 -m venv .venv`                                                                                      | Create a Python virtual environment             |

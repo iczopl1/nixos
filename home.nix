@@ -100,7 +100,6 @@
       gsw = "git switch";
       gb = "git branch";
 
-      g = "gemini";
       n = "nvim";
       py = "python3";
       venv = "python3 -m venv .venv";
