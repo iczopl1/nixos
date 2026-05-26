@@ -138,11 +138,11 @@
     "tooltip": false
   },
   "cpu": {
-    "format": " {usage: >3}%",
+    "format": "󰻠 {usage: >3}%",
     "on-click": "ghostty -e htop"
   },
   "memory": {
-    "format": " {: >3}%",
+    "format": "󰍛 {: >3}%",
     "on-click": "ghostty -e htop"
   },
   "temperature": {
@@ -203,17 +203,27 @@
   },
   "network": {
     // "interface": "wlp2s0", // (Optional) To force the use of this interface
-    "format": "⚠  Disabled",
-    "format-wifi": "  {essid}",
+    "format": "󰤭 Disabled",
+    "format-wifi": "󰤨 {essid}",
     // "format-ethernet": " {ifname}: {ipaddr}/{cidr}",
-    "format-ethernet": "  Wired",
-    "format-disconnected": "⚠  Disconnected",
-    "tooltip-format": " {ifname} via {gwaddri}",
-    "tooltip-format-wifi": "   {essid} ({signalStrength}%)",
-    "tooltip-format-ethernet": "  {ifname} ({ipaddr}/{cidr})",
-    "tooltip-format-disconnected": "⚠  Disconnected",
+    "format-ethernet": "󰈀 Wired",
+    "format-disconnected": "󰤮 Disconnected",
+    "tooltip-format": "󰈁 {ifname} via {gwaddr}",
+    "tooltip-format-wifi": "󰤨 {essid} ({signalStrength}%)",
+    "tooltip-format-ethernet": "󰈀 {ifname} ({ipaddr}/{cidr})",
+    "tooltip-format-disconnected": "󰤮 Disconnected",
     // "on-click": "ghostty -e nmtui"
     "on-click": "nm-connection-editor"
+  },
+  "bluetooth": {
+    "format": "󰂯",
+    "format-disabled": "󰂲",
+    "format-connected": "󰂱 {device_alias}",
+    "format-connected-battery": "󰂱 {device_alias} {device_battery_percentage}%",
+    "tooltip-format": "{controller_alias}\t{controller_address}",
+    "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{num_connections} connected",
+    "tooltip-format-connected-battery": "{controller_alias}\t{controller_address}\n\n{num_connections} connected",
+    "on-click": "blueman-manager"
   },
   "pulseaudio": {
     // "scroll-step": 1,
