@@ -36,7 +36,7 @@ The main modifier key (`$mainMod`) is set to the **SUPER (Windows) key**.
 | `$mainMod + S`      | Switch to next workspace                 | Equivalent to `e+1`                           |
 | `$mainMod + SHIFT + 0`  | Move active window to workspace 10       |
 | `$mainMod + SHIFT + CTRL + R` | Move active window to next empty workspace |
-| `$mainMod + SHIFT + L`  | Toggle dynamic 80/20 window layout       |
+| `$mainMod + ALT + L`  | Toggle dynamic 80/20 window layout       |
 | `$mainMod + mouse:272`| Move window (drag with left mouse button) |                                               |
 | `$mainMod + mouse:273`| Resize window (drag with right mouse button) |                                               |
 | `XF86AudioRaiseVolume`| Increase volume                          |                                               |
@@ -112,6 +112,7 @@ The following programs are configured to autostart on specific workspaces upon H
 *   **Terminal** (Alacritty): Workspace 1
 *   **Brave** (Web Browser): Workspace 2
 *   **Discord**: Workspace 3
+*   **KeePassXC**: Workspace 9
 
 ### Waybar Weather Module
 
