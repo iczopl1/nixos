@@ -18,16 +18,18 @@ mv "${style_file}.temp" "${style_background_file}"
 
 echo "File names swapped successfully!"
 
-# reload sway
-# swaymsg reload
+# reload Hyprland
+# hyprctl reload
 
 # pkill waybar && waybar &
 
 # Ensure only one Waybar instance runs
-pkill -x waybar && swaymsg reload
+pkill -x waybar || true
+hyprctl reload || true
+waybar >/dev/null 2>&1 &
 
-# reload sway
-# swaymsg reload
+# reload Hyprland
+# hyprctl reload
 
 # Ensure only one Waybar instance runs
 # pkill -x waybar && sleep 0.1 && waybar &

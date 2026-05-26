@@ -1,0 +1,1 @@
+/run/current-system/sw/bin/hyprland: /nix/store/1xw5xccqqh1xw3mvd70hyil6x418wxcm-gcc-14.3.0-lib/lib/libstdc++.so.6: version `GLIBCXX_3.4.34' not found (required by /run/current-system/sw/bin/hyprland)

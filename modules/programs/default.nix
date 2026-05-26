@@ -9,6 +9,18 @@
    waybar
    rofi
    grim
+   slurp
+   jq
+   brightnessctl
+   pavucontrol
+   networkmanagerapplet
+   #kdePackages.kdeconnect-kde
+   iio-hyprland
+   wvkbd
+   yad
+   ydotool
+   mpc
+   fzf
    brave
    mako
    dunst
@@ -37,8 +49,8 @@
    neovim
    vscodium
    flutter
-      google-chrome
-    mesa-demos   # daje eglinfo
+  google-chrome
+  mesa-demos   # daje eglinfo
   android-studio
    android-tools
   jdk17
@@ -50,7 +62,6 @@
    python311Packages.virtualenv
    python311Packages.pinocchio
 #programer tools
-  cyclonedds
    gcc
    cmake
    gnumake
@@ -74,6 +85,7 @@
     noto-fonts-color-emoji
     fira-code
     jetbrains-mono
+    nerd-fonts.symbols-only
     nerd-fonts.fira-code
 # LaTeX (pełny)
     texliveFull
@@ -118,8 +130,6 @@
   # Required by OpenTabletDriver
   hardware.uinput.enable = true;
   boot.kernelModules = [ "uinput" ];
-#fonst 
-  fonts.fontconfig.enable = true;
   programs.thunar.enable = true;
   #hyprland
   programs.hyprland.enable = true;

@@ -2,7 +2,9 @@
 
 This repository contains my personal NixOS configuration.
 
-## Keybindings (Hyprland)
+## Keybindings
+
+### Hyprland
 
 The main modifier key (`$mainMod`) is set to the **SUPER (Windows) key**.
 
@@ -39,26 +41,71 @@ The main modifier key (`$mainMod`) is set to the **SUPER (Windows) key**.
 | `XF86AudioLowerVolume`| Decrease volume                          |                                               |
 | `XF86AudioMute`     | Mute/unmute volume                       |                                               |
 | `XF86AudioMicMute`  | Mute/unmute microphone                   |                                               |
-| `XF86MonBrightnessUp`| Increase bri
+| `XF86MonBrightnessUp`| Increase brightness
+| `XF86MonBrightnessDown`| Decrease brightness
 
-## Key Configuration Details
+### Neovim
 
-### Global Packages and Libraries (`hosts/laptop/configuration.nix`)
-The following global packages and runtime libraries have been configured:
--   **`python311`**: Python 3.11 for general use.
--   **`gcc`**: The GNU Compiler Collection.
--   **`runtimeLibs`**: A collection of essential runtime libraries including `stdenv.cc.cc.lib`, `zlib`, `glib`, `dbus`, `fontconfig`, `freetype`, `libGL`, various `xorg` components (e.g., `libX11`, `libXext`, `libXrender`, `libxcb` utilities), `libxkbcommon`, and `wayland`. These are included in `environment.systemPackages`.
+These are custom keybindings defined in `dotfiles/nvim/lua/mappings.lua`:
 
-### Environment Variables
--   **`LD_LIBRARY_PATH`**: Configured via `environment.extraInit` to ensure necessary libraries are found at runtime.
--   **`QT_QPA_PLATFORM`**: Set to `"offscreen"` via `environment.sessionVariables`.
+| Keybinding          | Action                                   | Notes                                         |
+| :------------------ | :--------------------------------------- | :-------------------------------------------- |
+| `<mouse>`           | No operation                             | Disabled mouse in certain modes               |
+| `;` (Normal mode)   | Enter command mode (`:`)                 |                                               |
+| `jk` (Insert mode)  | Escape                                   |                                               |
+| `<PageUp>`          | No operation                             | Disabled in certain modes                     |
+| `<PageDown>`        | No operation                             | Disabled in certain modes                     |
+| `<C-s>`             | Save (commented out)                     |                                               |
 
-## Important Note for AI Tools / Automated Agents
+## Aliases
 
-**Under no circumstances are AI tools or automated agents permitted to execute the following commands:**
+These aliases and functions are defined in `home.nix` under `programs.bash.shellAliases` and `initExtra`.
 
--   `git commit`
--   `git push`
--   `nixos-rebuild switch`
+### Aliases
 
-These commands modify the system's state or version control history and must only be run by a human user to prevent accidental system disruption or unintended changes.
+| Alias             | Command                                                                                                      | Description                                     |
+| :---------------- | :----------------------------------------------------------------------------------------------------------- | :---------------------------------------------- |
+| `update`          | `sudo nixos-rebuild switch --flake /home/iczo/git/nixos#ThinkPadNIX`                                         | Update NixOS system                             |
+| `update-test`     | `sudo nixos-rebuild test --flake /home/iczo/git/nixos#ThinkPadNIX`                                           | Test NixOS configuration                        |
+| `update-build`    | `nix --extra-experimental-features nix-command --extra-experimental-features flakes build /home/iczo/git/nixos#nixosConfigurations.ThinkPadNIX.config.system.build.toplevel` | Build NixOS system                              |
+| `ls`              | `ls --color=auto`                                                                                            | List directory contents with color              |
+| `ll`              | `ls -alF --color=auto`                                                                                       | List directory contents in long format          |
+| `la`              | `ls -A --color=auto`                                                                                         | List all files including hidden                 |
+| `l`               | `ls -CF --color=auto`                                                                                        | List directory contents in column format        |
+| `..`              | `cd ..`                                                                                                      | Change to parent directory                      |
+| `...`             | `cd ../..`                                                                                                   | Change to grand-parent directory                |
+| `home`            | `cd ~`                                                                                                       | Change to home directory                        |
+| `s`               | `git status --short`                                                                                         | Git status (short format)                       |
+| `gs`              | `git status --short`                                                                                         | Git status (short format)                       |
+| `ga`              | `git add`                                                                                                    | Git add                                         |
+| `gaa`             | `git add --all`                                                                                              | Git add all                                     |
+| `gc`              | `git commit`                                                                                                 | Git commit                                      |
+| `gcm`             | `git commit -m`                                                                                              | Git commit with message                         |
+| `gd`              | `git diff`                                                                                                   | Git diff                                        |
+| `gl`              | `git log --oneline --graph --decorate -20`                                                                   | Git log (pretty format, last 20 commits)        |
+| `gp`              | `git push`                                                                                                   | Git push                                        |
+| `gpl`             | `git pull --ff-only`                                                                                         | Git pull (fast-forward only)                    |
+| `gsw`             | `git switch`                                                                                                 | Git switch branch                               |
+| `gb`              | `git branch`                                                                                                 | Git branch                                      |
+| `g`               | `gemini`                                                                                                     | Alias for gemini CLI                            |
+| `n`               | `nvim`                                                                                                       | Alias for Neovim                                |
+| `py`              | `python3`                                                                                                    | Alias for python3                               |
+| `venv`            | `python3 -m venv .venv`                                                                                      | Create a Python virtual environment             |
+| `va`              | `source .venv/bin/activate`                                                                                  | Activate Python virtual environment             |
+| `pipup`           | `python3 -m pip install --upgrade pip`                                                                       | Upgrade pip                                     |
+| `p7`              | `7z`                                                                                                         | Alias for 7-zip                                 |
+| `7zl`             | `7z l`                                                                                                       | List contents of 7-zip archive                  |
+| `7zx`             | `7z x`                                                                                                       | Extract 7-zip archive                           |
+| `7za`             | `7z a`                                                                                                       | Add files to 7-zip archive                      |
+| `th`              | `thunar . >/dev/null 2>&1 &`                                                                                 | Open Thunar file manager in current directory   |
+| `h`               | `_histpick`                                                                                                  | Run `_histpick` function (interactive history)  |
+| `hist`            | `history`                                                                                                    | Show command history                            |
+
+### Functions
+
+| Function          | Description                                                                                                                                                                                                                                                                                                                                 |
+| :---------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `uu [count]`      | Navigates up `count` directories. If `count` is not provided, it goes up one directory.                                                                                                                                                                                                                                                     |
+| `u [query]`       | Interactive directory changer. If `query` is a number, it behaves like `uu`. Otherwise, it uses `fzf` to let you select a parent directory to jump to. If `fzf` is not available, it lists parent directories.                                                                                                                                |
+| `z [query]`       | Smart directory changer. If `query` is empty, it changes to the home directory. If `query` matches a directory prefix, it changes to that directory. Otherwise, it uses `zoxide` to query and change to a frequently visited directory.                                                                                                    |
+| `_histpick`       | Interactive history picker. Uses `fzf` to let you select and execute a command from your bash history. If `fzf` is not available, it just prints the history.                                                                                                                                                                              |

@@ -23,7 +23,7 @@
     color: @lavender;
     border: 0;
     padding: 0;
-    font-family: "JetBrainsMono Nerd Font", "Fira Sans Semibold", "Font Awesome 4 Free", FontAwesome, Roboto, Helvetica, Arial, sans-serif;
+    font-family: "JetBrainsMono Nerd Font", "Symbols Nerd Font Mono", "Symbols Nerd Font", "JetBrains Mono", "Fira Code", "Font Awesome 6 Free", "Font Awesome 5 Free", "Font Awesome 4 Free", FontAwesome, Roboto, Helvetica, Arial, sans-serif;
     font-size: 12px;
     margin: 0;
 }
@@ -95,6 +95,7 @@ window#waybar {
 #custom-swap,
 #custom-cava-internal,
 #battery,
+#custom-gpu,
 #cpu,
 #memory,
 #disk,
@@ -257,6 +258,10 @@ window#waybar.empty #window {
     border-radius: 0 10px 10px 0;
     margin: 8px 0;
 
+}
+
+#custom-gpu {
+    color: @grad-orange;
 }
 
 #battery.charging {

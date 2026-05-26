@@ -50,7 +50,6 @@ in
       nerd-fonts.jetbrains-mono
       noto-fonts
       noto-fonts-color-emoji
-      nerd-fonts.symbols-only
     ];
   };
 
