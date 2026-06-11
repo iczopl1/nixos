@@ -160,7 +160,7 @@
         cd "$$target" || return
       }
 
-      source ~/.bash/z_function.sh
+      # source ~/.bash/z_function.sh
 
       _histpick() {
         local selected
@@ -175,7 +175,7 @@
       }
 
       # Source FZF history search widget
-      source ~/.bash/fzf_history_widget.sh
+      # source ~/.bash/fzf_history_widget.sh
     '';
   };
 #do hyprlock niezbedne
