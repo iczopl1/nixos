@@ -1,6 +1,11 @@
 { config, pkgs, ... }:
 
 {
+  imports = [
+    ./modules/programs/TestLocal.nix
+  ];
+
+{
   # You can add your Home Manager configurations here
   home.packages = with pkgs; [
     zoxide
@@ -61,6 +66,11 @@
     };
     ".config/nvim" = {
       source = ./dotfiles/nvim;
+      recursive = true;
+      force = true;
+    };
+    ".bash" = {
+      source = ./dotfiles/bash;
       recursive = true;
       force = true;
     };
@@ -150,35 +160,7 @@
         cd "$$target" || return
       }
 
-      z() {
-        local query="$${1:-}"
-        if [[ -z "$$query" ]]; then
-          if command -v fzf >/dev/null 2>&1; then
-            local selected_dir
-            selected_dir="$(find . -mindepth 1 -maxdepth 1 -type d -print 2>/dev/null | fzf --prompt='sub-dir> ')"
-            if [[ -n "$$selected_dir" ]]; then
-              cd "$$selected_dir" || return
-              command -v zoxide >/dev/null 2>&1 && zoxide add "$$PWD" >/dev/null 2>&1 || true
-              return
-            else
-              return # No directory selected, so don't change directory.
-            fi
-          else
-            cd "$${HOME}" || return
-            return
-          fi
-        fi
-
-        local target
-        target="$(find . -mindepth 1 -type d -name "$${query}*" -print 2>/dev/null | sort | head -n 1)"
-        if [[ -n "$$target" ]]; then
-          cd "$$target" || return
-          command -v zoxide >/dev/null 2>&1 && zoxide add "$$PWD" >/dev/null 2>&1 || true
-          return
-        fi
-
-        target="$(zoxide query -- "$$@" 2>/dev/null)" && cd "$$target"
-      }
+      source ~/.bash/z_function.sh
 
       _histpick() {
         local selected
@@ -193,7 +175,7 @@
       }
 
       # Source FZF history search widget
-      source ~/.config/bash/fzf_history_widget.sh
+      source ~/.bash/fzf_history_widget.sh
     '';
   };
 #do hyprlock niezbedne
