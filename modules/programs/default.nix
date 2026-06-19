@@ -1,6 +1,10 @@
 { config, pkgs, ... }:
 
 {
+  imports = [
+    ./python.nix
+  ];
+
   environment.systemPackages = with pkgs; [
 #terminal
    alacritty
@@ -57,10 +61,6 @@
    wget
    cava
    discord
-   python311
-   python311Packages.pip
-   python311Packages.virtualenv
-   python311Packages.pinocchio
 #programer tools
    gcc
    cmake
@@ -96,8 +96,6 @@
 # Graphviz (grafy)
     graphviz
 
-# Python + matplotlib (opcjonalnie do wykresów)
-    python3Packages.matplotlib
 # ImageMagick (obróbka obrazów w LaTeX/pandoc)
     imagemagick
 #Hasełka 
@@ -107,15 +105,11 @@
   hunspellDicts.en_US
   hunspellDicts.pl_PL
 # Neovim dependencies (from dotfiles analysis)
-    python3Packages.mypy
-    python3Packages.black
     google-java-format
     stylua
     #vscode-html-languageserver
     #vscode-css-languageserver
-    #python3Packages.pyright
     java-language-server
-    python3Packages.debugpy
 # dodatkowe 
     anydesk
 #Terminal program

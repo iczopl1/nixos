@@ -4,18 +4,12 @@
   imports = [
     ./modules/programs/TestLocal.nix
   ];
-
-{
   # You can add your Home Manager configurations here
   home.packages = with pkgs; [
     zoxide
     fzf
     brave
     vscodium
-    (python311.withPackages (ps: with ps; [
-      pyqt5
-      tkinter
-    ]))
     jdk21
     #intellij-idea-community
     maven
@@ -125,6 +119,11 @@
     };
     initExtra = ''
       export FZF_DEFAULT_OPTS="--height=40% --layout=reverse --border"
+
+      if command -v pyenv >/dev/null 2>&1; then
+        export PYENV_ROOT="$HOME/.pyenv"
+        eval "$(pyenv init - bash)"
+      fi
 
       uu() {
         local count=$${1:-1}

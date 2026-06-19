@@ -104,6 +104,31 @@ These aliases and functions are defined in `home.nix` under `programs.bash.shell
 
 ## Configuration Details
 
+### Python
+
+Python is configured in `modules/programs/python.nix`.
+
+The default interpreter is `python311` with a broad engineering stack installed globally:
+`numpy`, `scipy`, `sympy`, `pandas`, `matplotlib`, `seaborn`, `plotly`, `pygame`,
+`ortools`, `casadi`, `control`, `pinocchio`, `pyqt5`, `tkinter`, `pillow`, `opencv4`,
+`scikit-image`, `pyserial`, `pyusb`, `jupyterlab`, `ipython`, `black`, `ruff`, `mypy`,
+`pyright`, `debugpy` and `pytest`.
+
+`pyenv` is also installed for projects that need a Python version different from the
+system default. Typical workflow:
+
+```bash
+pyenv install 3.12.4
+pyenv local 3.12.4
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -U pip
+```
+
+Neovim detects `.venv` or `venv` in the project root, and also respects an already
+active `VIRTUAL_ENV`. Pyright uses that interpreter, so imports installed in the
+project virtual environment are visible to completions and diagnostics.
+
 ### Hyprland Autostart Programs
 
 The following programs are configured to autostart on specific workspaces upon Hyprland login:
