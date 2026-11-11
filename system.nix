@@ -2,6 +2,9 @@
 { config, pkgs, ... }:
 
 {
+  # Kernel zen – responsywność desktopu (MASTER §3). Pochodzi z cache nixpkgs, bez kompilacji.
+  boot.kernelPackages = pkgs.linuxPackages_zen;
+
   boot.loader = {
     timeout = 10;
     grub = {
