@@ -505,7 +505,7 @@ Przed commitem zmiany ROS agent wykonuje i pokazuje użytkownikowi wyniki:
  
 ## 15. Wspierana wersja NixOS
  
-**Stan na 2026-11-10:** system jest na **NixOS 25.11**, która **od 2026-06-30 nie dostaje aktualizacji bezpieczeństwa**. Migracja jest **do zrobienia**: na 26.05 (wsparcie do 2026-12-31) albo od razu na 26.11 (spodziewana pod koniec listopada 2026) – decyzja użytkownika.
+**Stan na 2026-11-11:** system jest na **NixOS 26.05** (wsparcie do ok. 2026-12-31). Migracja na 26.11 (spodziewana pod koniec listopada 2026) jest następnym krokiem – okno migracji otwiera się po wydaniu 26.11.
  
 ### Zasada
 - System (kanał nixpkgs) jest **zawsze na wersji stabilnej, która jeszcze dostaje łatki bezpieczeństwa**.
