@@ -32,6 +32,7 @@
       "brave"
       "google-chrome"
       "discord"
+      "discord-unwrapped"   # wewnętrzna nazwa paczki (nixpkgs owija discord-unwrapped)
       "anydesk"
       "android-studio"
       "android-studio-stable"
