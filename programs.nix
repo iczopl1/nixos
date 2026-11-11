@@ -48,10 +48,10 @@
     markdownlint-cli
 
     # --- AI (full) ---
-    gemini-cli
+    antigravity-cli        # następca gemini-cli (zmiana nazwy przez Google)
 
     # --- Biuro / grafika / dokumenty ---
-    libreoffice-fresh
+    libreoffice            # libreoffice-fresh przemianowany (nixpkgs 26.05+)
     gimp
     krita
     texliveFull
