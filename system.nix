@@ -1,4 +1,4 @@
-# Ustawienia systemowe ze starej konfiguracji (modules/system/default.nix).
+# Ustawienia systemowe: boot, sieć, locale, użytkownik, bluetooth, libvirt.
 { config, pkgs, ... }:
 
 {

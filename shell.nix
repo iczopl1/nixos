@@ -1,7 +1,4 @@
-# Zamiennik home.nix bez home-managera (nixos-selected nie używa HM):
-#   - aliasy i funkcje bash -> programs.bash (dla całego systemu)
-#   - zoxide / fzf -> programs.*
-#   - dotfiles -> symlinki tworzone przez systemd-tmpfiles użytkownika iczo
+# Shell: bash aliasy/funkcje, zoxide, fzf, symlinki dotfiles (systemd-tmpfiles).
 { lib, ... }:
 
 let
@@ -65,8 +62,7 @@ in
       hist = "history";
     };
 
-    # Funkcje z home.nix. Poprawione escapowanie: w starym pliku `$$x` dawało
-    # w bashu PID procesu zamiast zmiennej, więc u/uu/_histpick nie działały.
+    # Funkcje bash.
     interactiveShellInit = ''
       export FZF_DEFAULT_OPTS="--height=40% --layout=reverse --border"
 

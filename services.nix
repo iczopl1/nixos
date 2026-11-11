@@ -1,4 +1,4 @@
-# Usługi ze starej konfiguracji (modules/services/default.nix), sesja zmieniona na Mango.
+# Usługi: greetd+Mango, PipeWire, Tailscale (tailnet A), Syncthing.
 { config, pkgs, ... }:
 
 {

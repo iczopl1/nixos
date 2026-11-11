@@ -1,5 +1,4 @@
-# Czcionki ze starej konfiguracji (hosts/*/configuration.nix + modules/programs).
-# Barlow (etykiety hintd) dodaje keyboard-mouse.nix.
+# Czcionki systemowe. Barlow (etykiety hintd) dodaje keyboard-mouse.nix.
 { pkgs, ... }:
 
 {

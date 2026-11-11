@@ -1,15 +1,9 @@
-# Wszystkie programy ze starej konfiguracji (modules/programs/default.nix,
-# home.nix, hosts/*/configuration.nix, TestLocal.nix) poza Hyprlandem.
-# Programy z nixos-selected są w swoich modułach (mango.nix, keyboard-mouse.nix,
-# ros2.nix, crafts.nix) - tu nie są powtarzane.
-#
-# Usunięte (tylko Hyprland): hyprland, hypridle, iio-hyprland,
-# xdg-desktop-portal-hyprland, home-manager wayland.windowManager.hyprland.
-# hyprlock zostaje jako blokada ekranu (osobny program, działa w Mango).
+# Programy systemowe. Mango, keyboard-mouse, ros2 i crafts mają własne moduły.
+# hyprlock zostaje jako blokada ekranu (działa w Mango).
 { config, pkgs, lib, ... }:
 
 let
-  # Biblioteki uruchomieniowe dla binarek spoza Nix (z hosts/*/configuration.nix)
+  # Biblioteki uruchomieniowe dla binarek spoza Nix
   runtimeLibs = with pkgs; [
     stdenv.cc.cc.lib
     zlib
@@ -93,7 +87,7 @@ in
     flutter
     mesa-demos            # eglinfo
 
-    # --- Programowanie (system + dawny home.nix) ---
+    # --- Programowanie ---
     gcc
     (lib.lowPrio clang)   # lowPrio: `cc` zostaje z gcc
     clang-tools
@@ -147,7 +141,7 @@ in
     # --- Gry ---
     prismlauncher
 
-    # --- Bezpieczeństwo (dawny lokalny TestLocal.nix) ---
+    # --- Bezpieczeństwo ---
     maltego
   ] ++ runtimeLibs;
 

@@ -1,7 +1,4 @@
-# Dotfiles bez home-managera (nixos-selected nie używa HM).
-# Symlinki tworzone przez systemd-tmpfiles użytkownika iczo.
-# Komendy powłoki (aliasy/funkcje bash) celowo NIE są tu przenoszone ze starej
-# konfiguracji - obowiązują tylko te z nixos-selected.
+# Dodatkowe symlinki dotfiles (systemd-tmpfiles). Aliasy i funkcje bash są w shell.nix.
 { ... }:
 
 let
