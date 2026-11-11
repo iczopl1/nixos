@@ -24,7 +24,7 @@
 
     # --- IDE / edytory ---
     vscodium
-    android-studio
+    # android-studio – usunięty: broken download (patrz BROKEN.md)
     android-tools
     flutter
     mesa-demos            # eglinfo

@@ -18,6 +18,14 @@
 ---
  
 ## Wpisy
+
+### android-studio
+- Kiedy: 2026-11-11, nixpkgs: 26.11pre
+- Profil: full
+- Objaw: `cannot download android-studio-rabbit2-linux.tar.gz from any mirror` (connection reset by peer)
+- Przyczyna: serwery Google nie udostępniają już tej wersji (2026.2.2.8 / rabbit2); nixpkgs nie nadążył z hashem
+- Status: zablokowane
+- Obejście: pobrać ręcznie z https://developer.android.com/studio i rozpakować do ~/android-studio; nie instalować przez nixpkgs do czasu aktualizacji paczki
  
 ### brave (przeglądarka)
 - Kiedy: 2026-11-11, nixpkgs: 26.05
