@@ -22,10 +22,11 @@ in
     completion.enable = true;
 
     shellAliases = {
-      # Konfiguracja klasyczna w /etc/nixos (bez flake)
-      update = "sudo nixos-rebuild switch";
-      update-test = "sudo nixos-rebuild test";
-      update-build = "nixos-rebuild build";
+      # Przebudowa systemu – agenci używają rebuild.sh (tryb boot), użytkownik może switch.
+      rebuild = "cd ~/nix_conf && ./rebuild.sh";
+      rebuild-dry = "cd ~/nix_conf && ./rebuild.sh -n";
+      update = "sudo nixos-rebuild switch";   # użytkownik: szybki switch bez commitu
+      update-boot = "sudo nixos-rebuild boot"; # użytkownik: bezpieczny boot
 
       ls = "ls --color=auto";
       ll = "ls -alF --color=auto";
