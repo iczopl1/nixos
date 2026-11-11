@@ -9,7 +9,7 @@
     ./unstable.nix        # argument `unstable` dla mango.nix i keyboard-mouse.nix
     ./mango.nix           # kompozytor Mango + portale + wpis sesji
     ./keyboard-mouse.nix  # wl-kbptr, hintd, ydotool, Signal/Ferdium z a11y
-    ./ros2.nix            # podman, distrobox, porty DDS
+    # ros2.nix – włącz w /etc/nixos/local.nix na maszynie z ROS (MASTER §14)
     ./tailnet-b.nix       # druga sieć Tailscale w namespace
     ./crafts.nix          # aplikacje Craft (budowane ze źródeł, długi pierwszy build)
     # ./clev.nix          # NIE importować: brak źródeł ./hintdrive (patrz SETUP.md)
