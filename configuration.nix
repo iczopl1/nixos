@@ -13,6 +13,7 @@
     ./tailnet-b.nix       # druga sieć Tailscale w namespace
     ./crafts.nix          # aplikacje Craft (budowane ze źródeł, długi pierwszy build)
     # ./clev.nix          # NIE importować: brak źródeł ./hintdrive (patrz SETUP.md)
+    ./security.nix        # SSH off, firewall, otwarte porty
     ./system.nix          # boot, sieć, locale, użytkownik, bluetooth, libvirt
     ./services.nix        # greetd -> mango, pipewire, tailscale (tailnet A), syncthing
     ./power.nix           # usypia tylko przycisk zasilania; klapa/bezczynność nic nie robią

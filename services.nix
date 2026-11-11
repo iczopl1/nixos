@@ -33,10 +33,10 @@
   # Tailscale = tailnet A (tailscale0). tailnet-b.nix uruchamia obok drugi demon.
   services.tailscale.enable = true;
 
-  # Syncthing - synchronizacja z telefonem i PC
+  # Syncthing - synchronizacja z telefonem i PC.
+  # Porty otwarte jawnie w security.nix (nie openDefaultPorts).
   services.syncthing = {
     enable = true;
-    openDefaultPorts = true;
     user = "iczo";
     guiAddress = "127.0.0.1:8384";
   };
