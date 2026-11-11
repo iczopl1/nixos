@@ -26,7 +26,7 @@
   # Unfree tylko dla konkretnych pakietów (MASTER §16). Lista zawiera paczki z obu profili –
   # biała lista nie szkodzi, gdy pakiet nie jest zainstalowany.
   nixpkgs.config.allowUnfreePredicate = pkg:
-    builtins.elem (builtins.parseDrvName pkg.name).name [
+    builtins.elem (lib.getName pkg) [
       "claude-code"           # MASTER §0/§16 – zasada najważniejsza
       "claude-code-bin"
       "brave"
