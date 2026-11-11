@@ -17,6 +17,7 @@
     mpc
 
     # --- Komunikacja ---
+    # brave – w brave.nix (oficjalna binarka z GitHub Releases, nixpkgs 26.05 usunął pakiet)
     google-chrome
     discord
     anydesk
@@ -45,7 +46,6 @@
     prettier
     eslint
     markdownlint-cli
-    grip
 
     # --- AI (full) ---
     gemini-cli
