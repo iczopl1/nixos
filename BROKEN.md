@@ -19,6 +19,14 @@
  
 ## Wpisy
  
+### brave (przeglądarka)
+- Kiedy: 2026-11-11, nixpkgs: 26.05
+- Profil: minimal i full
+- Objaw: `error: brave has been removed from nixpkgs, as there were no committers among its maintainers to unblock security issues`
+- Przyczyna: usunięty z nixpkgs przez brak maintainerów zdolnych do obsługi CVE
+- Status: zablokowane (nixpkgs); obejście: oficjalna binarka z Brave Releases
+- Obejście: pobrać `.tar.gz` z oficjalnych GitHub Releases, spakować przez `autoPatchelfHook` (do zrobienia). Tymczasowo: firefox w minimal, google-chrome w full.
+
 ### OpenCV dla Pythona (kompilowany ze źródeł)
 - Kiedy: przed 2026-11-10 (dokładna data i wersja nixpkgs nieznane)
 - Profil: kompilowany podczas instalacji, przed postawieniem działającego systemu

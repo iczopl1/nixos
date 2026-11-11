@@ -64,7 +64,8 @@ in
     mpv
 
     # --- Przeglądarka ---
-    brave
+    # brave – usunięty z nixpkgs 26.05 (brak maintainerów); TODO: binarka z oficjalnych Releases
+    firefox
 
     # --- Edytory ---
     neovim
