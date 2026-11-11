@@ -168,7 +168,7 @@ fi
 if [[ "$DRY" -eq 1 ]]; then
   section "Dry-build"
   echo "Podgląd co zostanie pobrane/skompilowane (bez zmian w systemie):"
-  sudo nixos-rebuild dry-build -I nixos-config="$ENTRY" 2>&1 || true
+  sudo nixos-rebuild dry-build --file "$ENTRY" 2>&1 || true
   ok "Dry-build zakończony. Bez zmian w systemie i repo."
   exit 0
 fi
@@ -191,9 +191,9 @@ fi
 
 # --- 8. Build (tryb: boot) ---
 section "Build (tryb: boot)"
-echo "Komenda: sudo nixos-rebuild boot -I nixos-config=$ENTRY"
+echo "Komenda: sudo nixos-rebuild boot --file $ENTRY"
 BUILD_OK=0
-if sudo nixos-rebuild boot -I nixos-config="$ENTRY"; then
+if sudo nixos-rebuild boot --file "$ENTRY"; then
   BUILD_OK=1
 fi
 
