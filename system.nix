@@ -43,10 +43,16 @@
   users.users.iczo = {
     isNormalUser = true;
     description = "iczo";
-    # "ydotool": wymagane przez keyboard-mouse.nix / hintd (tryb kursora)
+    # "ydotool": keyboard-mouse.nix (full); "adbusers"/"libvirtd": programs.nix (full)
+    # Grupy tworzone przez moduły full – definiujemy je jawnie, by istniały też w minimal.
     extraGroups = [ "networkmanager" "wheel" "adbusers" "libvirtd" "kvm" "ydotool" ];
     packages = [ ];
   };
+
+  # Grupy wymagane przez moduły full; definiowane tutaj by istniały też w profilu minimal.
+  users.groups.ydotool  = {};   # programs.ydotool.enable (keyboard-mouse.nix)
+  users.groups.adbusers = {};   # programs.adb.enable (programs.nix)
+  users.groups.libvirtd = {};   # virtualisation.libvirtd.enable (programs.nix)
 
   hardware.bluetooth = {
     enable = true;
