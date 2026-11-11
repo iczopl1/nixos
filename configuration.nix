@@ -26,5 +26,18 @@
   # /etc/nixos/local.nix – ustawienia per-maszyna (dysk /dane, cpuTarget, efekty) – poza repo.
   ] ++ lib.optional (builtins.pathExists /etc/nixos/local.nix) /etc/nixos/local.nix;
 
-  nixpkgs.config.allowUnfree = true;
+  # Unfree tylko dla konkretnych pakietów (MASTER §16). Nie allowUnfree = true globalnie.
+  nixpkgs.config.allowUnfreePredicate = pkg:
+    builtins.elem (builtins.parseDrvName pkg.name).name [
+      "claude-code"           # MASTER §0/§16 – zasada najważniejsza
+      "claude-code-bin"
+      "brave"
+      "google-chrome"
+      "discord"
+      "anydesk"
+      "android-studio"
+      "android-studio-stable"
+      "gemini-cli"
+      "maltego"
+    ];
 }

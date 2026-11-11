@@ -110,6 +110,9 @@ in
     grip
 
     # --- AI ---
+    # Claude Code – zasada najważniejsza (MASTER §0/§16): musi być dostępny zawsze.
+    # Gotowa binarka z nixpkgs, bez kompilacji.
+    claude-code
     gemini-cli
 
     # --- Biuro / grafika / dokumenty ---
