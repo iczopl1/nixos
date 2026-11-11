@@ -168,7 +168,7 @@ fi
 if [[ "$DRY" -eq 1 ]]; then
   section "Dry-build"
   echo "Podgląd co zostanie pobrane/skompilowane (bez zmian w systemie):"
-  sudo nixos-rebuild build --dry-run -I nixos-config="$ENTRY" 2>&1 || true
+  sudo nixos-rebuild dry-build -I nixos-config="$ENTRY" 2>&1 || true
   ok "Dry-build zakończony. Bez zmian w systemie i repo."
   exit 0
 fi
