@@ -13,15 +13,15 @@ let
     fontconfig
     freetype
     libGL
-    xorg.libX11
-    xorg.libXext
-    xorg.libXrender
-    xorg.libxcb
-    xorg.xcbutil
-    xorg.xcbutilimage
-    xorg.xcbutilkeysyms
-    xorg.xcbutilrenderutil
-    xorg.xcbutilwm
+    libx11
+    libxext
+    libxrender
+    libxcb
+    libxcb-util
+    libxcb-image
+    libxcb-keysyms
+    libxcb-render-util
+    libxcb-wm
     libxkbcommon
     wayland
   ];
@@ -37,7 +37,7 @@ in
     slurp
     wl-clipboard
     cliphist
-    swww                  # tapety
+    awww                  # tapety (swww przemianowany na awww w nixpkgs 26.05)
     mako                  # powiadomienia
     brightnessctl
     pavucontrol
