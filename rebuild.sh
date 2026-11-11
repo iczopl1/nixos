@@ -168,7 +168,7 @@ fi
 if [[ "$DRY" -eq 1 ]]; then
   section "Dry-build"
   echo "Podgląd co zostanie pobrane/skompilowane (bez zmian w systemie):"
-  sudo nixos-rebuild dry-build --file "$ENTRY" 2>&1 || true
+  sudo nixos-rebuild dry-build -I nixos-config="$ENTRY" 2>&1 || true
   ok "Dry-build zakończony. Bez zmian w systemie i repo."
   exit 0
 fi
@@ -191,10 +191,34 @@ fi
 
 # --- 8. Build (tryb: boot) ---
 section "Build (tryb: boot)"
-echo "Komenda: sudo nixos-rebuild boot --file $ENTRY"
+
+# Znajdź nixpkgs w NIX_PATH (MASTER §6 – build z folderu projektu, nie z /etc/nixos)
+NIXPKGS_PATH=$(nix-instantiate --find-file nixpkgs 2>/dev/null || true)
+if [[ -z "$NIXPKGS_PATH" ]]; then
+  err "Nie można znaleźć nixpkgs w NIX_PATH. Sprawdź: nix-channel --list"
+  exit 1
+fi
+
+BUILD_LINK="/tmp/nix-rebuild-$$"
+echo "Komenda: nix-build $NIXPKGS_PATH/nixos -I nixos-config=$ENTRY"
 BUILD_OK=0
-if sudo nixos-rebuild boot --file "$ENTRY"; then
-  BUILD_OK=1
+
+# Buduj z folderu projektu (MASTER §6)
+if sudo nix-build "$NIXPKGS_PATH/nixos" \
+    --attr config.system.build.toplevel \
+    -I nixos-config="$ENTRY" \
+    -o "$BUILD_LINK"; then
+
+  SYSTEM_PATH=$(readlink -f "$BUILD_LINK")
+  sudo rm -f "$BUILD_LINK" 2>/dev/null || true
+
+  # Zainstaluj jako nową generację i ustaw boot
+  if sudo nix-env --profile /nix/var/nix/profiles/system --set "$SYSTEM_PATH" && \
+     sudo "$SYSTEM_PATH/bin/switch-to-configuration" boot; then
+    BUILD_OK=1
+  else
+    err "switch-to-configuration boot nie powiodło się"
+  fi
 fi
 
 # Wyłącz trap turbo przed normalnym zakończeniem (trap EXIT wykona się sam)
