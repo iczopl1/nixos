@@ -1,104 +1,139 @@
-PRZYSTOSOWAĆ REPO DO ZASAD MASTER
+# TODO – lista zadań
 
+> Format: `[ ]` do zrobienia · `[~]` w trakcie · `[x]` zrobione · `[-]` pominięte
+> Jeden podpunkt = jeden commit. Kolejność zatwierdza użytkownik (MASTER §17).
+> Gdzie skończyliśmy: patrz sekcja na dole.
 
-Dodać skrót do helpa np super + h i tam jest cała dokumentacja klawiszologi dodatkowo coś podobnego dodać do nvim 
+---
 
+## P0 – Krytyczne / bezpieczeństwo
 
-skrypt ustawiń skrypt do szybkiej zmiany ustawień w terminalu polecenie setn które uruchamia program który pozwala na szybką zmiane wizualnych ustawień typu wielkość cionki kolorki w terminalu
-do tego ten skrypt ma mieć liste programów w fajnej kolejności które trzeba postinstall ustawiać czyli ustaw syntching, połącz tailscale,dodaj klusz ssh git, i inne programy które wymagają wiecej konfiguracji w tej konfiguracji najlepiej jakby miało link do programu i strony która mówi jak to ustawić
+- [x] **T0.1** security.nix – SSH off, firewall jawny, syncthing explicit ports
+- [x] **T0.2** allowUnfreePredicate zamiast allowUnfree = true
+- [x] **T0.3** hardware-configuration.nix – swap + /boot/efi opcje; /dane → local.nix (ntfs3, nofail, uid/gid)
 
-dysk sda5 jest ntfs i jest wspólnym magazynem na dane dla windows i linux na dual boot oraz dlatego że dość często wywalam system i mam na nim dane by ich nie utracić 
-sprawdz czy istnieje lepszy sposób na montowanie go i by w terminalu foldere z tego dysku nie miały zielonej obramówki która utrudnia odczytanie i sugeruje że dane są tylko do odczytu
-Dodać auto montowanie dysków po wykryciu dyski które są włożone automatycznie montują się w /mnt/{nazwa partycji} jest komunikat po montowaniu sukces bądz faill
+---
 
-przeniesienie konfiguracji do /etc/nixos/ 
+## P1 – Ważne / blokujące inne
 
-ustawienia nvim ma pokazywać do 5 lini od kórsoraz zależnie od pozycji czyli 5 ,4 ,3 ,2 ,1 ,{numer lini} ,1 ,2 ,3 ,4 ,5 oraz główny nr lini w innych pozycjach 
+- [x] **T1.1** kernel zen w system.nix
+- [x] **T1.2** Claude Code w programs.nix (MASTER §0 – zasada najważniejsza)
+- [x] **T1.3** ros2.nix przeniesiony do local.nix per-maszyna (nie zawsze importowany)
+- [x] **T1.4** rebuild.sh + make-zip.sh + .gitignore
+- [x] **T1.5** Podział na profil minimal i full (`configuration_minimal.nix` + `configuration.nix`)
+        – minimal: boot, sieć, GUI, nvim, przeglądarka, KeePass, Claude Code, terminal, git
+        – full: wszystko z minimal + crafts, python ciężki, android-studio, maltego, ros2 (via local)
+        – python.nix: ciężkie biblioteki tylko do full (numpy/scipy zostają, casadi do sprawdzenia)
+- [ ] **T1.6** auto.sh – instalator na nową maszynę (MASTER §2)
+        – wykrywa nową maszynę po UUID /
+        – pyta minimal/full, pokazuje GB do pobrania
+        – najpierw stawia minimal, potem full w tle
 
-nvim upewnić się że wszystko działa w konfiguracji oraz jeżeli programuje z venv w głównym folderze otwartym to wspomagacze do pisania kodu mają bibloteki z venv załadowane (pisze venv ale nie musi być to w taki folderze np dla python może to być .v .venv venv v dla innych jezyków mogą być to inne foldery które przyjeły się jako standardowe)
+---
 
-dodać do nvim samouczek skrótów dostępnych 
+## P2 – Usprawnienia użytkowe
 
-dodać skróty na otwarcie/zamknięcie buffora na tab na wychodzenie z terminala lepsze tak by jedną kombinacją wychodzić albo by terminal nie blokował skrótów przejścia do innego bufora taba 
+### System / środowisko
+- [ ] **T2.1** Auto-montowanie USB/dysków po podłączeniu → `udiskie` lub reguły udev
+        – montuje w /mnt/{etykieta}, powiadomienie sukces/fail przez mako
+- [ ] **T2.2** Narzędzia diagnostyki dysków: `smartmontools`, `nvme-cli`, `hdparm`, `gsmartcontrol` (GUI)
+- [ ] **T2.3** Narzędzia sieciowe: `nmap`, `wireshark`, `iperf3`, `mtr`, `dig`/`drill`, `tcpdump`,
+        `bandwhich`, `nethogs`, `speedtest-cli`, `dnstop` – do programowania sieci i diagnozy
+- [ ] **T2.4** Drukarka HP LaserJet M175n – `hplip`, `cups`, auto-wykrycie przewodowej
+- [ ] **T2.5** Skrót wyłączenia ekranu (`dpms off`) + blokada klawiatury (do czyszczenia)
+        – bind w Mango, odblokowanie tym samym klawiszem
+- [ ] **T2.6** KeePassXC zawsze na workspace 9 – reguła okna w Mango + autostart
+- [ ] **T2.7** Super+Tab – window switcher z wszystkich workspaces (h/j/k/l + enter)
+        – `rofi -show window` lub dedykowany skrypt QML w Quickshell
+- [ ] **T2.8** Status Syncthing w barze – przez 1 min: liczba połączeń; potem: stan synchronizacji
+        – skrypt polling SyncthingAPI (port 8384 lokalny), widget w Quickshell
 
+### Brave
+- [ ] **T2.9** Brave – paczka ustawień przez `programs.brave` lub managed policies:
+        – wyłącz AI (Leo), wyłącz Google jako domyślna wyszukiwarka
+        – wyłącz autouzupełnianie bez Tab (Enter = szukaj, Tab = uzupełnij)
+        – wyłącz proponowanie zapisania hasła
+        – wyłącz telemetrię / opcjonalne dane
+        – PgUp/PgDown 0.5× standardowego kroku
+- [ ] **T2.10** Brave – zakładki (bookmarks policy):
+        – folder AI: ChatGPT, Gemini, Le Chat, Claude, Perplexity
+        – folder Google: Drive, Gmail, Mega.nz
+        – folder Local: lokalne usługi z tej konfiguracji (Syncthing :8384, itp.)
 
-synchronizacja schowka tak by y i p działało z linuxem bez specialnej kombinacji oraz by działało w nvim super + v które wkleja z histori 
+### nvim
+- [ ] **T2.11** nvim – relative line numbers: `5,4,3,2,1,{nr},1,2,3,4,5`
+        – `set number relativenumber` w init.lua
+- [ ] **T2.12** nvim – auto-detect venv / środowiska per język:
+        – Python: .venv, venv, .v, v → pyright/pylsp czyta biblioteki stamtąd
+        – Node: node_modules lokalne
+        – Rust: Cargo.toml → rust-analyzer
+- [ ] **T2.13** nvim – auto-format po zapisaniu (conform.nvim lub LSP format on save)
+        – Python: black/ruff, Lua: stylua, C/C++: clang-format, Nix: nixfmt, JS: prettier
+- [ ] **T2.14** nvim – synchronizacja schowka: `y`/`p` ↔ schowek systemowy bez kombinacji
+        – `set clipboard=unnamedplus`; Super+V → historia schowka przez cliphist + rofi
+- [ ] **T2.15** nvim – skrót zmiany rozmiaru czcionki (jak w terminalu)
+- [ ] **T2.16** nvim – pełna obsługa LaTeX (vimtex) + skrót `tex` w terminalu:
+        – kompilacja z minted (shell-escape, latexmk), czyszczenie plików pomocniczych
+        – podgląd PDF w zathurze (już zainstalowany)
+- [ ] **T2.17** nvim – skróty buffer/tab/terminal:
+        – otwórz/zamknij bufor, przejście między tabami bez blokady przez terminal
+        – wyjście z terminala jedną kombinacją
+- [ ] **T2.18** nvim – layout startowy:
+        – tab 0: pliki projektu (neo-tree/oil)
+        – tab 1: terminal + terminal z claude
+        – tab 2: lazygit lub fugitive (obsługa git)
+- [ ] **T2.19** nvim – skróty build/debug per język:
+        – make build/debug, DAP dla Python/Java/Rust/Go/Lua/C++
+- [ ] **T2.20** Zmiana rozmiaru czcionki w terminalu skrótem (Ctrl+= / Ctrl+-)
+        – Alacritty/Kitty/Foot obsługują natywnie, sprawdzić który jest domyślny
 
-dodać skrót na zwiekszenie / zminiejszenie cionki w terminalu i w nvim to samo !!
+### Inne
+- [ ] **T2.21** `agent.md` – komenda w terminalu zwracająca info dla AI agentów:
+        – zainstalowane narzędzia, wersje, konfiguracja Python/LaTeX/nvim
+- [ ] **T2.22** Mega.nz manager – `megatools` lub `megacmd` w programs.nix
+- [ ] **T2.23** JDownloader 2 – autostart, szybkie toggle zbierania linków, obsługa torrentów
+        – sprawdzić czy jest gotowa binarka NixOS (AUR-style)
 
-w nvim po zapisaniu ma auto formatować kod
+---
 
-obsługa prawie wszystkich popularnych formatów plików i programów kodów w nvim
+## P3 – Na kiedyś / niski priorytet
 
-obsługa pełna texlive i skróty typu tex który kompiluje znaleziony plik .tex do pdf bez śmiecenia 
-usuwa pliki pomocnicze do generowania korzystam z minted wiec odpowiednie flagi mają być do kompilacji 
+- [ ] **T3.1** Skrót Super+H – overlay z dokumentacją skrótów klawiszowych (Quickshell QML)
+- [ ] **T3.2** `setn` – interaktywny skrypt post-install: Syncthing, Tailscale, SSH key, itp.
+- [ ] **T3.3** nvim – tutorial/cheatsheet skrótów (which-key lub własny overlay)
+- [ ] **T3.4** nvim – obsługa wszystkich popularnych języków (treesitter + LSP)
+- [ ] **T3.5** nvim – animacja pisania (kolor okna ↑ przy szybszym pisaniu, 1–90 wpm)
+- [ ] **T3.6** AltGr+Ctrl jako drugi Super (xkb remap)
+- [ ] **T3.7** Status telefonu GrapheneOS (Tailscale + BT headset switch PC↔telefon)
+- [ ] **T3.8** Brave – auto-instalacja rozszerzenia KeePassXC
+- [ ] **T3.9** Kalendarz + plan zajęć PRz (A3S, A3S-L3) z synchronizacją z telefonem
+        – scraper `https://pei.prz.edu.pl/as/Zima2026_groups_days_horizontal.html`
+- [ ] **T3.10** Środowiska embedded: STM32, ESP32, nRF, Arduino (platformio, arm-none-eabi, openocd)
+- [ ] **T3.11** Ograniczanie prędkości internetu per-aplikacja (tc/wondershaper/sqm)
+- [ ] **T3.12** Profil efektów graficznych: minimal/medium/full przełączany w locie
+        – X250 domyślnie minimal, PC z RTX domyślnie full
 
-dodać wiekszość narzędzi do sprawdzania sieci do benchmark wszystkiego co się da dns dhcp nmap skanowania sieci podatności analizy ruchu tak bym mógł stwierdzić dlaczego pobiera mi z prędkością 150kb/s i wiedział czego to wina 
+---
 
+## [-] Pominięte
 
-program do łatwego ograniczania prędkości internetu absolutnej i relatywnej np 150 KB dla discord i 0.8 / 80% dla brave całego dostępnego do tego coś typu piorytet dostępu 
+- [-] **CpDev / TwinCAD 3 / CodeSys 3** – Wine + zawasowane sterowniki na X250 to zabójcze. Brak sensu.
 
+---
 
-programy do sprawdzania stunu dysku /dysków ssd hdd sd 
+## Gdzie skończyliśmy (2026-11-11)
 
-środowiska do programowania stm esp nrf arduino i innych kontrolerów 
+**Zrobione w tej sesji:**
+- T0.1–T0.3, T1.1–T1.5 – MASTER compliance (security, kernel zen, Claude Code, dyski, skrypty, podział minimal/full)
+- ros2.nix → local.nix
+- configuration_minimal.nix + programs_minimal.nix (commit a6cd5c9)
+- keyboard-mouse.nix, tailnet-b.nix → tylko full (kompilują lokalnie)
 
+**Następne w kolejce:**
+- T1.6 – auto.sh instalator (czeka na zatwierdzenie przez użytkownika)
+- T2.1 i dalej według priorytetów
 
-w nvim odpowiedni skrót klawiszowy do odpalania make build/ make debug i wywołanie debaggera wraz z przykładem 
-dodaj do tego pythona  jave rust go lua 
-
-w nvim dodaj na auto start tab 0 w którym mam pliki projektu otwarte dane pracuje tab 1 w którym jest terminal oraz termianl z claude oraz w tab 3 obsługa git nie wiem jakiś program plugin do łatwego zarządzania github 
-
-dodaj animacje pisania np podczas pisania okienko aktualnie wybrane reaguje zmienia delikatnie kolorek do odwrotnego kolorku z motywu do tego im szybciej piszesz tym bardziej zmienia kolor pełna zmiana przy około 90 wpm efekty delikatny od 1 wpm 
-
-spróbuj dodać jakieś wsparcie do programów z win interesuje mnie cpdev twincad 3 codesys 3 jak nie opłaca się działać pomiń bo jesteś na x250 i wirtualizacja zawasowane sterowniki z tych programów to zabujczy element 
-
-skruty klawiszowy na wyłączenie ekranu , i zablokowanie klawiatury dopuki go nie odklikne często czyszcze środkiem i nie chce by coś zostało wciśnięte przełączone 
-
-
-status z syntching w barze dodaj mi stan syntching np przez 1 min ilość połączeń przez następne 1 min stan synchronizacji 
-
-w brave zmniejsz krok przewijania w pgup pgdown bo nie mam scrrol i z tego korzystam ale za dużo scroluje na raz na razie ustaw 0.5 tego co jest bez żadnych ustawień 
-
-spróbuj dać drugi klawisz super np altGR+Ctrl też ma działać jak super wykorzystał bym to w niektórych skrutach by szybciej pisać dwoma rekami
-
-Dodanie statusu telefonu mam grafeneOS i chce mieć status telefonu planuje połączenie poprzez tailscale i na stałym adresie ip byłby telefon i teraz na telefonie jakieś wysyłanie danych aplikacja gotowa do połączenia 
-chce móc szybko przełączyć słuchawki bt z telefonu na pc i w drugą stronę oba urządzenia mają bt włączone i skonfigurowane połączenie i w trakcie przełączenia urządzenie dostaje komunikat by się rozłączyło a wtedy słuchawiki z automatu połączyły by się  z drugim urządzeniem robiąc przełączenie 
-
-
-jdownloader dodaj na auto start oraz dodaj możliwość szybkiego przełączenia zbierania linków w tym progranie dodaj tagże obsługę torentów 
-auto instalowanie dodatków do brave na pewno od  keepass najlepiej w osobnym pliku
-
-aplikacja kalendarza i auto uzupełnianie co godzine do tego synchronizacja z telefonem 
-mam na stronie  https://pei.prz.edu.pl/as/Zima2026_groups_days_horizontal.html moja grupa to A3S i A3S-L3  na ten rok w skrypcie konfiguracji dodaj szybką opcje wyłączenia zmiany grupy 
-
-wsparcie z sterownikami hp laserjet M175n drukarka przewodowa 
-
-w brave wyłącz proponowanie zapisania chasła 
-
-dodaj zakładki do brave automatycznie w folderze local w którym są wszystkie strony lokalne z tej konfiguracji 
-w brave domyślna strona główna powinła proponować ostatnio odwiedzane strony poniżej pasek wyszukiwania i statyczna grafika niezmieniająca się na samym dole mogą być staty 
-tak jak jest teraz ujdzie 
-Wyłącz AI w brave ile się da wyszukiwanie w google też wyłącz ale za to dodaj bookmarki w folderze AI do stron z chatami z gpt, gemini,lechat claude i innymi które mają darmowy dostęp 
-dodaj też folder google gdzie mam skruty do doogle drive do poczty oraz mam link do mega.nz.
-W brave wyłącz autouzupełnianie bez tab bo jak piszę i proponije mi link to po pisaniu i wciśnięciu enter zamiast szukać otwiera link a że mam podobne linki do żeczy które szukam albo chce wejść na strone domyślną np olx.pl ale przekierowóje mnie od razu do jakiegoś uzupełnienia get i wyszukiwania chce bym musiał wcisnąć tab by uzupełniało linki
-Włącz tryb jak najmniejszej telemetri w przeglondarce tak by mnie tyle nie śledzili nie wysyłaj danych opcionalnych i tak dalej w brave  ale nie wpływaj na sesie by mnie nie wylogowywało po uruchomieniu ponownie 
-
-
-Dodaj mega nz menager do nixos
-
-keepassXC ma zawsze być odpalony na 9 workspace nawet jak go zamkne to ma zostać automatycznie uruchomiony i przeniesiony na workspace 9
-
-chce mieć możliwość super + tab i zmiane okienka np jestem na workspace 3 klikam super tab odpala się menu takie jak w windows gdzie mam programy z wszystkich workspace i mogę wybierać klawiszami h j k l oraz potwierdzić wybór enter wtedy przechodzi mi na workspace na którym jest aplikacja oraz pełen ekran na nią 
-
-dodaj polecenie w teminalu agent.md który zwraca ustawienia dostępne programy i przydatne informacje dla agenta AI który pracuje nad projektem np w python i ma za zadanie wygenerować sprawozdanie z wykonanego programu i by ten agent po poproszeniu o wykonanie tej komendy dostał informacje o tym jak ustawione jest textlive oraz python jakie narzędzia w terminalu ma dostępne
-
-
-dodać ./autoinstall.sh skrypt który autogeneruje ustawienia hardware-configuration a potem instaluje wszystkie te ustawienia  za pierwszym razem  tak by nowa maszyna szybciej była wdrożona !! uwaga musiałem włączyć wiele ustawień typu experymentalne żródła impure za dużo plików i zwiększyłem limit i spędziłem pół dnia na ustawieniach 
-
-python usunąć komplentnie bibloteki które się długo kompilują i mają czesto problemy z kompilacją globalną typu opencv tak by uniknąć błędów kompilacji zależności od pythona do tego upewnić się że inne pakiety nie robią takich problemów że po 30 min kompilacji error na x% i instalacja systemu zablokowana a ja nadal tkwie na niepełnym systemie bez grub i tak dalej najwyżej dodaj w tym skrypcie wybór czy ładować całą konfiguracje czy mniejszą tak by system był urzywalny po pierwszej instalacji a potem jak sytem wstanie można było dokończyć pełną instalacje 
-
-
-przygotuj kilka dotowych ustawień do wyboru typu minimal , medum ,full gdzie włączasz/ wyłączasz efekty wizualne animacje tak że jak mam dwa urządzenia thinkpax x250 który nie jest silny i mam pc serwerowy z rtx to mógł szybko przełączać efekty najlepiej w programie od ustawień
-
-
+**Uwagi:**
+- Zalecany rebuild przed restartem: `! ./rebuild.sh "T1.5: weryfikacja"` (lub dry-build).
+- rebuild.sh musi czytać /etc/nixos/PROFILE – sprawdzić czy plik istnieje (domyślnie full).
+- T2.9 (Brave policies) – wymaga sprawdzenia czy NixOS ma `programs.chromium`/managed policies.
