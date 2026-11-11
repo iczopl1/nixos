@@ -69,8 +69,7 @@
     XDG_DATA_DIRS = [ "/run/current-system/sw/share" ];
   };
 
-  # android-studio / emulatory
-  programs.adb.enable = true;
+  # android-studio / emulatory (programs.adb usunięte w 26.05 – systemd 258 przejął uaccess)
   virtualisation.libvirtd.enable = true;
   programs.dconf.enable = true;
 

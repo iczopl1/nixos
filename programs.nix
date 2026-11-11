@@ -73,9 +73,6 @@
   # OpenTabletDriver (graficzny tablet)
   hardware.opentabletdriver.enable = true;
 
-  # Android / ADB
-  programs.adb.enable = true;
-
   # Wirtualizacja (libvirt/QEMU)
   virtualisation.libvirtd.enable = true;
 
