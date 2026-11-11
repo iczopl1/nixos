@@ -20,7 +20,7 @@
     # brave – w brave.nix (oficjalna binarka z GitHub Releases, nixpkgs 26.05 usunął pakiet)
     google-chrome
     discord
-    anydesk
+    # anydesk – usunięty: brak kompatybilnych bibliotek GUI dla Mango
 
     # --- IDE / edytory ---
     vscodium
