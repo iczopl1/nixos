@@ -37,6 +37,7 @@
       "android-studio"
       "android-studio-stable"
       "gemini-cli"
+      "antigravity-cli"     # następca gemini-cli
       "maltego"
       "signal-desktop"        # keyboard-mouse.nix (full)
     ];
