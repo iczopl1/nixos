@@ -124,3 +124,18 @@ map("n", "<leader>xs", "<cmd>Trouble symbols toggle<CR>",                  { des
 map("n", "<leader>ft", "<cmd>TodoTelescope<CR>", { desc = "TODO: lista (Telescope)" })
 map("n", "]t", function() require("todo-comments").jump_next() end, { desc = "Następny TODO" })
 map("n", "[t", function() require("todo-comments").jump_prev() end, { desc = "Poprzedni TODO" })
+
+---------------------------------------------------------------------------
+-- Oil (edytor plików)
+---------------------------------------------------------------------------
+map("n", "-", "<cmd>Oil<CR>", { desc = "Oil: otwórz katalog bieżący" })
+
+---------------------------------------------------------------------------
+-- Lazygit
+---------------------------------------------------------------------------
+map("n", "<leader>gg", "<cmd>LazyGit<CR>", { desc = "LazyGit" })
+
+---------------------------------------------------------------------------
+-- Git blame
+---------------------------------------------------------------------------
+map("n", "<leader>gB", "<cmd>GitBlameToggle<CR>", { desc = "Git blame: toggle" })

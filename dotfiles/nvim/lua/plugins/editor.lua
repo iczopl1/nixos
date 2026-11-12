@@ -54,6 +54,51 @@ return {
     },
   },
 
+  -- Oil: edytor plików jak bufor tekstu (zmień nazwę/przesuń/usuń przez edycję linii, – otwiera bieżący katalog)
+  {
+    "stevearc/oil.nvim",
+    lazy = false,
+    opts = {
+      default_file_explorer = false, -- NvimTree pozostaje jako główny (Ctrl+n)
+      view_options = { show_hidden = true },
+      keymaps = {
+        ["<CR>"] = "actions.select",
+        ["<BS>"]  = "actions.parent",
+        ["-"]     = "actions.parent",
+        ["_"]     = "actions.open_cwd",
+        ["q"]     = "actions.close",
+        ["gs"]    = "actions.change_sort",
+        ["g?"]    = "actions.show_help",
+      },
+    },
+  },
+
+  -- Lazygit: lazygit w pływającym oknie nvim (<leader>gg)
+  {
+    "kdheepak/lazygit.nvim",
+    cmd = "LazyGit",
+    dependencies = { "nvim-lua/plenary.nvim" },
+  },
+
+  -- Git blame: inline blame (kto/kiedy napisał linię) – <leader>gB toggle
+  {
+    "f-person/git-blame.nvim",
+    event = { "BufReadPre", "BufNewFile" },
+    opts = {
+      enabled = false, -- domyślnie wyłączony, toggle przez <leader>gB
+      display_virtual_text = true,
+      date_format = "%Y-%m-%d %H:%M",
+    },
+  },
+
+  -- Mini.splitjoin: gS/gJ split/join argumentów funkcji (bez konfiguracji)
+  {
+    "echasnovski/mini.splitjoin",
+    version = false,
+    event = "VeryLazy",
+    opts = {},
+  },
+
   -- Drzewo plików
   {
     "nvim-tree/nvim-tree.lua",
