@@ -48,7 +48,7 @@
     markdownlint-cli
 
     # --- AI (full) ---
-    antigravity-cli        # następca gemini-cli (zmiana nazwy przez Google)
+    # antigravity-cli – tylko w nixos-unstable (nie w nixpkgs 26.05); użyj nix-shell -p antigravity-cli
 
     # --- Biuro / grafika / dokumenty ---
     libreoffice            # libreoffice-fresh przemianowany (nixpkgs 26.05+)
