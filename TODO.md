@@ -91,19 +91,18 @@
 ## P3 – Na kiedyś / niski priorytet
 
 - [ ] **T3.1** Skrót Super+H – overlay z dokumentacją skrótów klawiszowych (Quickshell QML)
-- [ ] **T3.2** `setn` – interaktywny skrypt post-install: Syncthing, Tailscale, SSH key, itp.
+- [x] **T3.2** `setn.sh` – post-install: Tailscale, SSH key, Syncthing, KeePassXC, profil NixOS
 - [ ] **T3.3** nvim – tutorial/cheatsheet skrótów (which-key lub własny overlay)
 - [ ] **T3.4** nvim – obsługa wszystkich popularnych języków (treesitter + LSP)
 - [ ] **T3.5** nvim – animacja pisania (kolor okna ↑ przy szybszym pisaniu, 1–90 wpm)
 - [ ] **T3.6** AltGr+Ctrl jako drugi Super (xkb remap)
 - [ ] **T3.7** Status telefonu GrapheneOS (Tailscale + BT headset switch PC↔telefon)
-- [ ] **T3.8** Brave – auto-instalacja rozszerzenia KeePassXC
+- [x] **T3.8** Brave – KeePassXC extension auto-install (ExtensionInstallForcelist w brave.nix)
 - [ ] **T3.9** Kalendarz + plan zajęć PRz (A3S, A3S-L3) z synchronizacją z telefonem
         – scraper `https://pei.prz.edu.pl/as/Zima2026_groups_days_horizontal.html`
-- [ ] **T3.10** Środowiska embedded: STM32, ESP32, nRF, Arduino (platformio, arm-none-eabi, openocd)
+- [x] **T3.10** Embedded: platformio (ESP32), esptool dodane; STM32/nRF/arm-none-eabi/openocd już były
 - [ ] **T3.11** Ograniczanie prędkości internetu per-aplikacja (tc/wondershaper/sqm)
-- [ ] **T3.12** Profil efektów graficznych: minimal/medium/full przełączany w locie
-        – X250 domyślnie minimal, PC z RTX domyślnie full
+- [x] **T3.12** Efekty graficzne: toggle-effects.sh (blur/animacje), bind=SUPER+F8, alias `effects`
 
 ---
 
@@ -126,9 +125,9 @@
 - T2.6: keepassxc autostart + window_rule tag 9 w mango
 
 **Następne w kolejce:**
-- T2.8: Syncthing status w barze (QML w shell.qml)
-- T3.x: zadania niskiego priorytetu
-- Uwaga: dotfiles/nvim (config bez NvChad) NIE jest aktywny – ~/.config/nvim to stary katalog.
+- T3.1: Super+H overlay skrótów (Quickshell QML)
+- T3.4: nvim – LSP dla wszystkich popularnych języków
+- Uwaga: dotfiles/nvim NIE jest aktywny – stary ~/.config/nvim (NvChad).
   Aby aktywować: `rm -rf ~/.config/nvim && systemd-tmpfiles --create --user`
 
 **Uwagi:**

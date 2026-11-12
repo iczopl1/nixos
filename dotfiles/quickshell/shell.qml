@@ -251,7 +251,7 @@ ShellRoot {
 
                 Item { width: 12 }
 
-                // ===== Bateria =====
+                // ===== Bateria (BAT0 + BAT1) =====
                 Text {
                     id: batLabel
                     Layout.alignment: Qt.AlignVCenter
@@ -259,50 +259,65 @@ ShellRoot {
                     font.pixelSize: 12
                     font.family: "JetBrains Mono"
                     text: "bat --"
-                    visible: false          // ukryty dopóki nie dostaniemy danych
-
-                    property int pct: -1
-                    property bool charging: false
+                    visible: false
 
                     Process {
-                        id: batCapProc
-                        command: ["cat", "/sys/class/power_supply/BAT0/capacity"]
+                        id: batProc
+                        command: ["/bin/sh", "-c", "~/.config/scripts/bat-status.sh"]
                         running: false
                         stdout: SplitParser {
                             onRead: line => {
-                                const v = parseInt(line.trim())
-                                if (isNaN(v)) return
-                                batLabel.pct     = v
+                                const parts = line.trim().split(" ")
+                                const pct = parseInt(parts[0])
+                                if (isNaN(pct) || pct < 0) return
                                 batLabel.visible = true
-                                batLabel.updateText()
+                                batLabel.text    = "bat " + pct + "%"
+                                batLabel.color   = pct <= 15 ? "#f7768e"
+                                                 : pct <= 30 ? "#e0af68"
+                                                 : "#a9b1d6"
                             }
                         }
-                    }
-
-                    Process {
-                        id: batStatProc
-                        command: ["cat", "/sys/class/power_supply/BAT0/status"]
-                        running: false
-                        stdout: SplitParser {
-                            onRead: line => {
-                                batLabel.charging = (line.trim() === "Charging" || line.trim() === "Full")
-                                batLabel.updateText()
-                            }
-                        }
-                    }
-
-                    function updateText() {
-                        if (pct < 0) return
-                        const prefix = charging ? "^bat" : "bat"
-                        text  = prefix + " " + pct + "%"
-                        color = pct <= 15 ? "#f7768e"
-                              : pct <= 30 ? "#e0af68"
-                              : "#a9b1d6"
                     }
 
                     Timer {
                         interval: 30000; running: true; repeat: true; triggeredOnStart: true
-                        onTriggered: { batCapProc.running = true; batStatProc.running = true }
+                        onTriggered: batProc.running = true
+                    }
+                }
+
+                Item { width: 12 }
+
+                // ===== Syncthing (T2.8) =====
+                Text {
+                    id: syncLabel
+                    Layout.alignment: Qt.AlignVCenter
+                    color: "#a9b1d6"
+                    font.pixelSize: 12
+                    font.family: "JetBrains Mono"
+                    text: ""
+                    visible: false      // ukryty gdy Syncthing nie działa
+
+                    Process {
+                        id: syncProc
+                        command: ["/bin/sh", "-c", "~/.config/scripts/syncthing-status.sh"]
+                        running: false
+                        stdout: SplitParser {
+                            onRead: line => {
+                                const s = line.trim()
+                                if (!s) return
+                                syncLabel.text    = s
+                                syncLabel.visible = (s !== "sync off" && s !== "sync ?")
+                                syncLabel.color   = s.includes("OK")  ? "#9ece6a"
+                                                  : s.includes("off") ? "#565f89"
+                                                  : s.includes("%")   ? "#e0af68"
+                                                  : "#a9b1d6"
+                            }
+                        }
+                    }
+
+                    Timer {
+                        interval: 30000; running: true; repeat: true; triggeredOnStart: true
+                        onTriggered: syncProc.running = true
                     }
                 }
 

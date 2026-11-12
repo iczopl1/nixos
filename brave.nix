@@ -134,6 +134,12 @@ in
     # --- Brave Rewards wyłączone ---
     BraveRewardsEnabled = false;
 
+    # --- T3.8: Rozszerzenia wymuszone (KeePassXC) ---
+    # ID: pdffhmdngcdnblkagkiocabomlahoihh = KeePassXC-Browser (Chrome Web Store)
+    ExtensionInstallForcelist = [
+      "pdffhmdngcdnblkagkiocabomlahoihh;https://clients2.google.com/service/update2/crx"
+    ];
+
     # --- T2.10: Zakładki zarządzane ---
     ManagedBookmarks = [
       { name = "AI"; children = [

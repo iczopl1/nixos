@@ -78,13 +78,15 @@
     # --- Gry ---
     prismlauncher
 
-    # --- Embedded / mikrokontrolery ---
+    # --- Embedded / mikrokontrolery (T3.10) ---
     arduino-ide           # IDE 2.x – Nice Nano (nRF52840) przez UF2/DFU
     gcc-arm-embedded      # arm-none-eabi toolchain (STM32, nRF52, Cortex-M)
     openocd               # On-Chip Debugger – flash/debug STM32 przez ST-Link
     stlink                # ST-Link narzędzia CLI (st-flash, st-info, st-util)
     dfu-util              # DFU – bootloader Nice Nano (nRF52840)
     stm32flash            # flash STM32 przez UART (alternatywa dla ST-Link)
+    platformio            # PlatformIO CLI – ESP32, AVR, STM32, nRF (framework+upload)
+    esptool               # esptool.py – flash ESP32/ESP8266 przez UART
   ];
 
   # Wireshark – setuid wrapper dla dumpcap (przechwytywanie bez root) + udev (T2.3)
