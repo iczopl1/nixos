@@ -124,12 +124,25 @@
 - T2.5: wlopm + bind SUPER+F9 w mango
 - T2.6: keepassxc autostart + window_rule tag 9 w mango
 
+**Zrobione (kontynuacja tej sesji):**
+- T2.4: hplip + CUPS + Avahi (services.nix)
+- T2.7: Super+Tab rofi window switcher w mango
+- T2.8: syncthing-status.sh + widget w shell.qml
+- T2.9/T2.10: Brave managed policies + zakładki (brave.nix)
+- T2.11–T2.19: nvim (relativenumber, venv, format, clipboard, LaTeX, skróty, layout, DAP)
+- T2.20–T2.22: czcionka terminala, agent.sh, megatools
+- T2.25: Bar prawa strona CPU%/RAM%/vol/bat/sieć (bat-status.sh + shell.qml)
+- T3.2: setn.sh post-install
+- T3.8: KeePassXC extension w Brave (ExtensionInstallForcelist)
+- T3.10: platformio, esptool, arduino-ide, gcc-arm-embedded, openocd, stlink
+- T3.12: toggle-effects.sh + bind SUPER+F8
+- nvim: NvChad usunięty, nowa konfiguracja aktywna (dotfiles/nvim), lazy-lock.json wypełniony
+
 **Następne w kolejce:**
-- T3.1: Super+H overlay skrótów (Quickshell QML)
-- T3.4: nvim – LSP dla wszystkich popularnych języków
-- Uwaga: dotfiles/nvim NIE jest aktywny – stary ~/.config/nvim (NvChad).
-  Aby aktywować: `rm -rf ~/.config/nvim && systemd-tmpfiles --create --user`
+- T3.1: Super+H overlay z dokumentacją skrótów (Quickshell QML)
+- T3.4: nvim – LSP dla wszystkich popularnych języków (uzupełnienie)
+- T2.23: JDownloader 2 (brak w nixpkgs, ręczna instalacja lub własna derywacja)
 
 **Uwagi:**
-- T2.9 (Brave policies) – wymaga sprawdzenia czy NixOS ma `programs.chromium`/managed policies.
-- Zmiany T2.1–T2.6 są w working tree; uruchom `! ./auto.sh` żeby zbudować i commitować.
+- NvChad backup: ~/.config/nvim.nvchad-backup-20261112, ~/.local/share/nvim.nvchad-backup-20261112
+- lazy-lock.json z realnymi commitami po Lazy! restore; nvim startuje bez warningów/błędów
