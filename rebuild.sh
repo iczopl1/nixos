@@ -192,10 +192,17 @@ fi
 # --- 8. Build (tryb: boot) ---
 section "Build (tryb: boot)"
 
-# Znajdź nixpkgs w NIX_PATH (MASTER §6 – build z folderu projektu, nie z /etc/nixos)
-NIXPKGS_PATH=$(nix-instantiate --find-file nixpkgs 2>/dev/null || true)
+# Znajdź nixpkgs z kanałów root'a (sudo) – kanały użytkownika mogą wskazywać na unstable
+# Kolejność: /nix/var/nix/profiles/per-user/root/channels/nixos → sudo nix-instantiate
+NIXPKGS_PATH=""
+ROOT_CHANNEL="/nix/var/nix/profiles/per-user/root/channels/nixos"
+if [[ -d "$ROOT_CHANNEL" ]]; then
+  NIXPKGS_PATH="$ROOT_CHANNEL"
+else
+  NIXPKGS_PATH=$(sudo nix-instantiate --find-file nixpkgs 2>/dev/null || true)
+fi
 if [[ -z "$NIXPKGS_PATH" ]]; then
-  err "Nie można znaleźć nixpkgs w NIX_PATH. Sprawdź: nix-channel --list"
+  err "Nie można znaleźć nixpkgs. Sprawdź: sudo nix-channel --list"
   exit 1
 fi
 
