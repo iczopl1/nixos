@@ -290,6 +290,43 @@ ShellRoot {
 
                 Item { width: 12 }
 
+                // ===== Telefon GrapheneOS – status Tailscale (T3.7) =====
+                Text {
+                    id: phoneLabel
+                    Layout.alignment: Qt.AlignVCenter
+                    color: "#565f89"
+                    font.pixelSize: 12
+                    font.family: "JetBrains Mono"
+                    text: "ph ?"
+                    visible: false      // ukryty gdy ts-off (Tailscale wylogowany)
+
+                    Process {
+                        id: phoneProc
+                        command: ["/bin/sh", "-c", "~/.config/scripts/phone-status.sh"]
+                        running: false
+                        stdout: SplitParser {
+                            onRead: line => {
+                                const s = line.trim()
+                                if (!s) return
+                                if (s === "ts-off") {
+                                    phoneLabel.visible = false
+                                    return
+                                }
+                                phoneLabel.visible = true
+                                phoneLabel.text    = s === "online" ? "ph ●" : "ph ○"
+                                phoneLabel.color   = s === "online" ? "#9ece6a" : "#f7768e"
+                            }
+                        }
+                    }
+
+                    Timer {
+                        interval: 30000; running: true; repeat: true; triggeredOnStart: true
+                        onTriggered: phoneProc.running = true
+                    }
+                }
+
+                Item { width: 12 }
+
                 // ===== Syncthing (T2.8) =====
                 Text {
                     id: syncLabel

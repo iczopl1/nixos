@@ -116,7 +116,9 @@
         – CursorLine bg: spoczynek→błękit→bursztyn→czerwień wg WPM; licznik w lualine (tryb insert)
 - [x] **T3.6** AltGr+Ctrl jako drugi Super (xkb remap)
         – services.keyd: rightalt=layer(altgr), altgr/{left,right}control=leftmeta (system.nix)
-- [ ] **T3.7** Status telefonu GrapheneOS (Tailscale + BT headset switch PC↔telefon)
+- [x] **T3.7** Status telefonu GrapheneOS (Tailscale + BT headset switch PC↔telefon)
+        – phone-status.sh: tailscale status --json | grep pixel; wskaźnik ph ●/○ w QS barze
+        – bt-headset.sh: toggle connect/disconnect (MAC z ~/.config/bt-headset-mac); SUPER+F7
 - [x] **T3.8** Brave – KeePassXC extension auto-install (ExtensionInstallForcelist w brave.nix)
 - [ ] **T3.9** Kalendarz + plan zajęć PRz (A3S, A3S-L3) z synchronizacją z telefonem
         – scraper `https://pei.prz.edu.pl/as/Zima2026_groups_days_horizontal.html`
