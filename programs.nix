@@ -68,6 +68,14 @@
 
     # --- Gry ---
     prismlauncher
+
+    # --- Embedded / mikrokontrolery ---
+    arduino-ide           # IDE 2.x – Nice Nano (nRF52840) przez UF2/DFU
+    gcc-arm-embedded      # arm-none-eabi toolchain (STM32, nRF52, Cortex-M)
+    openocd               # On-Chip Debugger – flash/debug STM32 przez ST-Link
+    stlink                # ST-Link narzędzia CLI (st-flash, st-info, st-util)
+    dfu-util              # DFU – bootloader Nice Nano (nRF52840)
+    stm32flash            # flash STM32 przez UART (alternatywa dla ST-Link)
   ];
 
   # OpenTabletDriver (graficzny tablet)
@@ -75,6 +83,12 @@
 
   # Wirtualizacja (libvirt/QEMU)
   virtualisation.libvirtd.enable = true;
+
+  # udev rules dla embedded – Arduino IDE i ST-Link (dostęp bez sudo)
+  services.udev.packages = with pkgs; [
+    arduino-ide  # /dev/ttyUSB*, /dev/ttyACM* dla programatorów Arduino
+    stlink       # ST-Link V2/V3 (STM32)
+  ];
 
   environment.variables = {
     JAVA_HOME = "${pkgs.jdk17}";
