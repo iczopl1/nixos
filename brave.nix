@@ -88,8 +88,9 @@ let
       # Plik .desktop i ikony
       mkdir -p $out/share
       cp -a usr/share/. $out/share/
-      substituteInPlace $out/share/applications/brave-browser.desktop \
-        --replace-fail "/opt/brave.com/brave/brave-browser" "$out/bin/brave"
+      # Podmień ścieżkę Exec= niezależnie od tego co wpisze upstream w .desktop
+      sed -i "s|Exec=.*brave-browser|Exec=$out/bin/brave|g" \
+        $out/share/applications/brave-browser.desktop
 
       runHook postInstall
     '';
