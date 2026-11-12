@@ -59,9 +59,14 @@
     pandoc
     graphviz
 
-    # --- nvim LSP (Java) ---
+    # --- nvim LSP (T3.4: full) ---
     google-java-format
     java-language-server
+    typescript-language-server   # JS/TS LSP
+    vscode-langservers-extracted # HTML/CSS/JSON/ESLint LSP (vscode-html-languageserver itp.)
+    rust-analyzer                # Rust LSP
+    gopls                        # Go LSP
+    kotlin-language-server       # Kotlin LSP
 
     # --- Diagnostyka dysków (T2.2) ---
     gsmartcontrol         # GUI dla smartmontools (SMART, wykresy)

@@ -96,6 +96,9 @@ in
     nil                 # Nix LSP (nil_ls) – uzupełnianie, go-to-def, diagnostyka
     statix              # linter .nix – antywzorce (używany też w rebuild.sh)
     deadnix             # wykrywanie martwego kodu .nix (używany też w rebuild.sh)
+    bash-language-server  # T3.4: Bash/Shell LSP
+    yaml-language-server  # T3.4: YAML LSP
+    marksman              # T3.4: Markdown LSP
     hunspell
     hunspellDicts.en_US
     hunspellDicts.pl_PL

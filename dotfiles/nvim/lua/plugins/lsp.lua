@@ -1,10 +1,6 @@
 -- LSP. Serwery są instalowane przez NixOS (nie Mason):
---   lua_ls               -> lua-language-server   (programs_minimal.nix)
---   pyright              -> pyright               (python.nix)
---   clangd               -> clang-tools           (programs.nix)
---   java_language_server -> java-language-server  (programs.nix)
---   texlab               -> texlab                (programs.nix)
---   nil_ls               -> nil                   (programs_minimal.nix) – Nix LSP
+-- minimal: lua_ls, pyright, clangd, texlab, nil_ls, bashls, yamlls, marksman
+-- full:    + java_language_server, ts_ls, html/cssls/jsonls, rust_analyzer, gopls, kotlin_language_server
 -- nvim-lspconfig dostarcza tylko gotowe ustawienia (komendy, root_markers).
 
 -- Python: użyj venv projektu ($VIRTUAL_ENV, .venv/, venv/) - jak w starej konfiguracji.
@@ -138,7 +134,37 @@ return {
         },
       })
 
-      vim.lsp.enable({ "lua_ls", "pyright", "clangd", "java_language_server", "texlab", "nil_ls" })
+      -- minimal: Bash, YAML, Markdown
+      vim.lsp.config("bashls", {})
+      vim.lsp.config("yamlls", {
+        settings = {
+          yaml = { validate = true, format = { enable = true } },
+        },
+      })
+      vim.lsp.config("marksman", {})
+
+      -- full: JS/TS, HTML/CSS/JSON, Rust, Go, Kotlin
+      vim.lsp.config("ts_ls", {})
+      vim.lsp.config("html", {})
+      vim.lsp.config("cssls", {})
+      vim.lsp.config("jsonls", {})
+      vim.lsp.config("rust_analyzer", {
+        settings = {
+          ["rust-analyzer"] = {
+            checkOnSave = { command = "clippy" },
+          },
+        },
+      })
+      vim.lsp.config("gopls", {})
+      vim.lsp.config("kotlin_language_server", {})
+
+      -- enable: uruchamia serwer gdy plik pasuje do filetype (auto z nvim-lspconfig)
+      vim.lsp.enable({
+        "lua_ls", "pyright", "clangd", "texlab", "nil_ls",
+        "bashls", "yamlls", "marksman",
+        "java_language_server", "ts_ls", "html", "cssls", "jsonls",
+        "rust_analyzer", "gopls", "kotlin_language_server",
+      })
     end,
   },
 }
