@@ -73,6 +73,26 @@
   virtualisation.libvirtd.enable = true;
   programs.dconf.enable = true;
 
+  # T3.6: AltGr+Ctrl jako drugi Super (xkb remap przez keyd – działa na poziomie kernela, Wayland-OK).
+  # RightAlt (AltGr) przytrzymane aktywuje warstwę altgr; w tej warstwie Ctrl = leftmeta (Super).
+  services.keyd = {
+    enable = true;
+    keyboards = {
+      default = {
+        ids = [ "*" ];
+        settings = {
+          main = {
+            rightalt = "layer(altgr)";
+          };
+          "altgr" = {
+            leftcontrol  = "leftmeta";
+            rightcontrol = "leftmeta";
+          };
+        };
+      };
+    };
+  };
+
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # Wyłącz budowanie dokumentacji NixOS (options.json, man-pages) – nie potrzebne na desktopie,

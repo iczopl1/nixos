@@ -112,7 +112,8 @@
 - [ ] **T3.3** nvim – tutorial/cheatsheet skrótów (which-key lub własny overlay)
 - [x] **T3.4** nvim – obsługa wszystkich popularnych języków (treesitter + LSP)
 - [ ] **T3.5** nvim – animacja pisania (kolor okna ↑ przy szybszym pisaniu, 1–90 wpm)
-- [ ] **T3.6** AltGr+Ctrl jako drugi Super (xkb remap)
+- [x] **T3.6** AltGr+Ctrl jako drugi Super (xkb remap)
+        – services.keyd: rightalt=layer(altgr), altgr/{left,right}control=leftmeta (system.nix)
 - [ ] **T3.7** Status telefonu GrapheneOS (Tailscale + BT headset switch PC↔telefon)
 - [x] **T3.8** Brave – KeePassXC extension auto-install (ExtensionInstallForcelist w brave.nix)
 - [ ] **T3.9** Kalendarz + plan zajęć PRz (A3S, A3S-L3) z synchronizacją z telefonem
@@ -142,10 +143,19 @@
 - T2.27: nvim – pluginy workflow (oil.nvim, lazygit.nvim, git-blame.nvim, mini.splitjoin)
 - T2.28: nvim – UI (alpha-nvim, zen-mode.nvim, nvim-colorizer.lua)
 
+**Zrobione (sesja 3):**
+- T3.1: Quickshell overlay Super+H (Shortcuts.qml + SocketServer + import Quickshell.Io)
+- T2.23: JDownloader 2 (writeShellScriptBin + fetchurl Setup jar)
+- T3.4: nvim LSP (cmake-language-server, bash/yaml/marksman + treesitter parsery)
+- T2.26–T2.28: nvim pluginy (surround, flash, trouble, noice, todo-comments, oil, lazygit, git-blame, mini.splitjoin, alpha, zen-mode, colorizer)
+- T3.6: AltGr+Ctrl = drugi Super (services.keyd w system.nix)
+
 **Następne w kolejce:**
-- T3.1: Super+H overlay z dokumentacją skrótów (Quickshell QML)
-- T2.23: JDownloader 2 (brak w nixpkgs, ręczna instalacja lub własna derywacja)
-- T3.9: Kalendarz PRz (scraper planu zajęć)
+- T3.3: nvim tutorial/cheatsheet skrótów (which-key lub własny overlay)
+- T3.5: nvim animacja pisania (kolor okna przy szybkim pisaniu)
+- T3.7: Status telefonu GrapheneOS (Tailscale + BT headset switch)
+- T3.9: Kalendarz PRz (scraper pei.prz.edu.pl)
+- T3.11: Per-aplikacja ograniczanie internetu (tc/wondershaper)
 
 **Uwagi:**
 - NvChad backup: ~/.config/nvim.nvchad-backup-20261112, ~/.local/share/nvim.nvchad-backup-20261112
