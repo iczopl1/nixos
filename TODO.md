@@ -78,6 +78,21 @@
 - [x] **T2.19** nvim – DAP: Python (debugpy), C/C++ (lldb-dap), STM32 (OpenOCD)
 - [x] **T2.20** Zmiana rozmiaru czcionki w terminalu – Alacritty Ctrl+= / Ctrl+- natywne
         – Alacritty/Kitty/Foot obsługują natywnie, sprawdzić który jest domyślny
+- [ ] **T2.26** nvim – pluginy produktywności (lua/plugins/):
+        – `nvim-surround` (tpope/vim-surround fork): cs"' zmień, ys dodaj, ds usuń otoczenie
+        – `flash.nvim`: szybka nawigacja po ekranie (skróty s/S/r)
+        – `trouble.nvim`: panel błędów LSP/diagnostics/quickfix (<leader>xx)
+        – `noice.nvim`: ładniejsze powiadomienia, cmdline, messages
+        – `todo-comments.nvim`: podświetla TODO/FIXME/NOTE + Telescope (<leader>ft)
+- [ ] **T2.27** nvim – pluginy workflow:
+        – `oil.nvim`: edytor plików jak bufor tekstu (zmień nazwę, przesuń, usuń)
+        – `lazygit.nvim`: lazygit w float window (<leader>gg)
+        – `git-blame.nvim`: inline blame (kto/kiedy napisał linię)
+        – `mini.splitjoin`: gS/gJ split/join argumentów funkcji
+- [ ] **T2.28** nvim – UI:
+        – `dashboard-nvim` lub `alpha-nvim`: ekran startowy
+        – `zen-mode.nvim`: tryb skupienia (<leader>z)
+        – `nvim-colorizer.lua`: podgląd kolorów hex/rgb w edytorze
 
 ### Inne
 - [x] **T2.21** Komenda `agent` w terminalu (alias w shell.nix → dotfiles/scripts/agent.sh)
