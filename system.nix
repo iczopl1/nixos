@@ -93,7 +93,29 @@
     };
   };
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings = {
+    experimental-features = [ "nix-command" "flakes" ];
+
+    # Cache – pobieraj z cache zamiast kompilować (MASTER §4/§13)
+    substituters = [ "https://cache.nixos.org/" ];
+    trusted-public-keys = [
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+    ];
+
+    # Równoległe pobieranie z cache (domyślnie 16, zostawiamy)
+    max-substitution-jobs = 16;
+
+    # Hard-linkuj identyczne pliki w /nix/store – mniej miejsca, szybszy GC
+    auto-optimise-store = true;
+
+    # Trzymaj outputy buildów – nie będą kasowane przy GC, nie trzeba pobierać ponownie
+    keep-outputs = true;
+    keep-derivations = true;
+  };
+
+  # Budowanie w tle nie blokuje pracy (MASTER §5)
+  nix.daemonCPUSchedPolicy = "idle";
+  nix.daemonIOSchedClass = "idle";
 
   # Wyłącz budowanie dokumentacji NixOS (options.json, man-pages) – nie potrzebne na desktopie,
   # a moduły custom mogą powodować błędy eval-cacheable-options w sandboxie.
