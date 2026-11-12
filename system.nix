@@ -93,6 +93,15 @@
     };
   };
 
+  # nixos-rebuild-ng (Python, NixOS 26.05+) czyta nixos-config z /etc/nix/nix.conf (nix-path),
+  # a nie z NIX_PATH env. Bez tego wpisu /etc/nix/nix.conf nie ma nix-path i rebuild-ng
+  # odpada na system.nix zamiast configuration.nix.
+  nix.nixPath = [
+    "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos"
+    "nixos-config=/etc/nixos/configuration.nix"
+    "/nix/var/nix/profiles/per-user/root/channels"
+  ];
+
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
 
