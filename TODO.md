@@ -18,6 +18,7 @@
 
 - [x] **T1.1** kernel zen w system.nix
 - [x] **T1.2** Claude Code w programs.nix (MASTER §0 – zasada najważniejsza)
+- [x] **T1.7** agy (antigravity-cli z unstable) w programs_minimal.nix (MASTER §0/§16)
 - [x] **T1.3** ros2.nix przeniesiony do local.nix per-maszyna (nie zawsze importowany)
 - [x] **T1.4** rebuild.sh + make-zip.sh + .gitignore
 - [x] **T1.5** Podział na profil minimal i full (`configuration_minimal.nix` + `configuration.nix`)
@@ -78,18 +79,18 @@
 - [x] **T2.19** nvim – DAP: Python (debugpy), C/C++ (lldb-dap), STM32 (OpenOCD)
 - [x] **T2.20** Zmiana rozmiaru czcionki w terminalu – Alacritty Ctrl+= / Ctrl+- natywne
         – Alacritty/Kitty/Foot obsługują natywnie, sprawdzić który jest domyślny
-- [ ] **T2.26** nvim – pluginy produktywności (lua/plugins/):
+- [x] **T2.26** nvim – pluginy produktywności (lua/plugins/):
         – `nvim-surround` (tpope/vim-surround fork): cs"' zmień, ys dodaj, ds usuń otoczenie
         – `flash.nvim`: szybka nawigacja po ekranie (skróty s/S/r)
         – `trouble.nvim`: panel błędów LSP/diagnostics/quickfix (<leader>xx)
         – `noice.nvim`: ładniejsze powiadomienia, cmdline, messages
         – `todo-comments.nvim`: podświetla TODO/FIXME/NOTE + Telescope (<leader>ft)
-- [ ] **T2.27** nvim – pluginy workflow:
+- [x] **T2.27** nvim – pluginy workflow:
         – `oil.nvim`: edytor plików jak bufor tekstu (zmień nazwę, przesuń, usuń)
         – `lazygit.nvim`: lazygit w float window (<leader>gg)
         – `git-blame.nvim`: inline blame (kto/kiedy napisał linię)
         – `mini.splitjoin`: gS/gJ split/join argumentów funkcji
-- [ ] **T2.28** nvim – UI:
+- [x] **T2.28** nvim – UI:
         – `dashboard-nvim` lub `alpha-nvim`: ekran startowy
         – `zen-mode.nvim`: tryb skupienia (<leader>z)
         – `nvim-colorizer.lua`: podgląd kolorów hex/rgb w edytorze
@@ -129,35 +130,23 @@
 
 ## Gdzie skończyliśmy (2026-11-12)
 
-**Zrobione w tej sesji:**
-- rebuild.sh: nix-build zamiast nixos-rebuild-ng (fix kompatybilności z modułami NixOS)
-- auto.sh: auto-generowanie commitu, prompt minimal/full przy braku PROFILE
-- brave.nix: fix Exec= w .desktop (brave-stable → brave)
-- T2.1: udiskie + udisks2 (programs_minimal.nix + services.nix + mango)
-- T2.2: smartmontools, nvme-cli, hdparm (minimal), gsmartcontrol (full)
-- T2.3: nmap, wireshark, iperf3, mtr, dig, tcpdump, bandwhich, nethogs, speedtest-cli
-- T2.5: wlopm + bind SUPER+F9 w mango
-- T2.6: keepassxc autostart + window_rule tag 9 w mango
+**Zrobione (sesja 1):**
+- rebuild.sh, auto.sh, brave.nix fix, T2.1–T2.7, T2.9/T2.10, T2.11–T2.22, T2.25
+- T3.2, T3.8, T3.10, T3.12, T1.7 (agy)
+- nvim: NvChad usunięty, nowa konfiguracja (dotfiles/nvim), lazy-lock.json wypełniony
 
-**Zrobione (kontynuacja tej sesji):**
-- T2.4: hplip + CUPS + Avahi (services.nix)
-- T2.7: Super+Tab rofi window switcher w mango
-- T2.8: syncthing-status.sh + widget w shell.qml
-- T2.9/T2.10: Brave managed policies + zakładki (brave.nix)
-- T2.11–T2.19: nvim (relativenumber, venv, format, clipboard, LaTeX, skróty, layout, DAP)
-- T2.20–T2.22: czcionka terminala, agent.sh, megatools
-- T2.25: Bar prawa strona CPU%/RAM%/vol/bat/sieć (bat-status.sh + shell.qml)
-- T3.2: setn.sh post-install
-- T3.8: KeePassXC extension w Brave (ExtensionInstallForcelist)
-- T3.10: platformio, esptool, arduino-ide, gcc-arm-embedded, openocd, stlink
-- T3.12: toggle-effects.sh + bind SUPER+F8
-- nvim: NvChad usunięty, nowa konfiguracja aktywna (dotfiles/nvim), lazy-lock.json wypełniony
+**Zrobione (sesja 2):**
+- Pamięć projektu zaktualizowana (memory/project_state.md, user_profile.md, feedback_workflow.md)
+- T2.26: nvim – pluginy produktywności (nvim-surround, flash, trouble, noice, todo-comments)
+- T2.27: nvim – pluginy workflow (oil.nvim, lazygit.nvim, git-blame.nvim, mini.splitjoin)
+- T2.28: nvim – UI (alpha-nvim, zen-mode.nvim, nvim-colorizer.lua)
 
 **Następne w kolejce:**
 - T3.1: Super+H overlay z dokumentacją skrótów (Quickshell QML)
-- T3.4: nvim – LSP dla wszystkich popularnych języków (uzupełnienie)
 - T2.23: JDownloader 2 (brak w nixpkgs, ręczna instalacja lub własna derywacja)
+- T3.9: Kalendarz PRz (scraper planu zajęć)
 
 **Uwagi:**
 - NvChad backup: ~/.config/nvim.nvchad-backup-20261112, ~/.local/share/nvim.nvchad-backup-20261112
-- lazy-lock.json z realnymi commitami po Lazy! restore; nvim startuje bez warningów/błędów
+- nvim: 31 pluginów, startuje bez warningów/błędów (exit 0, puste messages i stderr)
+- Syncthing: folder Dane sync w toku (pixel9: ~68%, 929 MB do odebrania, brak błędów)
