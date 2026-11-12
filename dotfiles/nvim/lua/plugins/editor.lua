@@ -1,5 +1,45 @@
--- Edytor: szukanie, drzewo plików, git, nawiasy, terminale.
+-- Edytor: szukanie, drzewo plików, git, nawiasy, terminale, nawigacja, diagnostyka.
 return {
+  -- Surround: cs"' zmień, ys dodaj, ds usuń (np. ysiw" owija słowo cudzysłowem)
+  {
+    "kylechui/nvim-surround",
+    version = "*",
+    event = "VeryLazy",
+    opts = {},
+  },
+
+  -- Flash: szybka nawigacja po ekranie – s/S wyszukuje i skacze jednym ruchem
+  {
+    "folke/flash.nvim",
+    event = "VeryLazy",
+    opts = {
+      modes = {
+        search = { enabled = false }, -- nie zastępuje /
+      },
+    },
+    keys = {
+      { "s",     function() require("flash").jump() end,              mode = { "n", "x", "o" }, desc = "Flash: skocz" },
+      { "S",     function() require("flash").treesitter() end,        mode = { "n", "x", "o" }, desc = "Flash: Treesitter" },
+      { "r",     function() require("flash").remote() end,            mode = "o",               desc = "Flash: zdalne" },
+      { "<C-s>", function() require("flash").toggle() end,            mode = "c",               desc = "Flash: toggle" },
+    },
+  },
+
+  -- Trouble: panel błędów LSP, quickfix, loclist (<leader>xx i <leader>d*)
+  {
+    "folke/trouble.nvim",
+    cmd = "Trouble",
+    opts = { focus = true },
+  },
+
+  -- TODO-komentarze: podświetla TODO/FIXME/NOTE + Telescope (<leader>ft)
+  {
+    "folke/todo-comments.nvim",
+    event = { "BufReadPre", "BufNewFile" },
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = { signs = true },
+  },
+
   -- Szukanie plików / tekstu
   {
     "nvim-telescope/telescope.nvim",

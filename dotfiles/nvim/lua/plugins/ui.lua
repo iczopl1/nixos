@@ -80,6 +80,7 @@ return {
         { "<leader>t", group = "karty / motyw" },
         { "<leader>f", group = "szukaj / formatuj" },
         { "<leader>d", group = "debugger / diagnostyka" },
+        { "<leader>x", group = "trouble / zamknij bufor" },
         { "<leader>g", group = "git" },
         { "<leader>l", group = "LaTeX (vimtex)" },
       },
@@ -91,5 +92,32 @@ return {
     "lukas-reineke/indent-blankline.nvim",
     main = "ibl",
     opts = { scope = { enabled = true } },
+  },
+
+  -- Noice: ładniejsze powiadomienia, cmdline pływający, messages w popup
+  {
+    "folke/noice.nvim",
+    event = "VeryLazy",
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+      "rcarriga/nvim-notify",
+    },
+    opts = {
+      lsp = {
+        override = {
+          ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+          ["vim.lsp.util.stylize_markdown"] = true,
+          ["cmp.entry.get_documentation"] = true,
+        },
+        progress = { enabled = false }, -- pasek postępu LSP wyłączony (używamy lualine)
+      },
+      presets = {
+        bottom_search = true,
+        command_palette = true,
+        long_message_to_split = true,
+        inc_rename = false,
+      },
+      notify = { enabled = true },
+    },
   },
 }

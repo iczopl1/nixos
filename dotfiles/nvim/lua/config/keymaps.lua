@@ -108,3 +108,19 @@ map({ "n", "v" }, "<leader>fm", function()
 end, { desc = "Formatuj" })
 map("n", "<leader>ds", vim.diagnostic.setloclist, { desc = "Diagnostyka: lista" })
 map("n", "<leader>wK", "<cmd>WhichKey<CR>", { desc = "Wszystkie skróty" })
+
+---------------------------------------------------------------------------
+-- Trouble (panel błędów / diagnostyki)
+---------------------------------------------------------------------------
+map("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<CR>",              { desc = "Trouble: wszystkie" })
+map("n", "<leader>xd", "<cmd>Trouble diagnostics toggle filter.buf=0<CR>", { desc = "Trouble: bufor" })
+map("n", "<leader>xl", "<cmd>Trouble loclist toggle<CR>",                  { desc = "Trouble: loclist" })
+map("n", "<leader>xq", "<cmd>Trouble qflist toggle<CR>",                   { desc = "Trouble: quickfix" })
+map("n", "<leader>xs", "<cmd>Trouble symbols toggle<CR>",                  { desc = "Trouble: symbole" })
+
+---------------------------------------------------------------------------
+-- TODO-komentarze
+---------------------------------------------------------------------------
+map("n", "<leader>ft", "<cmd>TodoTelescope<CR>", { desc = "TODO: lista (Telescope)" })
+map("n", "]t", function() require("todo-comments").jump_next() end, { desc = "Następny TODO" })
+map("n", "[t", function() require("todo-comments").jump_prev() end, { desc = "Poprzedni TODO" })
