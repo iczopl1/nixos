@@ -40,5 +40,8 @@
       "antigravity-cli"     # następca gemini-cli
       "maltego"
       "signal-desktop"        # keyboard-mouse.nix (full)
+      "steam"
+      "steam-unwrapped"
+      "steam-run"
     ];
 }

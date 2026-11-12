@@ -169,6 +169,9 @@ in
     esptool               # esptool.py – flash ESP32/ESP8266 przez UART
   ];
 
+  # Steam – moduł NixOS: obsługuje 32-bit libs, udev, gamescope opcjonalnie
+  programs.steam.enable = true;
+
   # Wireshark – setuid wrapper dla dumpcap (przechwytywanie bez root) + udev (T2.3)
   programs.wireshark.enable = true;
   users.users.iczo.extraGroups = [ "wireshark" ];
