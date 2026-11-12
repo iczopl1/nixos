@@ -144,6 +144,18 @@
 - [x] **T3.10** Embedded: platformio (ESP32), esptool dodane; STM32/nRF/arm-none-eabi/openocd już były
 - [ ] **T3.11** Ograniczanie prędkości internetu per-aplikacja (tc/wondershaper/sqm)
 - [x] **T3.12** Efekty graficzne: toggle-effects.sh (blur/animacje), bind=SUPER+F8, alias `effects`
+- [ ] **T3.13** Obramówka aktywnego okna zmienia kolor z prędkością pisania (WPM)
+        – spoczynek→błękit→bursztyn→czerwień (jak T3.5 w lualine, ale border_color w mango)
+        – skrypt wpm-border.sh: czyta WPM z pipe/socket od typing_speed.lua, ustawia kolor przez mmsg
+        – kolory: 0–20 wpm: #9eeaf9 (spokój), 20–50: #e0af68 (amber), 50–80: #f7768e (czerwień)
+        – aktywny tylko w trybie insert nvim (sygnał od autocmd InsertEnter/Leave)
+        – wyłącznik: ten sam co T3.12 (toggle-effects.sh) albo osobny flag plik
+- [ ] **T3.14** Efekty cząsteczkowe na tle ekranu (Quickshell QML)
+        – kilka motywów do wyboru skrótem np. SUPER+F6: liście jesienne, kropelki deszczu, śnieg, iskry
+        – implementacja w Quickshell (WlrLayer.Background lub Overlay pod oknami), animacja przez Timer + Canvas
+        – cząsteczki: pozycja/prędkość/opacity losowe, fizyka uproszczona (grawitacja, wiatr)
+        – wydajność: max ~80 cząsteczek, Canvas tylko gdy warstwa aktywna; wyłączone domyślnie (MASTER §11)
+        – motyw zapisany w ~/.config/particle-effect (plik z nazwą motywu lub "off")
 
 ---
 
@@ -179,6 +191,8 @@
 - T3.7: Status telefonu GrapheneOS (Tailscale + BT headset switch)
 - T3.9: Kalendarz PRz (scraper pei.prz.edu.pl)
 - T3.11: Per-aplikacja ograniczanie internetu (tc/wondershaper)
+- T3.13: Obramówka okna zmienia kolor z WPM pisania
+- T3.14: Efekty cząsteczkowe na tle (liście, deszcz, śnieg – Quickshell QML)
 
 **Uwagi:**
 - NvChad backup: ~/.config/nvim.nvchad-backup-20261112, ~/.local/share/nvim.nvchad-backup-20261112
