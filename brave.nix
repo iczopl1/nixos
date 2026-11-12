@@ -62,13 +62,14 @@ let
       # Wayland
       libxkbcommon
       wayland
-      # Qt5 / Qt6 shim (native file dialogs w brave 1.99+)
-      qt5.qtbase
-      qt6.qtbase
       # Dźwięk / urządzenia
       alsa-lib
       udev
     ];
+
+    # Qt5/Qt6 shimy w Brave są opcjonalne (native file dialogs); bez Qt w buildInputs
+    # autoPatchelfHook chciałby je linkować – ignorujemy, Brave odpada na GTK dialogi.
+    autoPatchelfIgnoreMissingDeps = [ "libQt5*.so.5" "libQt6*.so.6" "libqt5*.so" "libqt6*.so" ];
 
     # Wyodrębnij .deb – bez próby ustawiania setuid (chrome-sandbox) w sandboxie Nix
     unpackPhase = ''
