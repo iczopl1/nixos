@@ -15,31 +15,63 @@ let
 
     src = pkgs.fetchurl {
       url = "https://github.com/LinkSy-mg/linksy-releases/releases/download/linux-v${version}/linksy-${version}-linux-x86_64.tar.gz";
-      sha256 = "0rmym8b0b3j7j6768bbaf3pcls2jvjygqwhz6za5sq4099sii2p5";
+      hash = "sha256-MT6SoPMo8nW8nLv3jqJCM9PEklH5Rufen+H0J1STKBM=";
     };
 
-    nativeBuildInputs = [ pkgs.autoPatchelfHook ];
+    nativeBuildInputs = [
+      pkgs.autoPatchelfHook
+      pkgs.wrapGAppsHook4   # obsługuje GTK4 schemas, ikony, GLib i/o modules
+    ];
 
     buildInputs = with pkgs; [
       gtk4
       libadwaita
+      glib
       pango
       cairo
       graphene
-      glib
+      harfbuzz
+      gdk-pixbuf
+      # GStreamer (screen-share, kamera)
       gst_all_1.gstreamer
       gst_all_1.gst-plugins-base
       gst_all_1.gst-plugins-good
-      gst_all_1.gst-plugins-bad   # GTK4 sink (linksy-screen)
+      gst_all_1.gst-plugins-bad
+      # Sieć i TLS
+      libsoup_3
+      glib-networking
+      openssl
+      # Audio/wideo
+      pipewire
+      libpulseaudio
     ];
 
+    # Nie przerywaj buildu na brakujących bibliotekach – mogą być ładowane przez dlopen
+    autoPatchelfIgnoreMissingDeps = true;
+
     dontBuild = true;
+    dontConfigure = true;
 
     installPhase = ''
-      mkdir -p $out/bin $out/share/icons $out/share/applications
-      cp -r bin/* $out/bin/
-      cp -r share/icons/* $out/share/icons/ 2>/dev/null || true
-      cp share/mg.diary.linksy.Linksy.desktop $out/share/applications/ 2>/dev/null || true
+      runHook preInstall
+      echo "=== Zawartość tarballa ==="
+      find . -ls
+      mkdir -p $out/bin $out/share/applications $out/share/icons
+
+      # Kopiuj wszystkie pliki wykonywalne z bin/ (lub z katalogu głównego)
+      if [ -d bin ]; then
+        cp -r bin/. $out/bin/
+      else
+        find . -maxdepth 1 -type f -executable -exec cp {} $out/bin/ \;
+      fi
+
+      # Desktop entry i ikony (toleruje brak pliku)
+      find . -name "*.desktop" -exec cp {} $out/share/applications/ \; 2>/dev/null || true
+      if [ -d share/icons ]; then
+        cp -r share/icons/. $out/share/icons/
+      fi
+
+      runHook postInstall
     '';
   };
 
@@ -91,7 +123,7 @@ in
 
     # --- Komunikacja ---
     # brave – w brave.nix (oficjalna binarka z GitHub Releases, nixpkgs 26.05 usunął pakiet)
-    # linksy – wyłączony: błąd buildu (TODO: naprawić derywację)
+    linksy
     google-chrome
     discord
     # anydesk – usunięty: brak kompatybilnych bibliotek GUI dla Mango
