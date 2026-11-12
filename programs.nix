@@ -91,7 +91,7 @@ in
 
     # --- Komunikacja ---
     # brave – w brave.nix (oficjalna binarka z GitHub Releases, nixpkgs 26.05 usunął pakiet)
-    linksy               # integracja PC↔telefon (pliki, schowek, ekran, kamera); binarka z Releases
+    # linksy – wyłączony: błąd buildu (TODO: naprawić derywację)
     google-chrome
     discord
     # anydesk – usunięty: brak kompatybilnych bibliotek GUI dla Mango
