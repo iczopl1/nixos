@@ -29,6 +29,14 @@
         – wykrywa nową maszynę po UUID /
         – pyta minimal/full, pokazuje GB do pobrania
         – najpierw stawia minimal, potem full w tle
+- [ ] **T1.8** Thunderbird – klient e-mail
+        – `thunderbird` z nixpkgs (full); unfree: nie (jest wolny)
+- [ ] **T1.9** Beeper – komunikator all-in-one (Signal, WhatsApp, Telegram, iMessage…)
+        – sprawdzić czy jest w nixpkgs; jeśli nie – binarka z oficjalnych Releases (MASTER §13)
+        – unfree: dodać do allowUnfreePredicate jeśli wymagane
+- [ ] **T1.10** Grayjay – agregator wideo (YouTube, Twitch, Nebula…) by FUTO
+        – nie ma w nixpkgs; binarka/AppImage z oficjalnych Releases lub flathub
+        – własna derywacja jak Linksy (autoPatchelfHook)
 
 ---
 
