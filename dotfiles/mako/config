@@ -1,0 +1,11 @@
+# Mako – konfiguracja powiadomień
+# Domyślny timeout: 5 s (0 = zostają na zawsze – stary default)
+default-timeout=5000
+
+# Powiadomienia krytyczne (błędy, alerty) zostają dłużej
+[urgency=critical]
+default-timeout=0
+
+# Montowanie dysków (udiskie) – 5 s i znikają
+[app-name=udiskie]
+default-timeout=5000

@@ -26,5 +26,8 @@ in
     # Mango: config linkowany z repo (bez tego zmiany w repo nie trafiają do kompozytora)
     "d %h/.config/mango 0755 - - -"
     "L+ %h/.config/mango/config.conf - - - - ${dotfiles}/mango/config.conf"
+    # Mako: powiadomienia – timeout 5 s (domyślnie 0 = zostają na zawsze)
+    "d %h/.config/mako 0755 - - -"
+    "L+ %h/.config/mako/config - - - - ${dotfiles}/mako/config"
   ];
 }
