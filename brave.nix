@@ -62,6 +62,9 @@ let
       # Wayland
       libxkbcommon
       wayland
+      # Qt5 / Qt6 shim (native file dialogs w brave 1.99+)
+      qt5.qtbase
+      qt6.qtbase
       # Dźwięk / urządzenia
       alsa-lib
       udev
