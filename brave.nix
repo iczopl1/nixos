@@ -67,8 +67,10 @@ let
       udev
     ];
 
-    # Wyodrębnij .deb do bieżącego katalogu
-    unpackPhase = "dpkg -x $src .";
+    # Wyodrębnij .deb – bez próby ustawiania setuid (chrome-sandbox) w sandboxie Nix
+    unpackPhase = ''
+      dpkg-deb --fsys-tarfile $src | tar x --no-same-permissions --no-same-owner
+    '';
 
     installPhase = ''
       runHook preInstall
