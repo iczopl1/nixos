@@ -43,8 +43,8 @@
 - [x] **T2.5** Skrót wyłączenia ekranu: `bind=SUPER,F9,spawn_shell,wlopm --off`
 - [x] **T2.6** KeePassXC zawsze na workspace 9 – autostart + window_rule w Mango
         – `window_rule=app_id:org.keepassxc.KeePassXC,tags:9`
-- [ ] **T2.7** Super+Tab – window switcher z wszystkich workspaces (h/j/k/l + enter)
-        – `rofi -show window` lub dedykowany skrypt QML w Quickshell
+- [x] **T2.7** Super+Tab – window switcher z wszystkich workspaces
+        – `rofi -show window -theme ~/.config/rofi/rofi.rosi` (zastąpił focusstack,next)
 - [ ] **T2.8** Status Syncthing w barze – przez 1 min: liczba połączeń; potem: stan synchronizacji
         – skrypt polling SyncthingAPI (port 8384 lokalny), widget w Quickshell
 
