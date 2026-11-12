@@ -206,16 +206,16 @@ if [[ -z "$NIXPKGS_PATH" ]]; then
   exit 1
 fi
 
-echo "Komenda: nixos-rebuild boot [NIX_PATH=nixpkgs=$NIXPKGS_PATH, nixos-config=$ENTRY]"
+echo "Komenda: nixos-rebuild boot --no-flake --file $ENTRY [NIX_PATH=nixpkgs=$NIXPKGS_PATH]"
 BUILD_OK=0
 
-# nixos-rebuild boot z jawnym NIX_PATH – poprawnie zarządza generacjami i aktualizuje GRUB.
-# Nie używamy `nix-build + nix-env + switch-to-configuration` bo switch-to-configuration
-# wywołane bezpośrednio ze store-path nie aktualizuje grub.cfg (znany problem).
-# NIX_PATH ustawiony jawnie żeby nixos-rebuild nie brał nixpkgs z /etc/nixos/.
+# nixos-rebuild-ng (Python, NixOS 26.05+) ignoruje nixos-config w NIX_PATH –
+# szuka konfiguracji w /etc/nixos/{configuration,system}.nix.
+# Jedyny pewny sposób: --file wskazuje plik wejściowy bezpośrednio.
+# NIX_PATH nadal potrzebny dla nixpkgs, bo root może mieć /etc/nixos w swoim PATH.
 if sudo env \
-    NIX_PATH="nixpkgs=$NIXPKGS_PATH:nixos-config=$ENTRY" \
-    nixos-rebuild boot --no-flake 2>&1; then
+    NIX_PATH="nixpkgs=$NIXPKGS_PATH" \
+    nixos-rebuild boot --no-flake --file "$ENTRY" 2>&1; then
   BUILD_OK=1
 else
   err "nixos-rebuild boot nie powiodło się"

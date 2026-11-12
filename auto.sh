@@ -386,19 +386,12 @@ if [[ -z "$NIXPKGS_CHAN" || ! -d "$NIXPKGS_CHAN" ]]; then
 fi
 
 build_and_activate_boot() {
-  # Buduje system i ustawia jako boot (tak samo jak rebuild.sh, żeby uniknąć
-  # błędu "nixos-rebuild picks system.nix" gdy NIX_PATH wskazuje /etc/nixos/).
+  # nixos-rebuild boot --file: jedyny pewny sposób na NixOS 26.05+ (nixos-rebuild-ng/Python).
+  # nixos-rebuild-ng ignoruje nixos-config w NIX_PATH, wymaga --file.
   local entry="$1"
-  local link="/tmp/auto-install-$$"
-  sudo nix-build "$NIXPKGS_CHAN/nixos" \
-    --attr config.system.build.toplevel \
-    -I nixos-config="$entry" \
-    -o "$link"
-  local syspath
-  syspath=$(readlink -f "$link")
-  sudo rm -f "$link"
-  sudo nix-env --profile /nix/var/nix/profiles/system --set "$syspath"
-  sudo "$syspath/bin/switch-to-configuration" boot
+  sudo env \
+    NIX_PATH="nixpkgs=$NIXPKGS_CHAN" \
+    nixos-rebuild boot --no-flake --file "$entry"
 }
 
 if [[ "$IN_CHROOT" -eq 1 ]]; then
