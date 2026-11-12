@@ -122,13 +122,14 @@ if [[ "$NEW_MACHINE" -eq 0 ]]; then
   fi
 
   # Deleguj do rebuild.sh – ma sprawdzoną logikę budowania (nix-build przez kanał nixos).
-  # rebuild.sh sam czyta PROFILE, robi sprawdzenia, commit i kopiowanie.
+  # rebuild.sh sam czyta PROFILE, robi sprawdzenia, commit (jeśli są zmiany) i kopiowanie.
   # Opis commitu generujemy automatycznie z listy zmienionych plików.
+  # Uwaga: grep na pustym wejściu zwraca 1 → używamy || true żeby nie wywołać set -e.
   AUTO_CHANGED=$(git -C "$REPO_DIR" diff --name-only HEAD 2>/dev/null \
-    | grep -v '^$' | head -4 | paste -sd ',' | sed 's/,/, /g')
+    | head -4 | paste -sd ',' | sed 's/,/, /g' || true)
   if [[ -z "$AUTO_CHANGED" ]]; then
     AUTO_CHANGED=$(git -C "$REPO_DIR" status --short 2>/dev/null \
-      | awk '{print $2}' | head -4 | paste -sd ',' | sed 's/,/, /g')
+      | awk '{print $2}' | head -4 | paste -sd ',' | sed 's/,/, /g' || true)
   fi
   AUTO_MSG="auto: ${AUTO_CHANGED:-synchronizacja konfiguracji}"
   info "Uruchamiam rebuild.sh (commit: \"$AUTO_MSG\")..."
