@@ -1,5 +1,5 @@
 // Quickshell bar dla Mango – ThinkPadNIX
-// Lewo: tagi (workspace)   Środek: zegar + data   Prawo: vol + bat
+// Lewo: tagi (workspace)   Środek: zegar + data   Prawo: cpu | ram | vol | bat | net
 // SUPER+D: Vimium hints (Hints.qml + mango-hintd.conf)
 
 import QtQuick
@@ -130,6 +130,94 @@ ShellRoot {
 
                 Item { Layout.fillWidth: true }
 
+                // ===== CPU (T2.25) =====
+                Text {
+                    id: cpuLabel
+                    Layout.alignment: Qt.AlignVCenter
+                    color: "#a9b1d6"
+                    font.pixelSize: 12
+                    font.family: "JetBrains Mono"
+                    text: "cpu --"
+
+                    property var prevCpu: null
+
+                    Process {
+                        id: cpuProc
+                        command: ["/bin/sh", "-c", "head -1 /proc/stat"]
+                        running: false
+                        stdout: SplitParser {
+                            onRead: line => {
+                                const parts = line.trim().split(/\s+/)
+                                if (parts[0] !== "cpu") return
+                                const vals = parts.slice(1).map(Number)
+                                if (cpuLabel.prevCpu) {
+                                    const prev     = cpuLabel.prevCpu
+                                    const idle     = vals[3] + vals[4]
+                                    const prevIdle = prev[3] + prev[4]
+                                    const total    = vals.reduce((a, b) => a + b, 0)
+                                    const prevTotal = prev.reduce((a, b) => a + b, 0)
+                                    const dTotal   = total - prevTotal
+                                    const dIdle    = idle  - prevIdle
+                                    const pct = dTotal > 0 ? Math.round((dTotal - dIdle) / dTotal * 100) : 0
+                                    cpuLabel.text  = "cpu " + pct + "%"
+                                    cpuLabel.color = pct > 80 ? "#f7768e" : pct > 50 ? "#e0af68" : "#a9b1d6"
+                                }
+                                cpuLabel.prevCpu = vals
+                            }
+                        }
+                    }
+
+                    Timer {
+                        interval: 2000; running: true; repeat: true; triggeredOnStart: true
+                        onTriggered: cpuProc.running = true
+                    }
+                }
+
+                Item { width: 10 }
+
+                // ===== RAM (T2.25) =====
+                Text {
+                    id: ramLabel
+                    Layout.alignment: Qt.AlignVCenter
+                    color: "#a9b1d6"
+                    font.pixelSize: 12
+                    font.family: "JetBrains Mono"
+                    text: "ram --"
+
+                    property int memTotal: 0
+                    property int memAvail: -1
+
+                    function refresh() {
+                        if (memTotal > 0 && memAvail >= 0) {
+                            const pct = Math.round((memTotal - memAvail) / memTotal * 100)
+                            text  = "ram " + pct + "%"
+                            color = pct > 85 ? "#f7768e" : pct > 70 ? "#e0af68" : "#a9b1d6"
+                        }
+                    }
+
+                    Process {
+                        id: ramProc
+                        command: ["/bin/sh", "-c", "grep -E '^(MemTotal|MemAvailable):' /proc/meminfo"]
+                        running: false
+                        stdout: SplitParser {
+                            onRead: line => {
+                                const m = line.match(/^(\w+):\s+(\d+)/)
+                                if (!m) return
+                                if (m[1] === "MemTotal")     ramLabel.memTotal = parseInt(m[2])
+                                if (m[1] === "MemAvailable") ramLabel.memAvail = parseInt(m[2])
+                                ramLabel.refresh()
+                            }
+                        }
+                    }
+
+                    Timer {
+                        interval: 3000; running: true; repeat: true; triggeredOnStart: true
+                        onTriggered: ramProc.running = true
+                    }
+                }
+
+                Item { width: 12 }
+
                 // ===== Głośność =====
                 Text {
                     id: volLabel
@@ -215,6 +303,55 @@ ShellRoot {
                     Timer {
                         interval: 30000; running: true; repeat: true; triggeredOnStart: true
                         onTriggered: { batCapProc.running = true; batStatProc.running = true }
+                    }
+                }
+
+                Item { width: 12 }
+
+                // ===== Sieć ↓↑ (T2.25) =====
+                Text {
+                    id: netLabel
+                    Layout.alignment: Qt.AlignVCenter
+                    color: "#a9b1d6"
+                    font.pixelSize: 12
+                    font.family: "JetBrains Mono"
+                    text: "↓0K ↑0K"
+                    visible: false          // ukryty do pierwszego pomiaru
+
+                    property var prevNet: null
+
+                    function fmtSpeed(bytesPerSec) {
+                        if (bytesPerSec >= 1048576) return (bytesPerSec / 1048576).toFixed(1) + "M"
+                        if (bytesPerSec >= 1024)    return Math.round(bytesPerSec / 1024) + "K"
+                        return "0K"
+                    }
+
+                    Process {
+                        id: netProc
+                        // Pomija lo, bierze pierwszy interfejs (wlp*, enp*, eth*, eno*)
+                        command: ["/bin/sh", "-c", "awk 'NR>2 && !/lo:/{print; exit}' /proc/net/dev"]
+                        running: false
+                        stdout: SplitParser {
+                            onRead: line => {
+                                const parts = line.trim().split(/\s+/)
+                                if (parts.length < 10) return
+                                const rx = parseInt(parts[1])  // bytes received
+                                const tx = parseInt(parts[9])  // bytes transmitted
+                                if (isNaN(rx) || isNaN(tx)) return
+                                if (netLabel.prevNet !== null) {
+                                    const dRx = (rx - netLabel.prevNet.rx) / 2.0
+                                    const dTx = (tx - netLabel.prevNet.tx) / 2.0
+                                    netLabel.text    = "↓" + netLabel.fmtSpeed(dRx) + " ↑" + netLabel.fmtSpeed(dTx)
+                                    netLabel.visible = true
+                                }
+                                netLabel.prevNet = { rx: rx, tx: tx }
+                            }
+                        }
+                    }
+
+                    Timer {
+                        interval: 2000; running: true; repeat: true; triggeredOnStart: true
+                        onTriggered: netProc.running = true
                     }
                 }
 

@@ -49,12 +49,10 @@
         – skrypt polling SyncthingAPI (port 8384 lokalny), widget w Quickshell
 
 ### Bar (Quickshell)
-- [ ] **T2.25** Bar – prawa strona: CPU%, RAM%, bateria, prędkość sieci (↓↑ KB/s lub MB/s)
-        – CPU: `/proc/stat` (diff między próbkami, timer 2s)
-        – RAM: `/proc/meminfo` (MemTotal - MemAvailable)
-        – Bateria: `/sys/class/power_supply/BAT0/` capacity + status (już jest, poprawić widoczność)
-        – Sieć: `/proc/net/dev` (diff bajtów RX/TX między próbkami, wybrany interfejs: eth0/wlan0/wlp*)
-        – Kolejność: cpu XX% | ram XX% | bat XX% | ↓X ↑X
+- [x] **T2.25** Bar – prawa strona: CPU%, RAM%, bateria, prędkość sieci (↓↑ KB/s lub MB/s)
+        – cpu/ram: timer 2–3s, diff /proc/stat i /proc/meminfo; bat: timer 30s
+        – sieć: /proc/net/dev, pierwszy interfejs non-lo, diff bajtów co 2s
+        – Kolejność: cpu XX% | ram XX% | vol XX% | bat XX% | ↓X ↑X
 
 ### Brave
 - [ ] **T2.9** Brave – paczka ustawień przez `programs.brave` lub managed policies:
@@ -142,9 +140,9 @@
 - T2.6: keepassxc autostart + window_rule tag 9 w mango
 
 **Następne w kolejce:**
-- T2.7: Super+Tab window switcher (rofi -show window)
-- T2.25: Bar prawa strona CPU%/RAM%/bat/sieć (QML w shell.qml)
 - T2.9/T2.10: Brave policies/zakładki
+- T2.8: Syncthing status w barze
+- T2.11+: nvim improvements
 
 **Uwagi:**
 - T2.9 (Brave policies) – wymaga sprawdzenia czy NixOS ma `programs.chromium`/managed policies.
