@@ -206,26 +206,19 @@ if [[ -z "$NIXPKGS_PATH" ]]; then
   exit 1
 fi
 
-BUILD_LINK="/tmp/nix-rebuild-$$"
-echo "Komenda: nix-build $NIXPKGS_PATH/nixos -I nixos-config=$ENTRY"
+echo "Komenda: nixos-rebuild boot [NIX_PATH=nixpkgs=$NIXPKGS_PATH, nixos-config=$ENTRY]"
 BUILD_OK=0
 
-# Buduj z folderu projektu (MASTER §6)
-if sudo nix-build "$NIXPKGS_PATH/nixos" \
-    --attr config.system.build.toplevel \
-    -I nixos-config="$ENTRY" \
-    -o "$BUILD_LINK"; then
-
-  SYSTEM_PATH=$(readlink -f "$BUILD_LINK")
-  sudo rm -f "$BUILD_LINK" 2>/dev/null || true
-
-  # Zainstaluj jako nową generację i ustaw boot
-  if sudo nix-env --profile /nix/var/nix/profiles/system --set "$SYSTEM_PATH" && \
-     sudo "$SYSTEM_PATH/bin/switch-to-configuration" boot; then
-    BUILD_OK=1
-  else
-    err "switch-to-configuration boot nie powiodło się"
-  fi
+# nixos-rebuild boot z jawnym NIX_PATH – poprawnie zarządza generacjami i aktualizuje GRUB.
+# Nie używamy `nix-build + nix-env + switch-to-configuration` bo switch-to-configuration
+# wywołane bezpośrednio ze store-path nie aktualizuje grub.cfg (znany problem).
+# NIX_PATH ustawiony jawnie żeby nixos-rebuild nie brał nixpkgs z /etc/nixos/.
+if sudo env \
+    NIX_PATH="nixpkgs=$NIXPKGS_PATH:nixos-config=$ENTRY" \
+    nixos-rebuild boot --no-flake 2>&1; then
+  BUILD_OK=1
+else
+  err "nixos-rebuild boot nie powiodło się"
 fi
 
 # Wyłącz trap turbo przed normalnym zakończeniem (trap EXIT wykona się sam)
