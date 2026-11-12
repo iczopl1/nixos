@@ -34,15 +34,15 @@
 ## P2 – Usprawnienia użytkowe
 
 ### System / środowisko
-- [ ] **T2.1** Auto-montowanie USB/dysków po podłączeniu → `udiskie` lub reguły udev
-        – montuje w /mnt/{etykieta}, powiadomienie sukces/fail przez mako
-- [ ] **T2.2** Narzędzia diagnostyki dysków: `smartmontools`, `nvme-cli`, `hdparm`, `gsmartcontrol` (GUI)
-- [ ] **T2.3** Narzędzia sieciowe: `nmap`, `wireshark`, `iperf3`, `mtr`, `dig`/`drill`, `tcpdump`,
-        `bandwhich`, `nethogs`, `speedtest-cli`, `dnstop` – do programowania sieci i diagnozy
+- [x] **T2.1** Auto-montowanie USB/dysków → `udiskie` + `udisks2`
+        – services.udisks2.enable, exec_once=udiskie --no-tray --notify w mango
+- [x] **T2.2** Narzędzia diagnostyki dysków: `smartmontools`, `nvme-cli`, `hdparm` (minimal), `gsmartcontrol` (GUI, full)
+- [x] **T2.3** Narzędzia sieciowe: `nmap`, `wireshark`, `iperf3`, `mtr`, `dig`, `tcpdump`, `bandwhich`, `nethogs`, `speedtest-cli`
+        – wireshark: programs.wireshark.enable + grupa wireshark (full)
 - [ ] **T2.4** Drukarka HP LaserJet M175n – `hplip`, `cups`, auto-wykrycie przewodowej
-- [ ] **T2.5** Skrót wyłączenia ekranu (`dpms off`) + blokada klawiatury (do czyszczenia)
-        – bind w Mango, odblokowanie tym samym klawiszem
-- [ ] **T2.6** KeePassXC zawsze na workspace 9 – reguła okna w Mango + autostart
+- [x] **T2.5** Skrót wyłączenia ekranu: `bind=SUPER,F9,spawn_shell,wlopm --off`
+- [x] **T2.6** KeePassXC zawsze na workspace 9 – autostart + window_rule w Mango
+        – `window_rule=app_id:org.keepassxc.KeePassXC,tags:9`
 - [ ] **T2.7** Super+Tab – window switcher z wszystkich workspaces (h/j/k/l + enter)
         – `rofi -show window` lub dedykowany skrypt QML w Quickshell
 - [ ] **T2.8** Status Syncthing w barze – przez 1 min: liczba połączeń; potem: stan synchronizacji
@@ -132,20 +132,20 @@
 ## Gdzie skończyliśmy (2026-11-12)
 
 **Zrobione w tej sesji:**
-- brave.nix: fix Qt5/Qt6 mismatch (autoPatchelfIgnoreMissingDeps)
-- ~/.config/mango/config.conf: utworzony od zera (hylprland→mango składnia), fix hintkeys, awww-daemon
-- dotfiles/mango/ dodane do repo + tmpfiles symlink w shell.nix
-- ~/.bashrc: zastąpiony czystym plikiem (zerwany symlink z flake config)
-- services.nix: syncthing dataDir=/home/iczo (fix permission denied)
-- dotfiles/quickshell/: przeniesione z quickshell/bar/, dodano shell.qml (bar z tagami, zegarem, vol, bat)
-- mango config: exec_once=waybar → exec_once=quickshell (obu plikach)
-- ~/.config/quickshell symlink utworzony
-- T1.6: auto.sh instalator zakończony
+- rebuild.sh: nix-build zamiast nixos-rebuild-ng (fix kompatybilności z modułami NixOS)
+- auto.sh: auto-generowanie commitu, prompt minimal/full przy braku PROFILE
+- brave.nix: fix Exec= w .desktop (brave-stable → brave)
+- T2.1: udiskie + udisks2 (programs_minimal.nix + services.nix + mango)
+- T2.2: smartmontools, nvme-cli, hdparm (minimal), gsmartcontrol (full)
+- T2.3: nmap, wireshark, iperf3, mtr, dig, tcpdump, bandwhich, nethogs, speedtest-cli
+- T2.5: wlopm + bind SUPER+F9 w mango
+- T2.6: keepassxc autostart + window_rule tag 9 w mango
 
 **Następne w kolejce:**
-- T2.1 i dalej według priorytetów
-- Zalecany rebuild: `! ./rebuild.sh "sync konfiguracji"`
+- T2.7: Super+Tab window switcher (rofi -show window)
+- T2.25: Bar prawa strona CPU%/RAM%/bat/sieć (QML w shell.qml)
+- T2.9/T2.10: Brave policies/zakładki
 
 **Uwagi:**
 - T2.9 (Brave policies) – wymaga sprawdzenia czy NixOS ma `programs.chromium`/managed policies.
-- Pasek Quickshell wymaga przetestowania (quickshell musi być uruchomiony przez Mango).
+- Zmiany T2.1–T2.6 są w working tree; uruchom `! ./auto.sh` żeby zbudować i commitować.

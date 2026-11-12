@@ -63,6 +63,12 @@
     google-java-format
     java-language-server
 
+    # --- Diagnostyka dysków (T2.2) ---
+    gsmartcontrol         # GUI dla smartmontools (SMART, wykresy)
+
+    # --- Narzędzia sieciowe – GUI (T2.3) ---
+    wireshark             # GUI analizator pakietów (setuid przez programs.wireshark)
+
     # --- Bezpieczeństwo ---
     maltego
 
@@ -77,6 +83,10 @@
     dfu-util              # DFU – bootloader Nice Nano (nRF52840)
     stm32flash            # flash STM32 przez UART (alternatywa dla ST-Link)
   ];
+
+  # Wireshark – setuid wrapper dla dumpcap (przechwytywanie bez root) + udev (T2.3)
+  programs.wireshark.enable = true;
+  users.users.iczo.extraGroups = [ "wireshark" ];
 
   # OpenTabletDriver (graficzny tablet)
   hardware.opentabletdriver.enable = true;

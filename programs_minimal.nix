@@ -45,6 +45,21 @@ in
     wvkbd                 # klawiatura ekranowa (tablet/touch)
     yad                   # dialogi GUI dla skryptów
     udiskie               # auto-mount USB/dysków (frontend dla udisks2)
+    wlopm                 # wyłączanie ekranu przez wlr-output-power-management (T2.5)
+
+    # --- Diagnostyka dysków (T2.2) ---
+    smartmontools         # smartctl / smartd – SMART monitoring HDD/SSD/NVMe
+    nvme-cli              # nvme – narzędzia dla dysków NVMe
+    hdparm                # hdparm – parametry i wydajność dysków ATA/SATA
+
+    # --- Narzędzia sieciowe (T2.3) ---
+    nmap                  # skanowanie portów i sieci
+    iperf3                # pomiar przepustowości
+    bandwhich             # prędkość sieci per-proces w terminalu
+    dnsutils              # dig, nslookup – zapytania DNS
+    tcpdump               # przechwytywanie pakietów (wymaga sudo)
+    nethogs               # ruch sieciowy per-proces (wymaga sudo)
+    speedtest-cli         # pomiar prędkości łącza
 
     # --- Narzędzia terminalowe ---
     jq
