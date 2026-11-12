@@ -77,6 +77,11 @@ in
     p7zip
     tree
     fastfetch
+    bat                   # ch: podgląd pliku z kolorami (cat z podświetlaniem)
+    eza                   # ls/ll/l: nowoczesny ls (kolory, git, ikony)
+    fd                    # fe/fo/e/o: szybkie znajdowanie plików (fd-find)
+    bc                    # ]: kalkulator (bc -l)
+    libnotify             # pp: notify-send (testowanie powiadomień mako)
     mpv
 
     # --- Przeglądarka ---
