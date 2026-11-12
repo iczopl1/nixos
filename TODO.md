@@ -99,8 +99,9 @@
 - [x] **T2.21** Komenda `agent` w terminalu (alias w shell.nix → dotfiles/scripts/agent.sh)
         – wypisuje: system, narzędzia deweloperskie, Python/LaTeX/nvim/AI, serwisy lokalne
 - [x] **T2.22** Mega.nz – `megatools` w programs.nix (megaput, megaget, megals, megacopy…)
-- [ ] **T2.23** JDownloader 2 – nie ma w nixpkgs; potrzebna własna derywacja z oficjalnym jarem
-        – na razie: pobierz ręcznie z jdownloader.org i uruchom przez `java -jar JDownloader.jar`
+- [x] **T2.23** JDownloader 2 – nie ma w nixpkgs; własna derywacja z oficjalnym Setup jarem
+        – `writeShellScriptBin "jdownloader"` w programs.nix; Setup jar z fetchurl (sha256 przypięty)
+        – pierwsze uruchomienie: GUI instalator → ~/JDownloader2/; dalej startuje bezpośrednio
 
 ---
 

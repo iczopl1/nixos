@@ -3,6 +3,40 @@
 # mango.nix, keyboard-mouse.nix, crafts.nix i python.nix mają własne moduły.
 { pkgs, lib, ... }:
 
+let
+  # T2.23: JDownloader 2 – nie ma w nixpkgs; własna derywacja z oficjalnego Setup jara.
+  # GIT: nie dotyczy – pobieramy oficjalny jar z serwera JDownloader
+  # Przy pierwszym uruchomieniu (brak ~/JDownloader2/JDownloader2.jar) odpala Setup jar
+  # z GUI instalatorem → instaluje do ~/JDownloader2/.  Kolejne uruchomienia startują bezpośrednio.
+  # JDownloader sam się aktualizuje, więc wersja jara w Nix nie ma znaczenia.
+  jd2SetupJar = pkgs.fetchurl {
+    url = "https://jdownloader.org/downloads/jdownloader2/appwork/JDownloader2Setup.jar";
+    sha256 = "0h0jbc05rhz4hhz128q23rwg0sjj2745fq2fkmkv4iglwpyi8d2x";
+  };
+
+  jdownloader2 = pkgs.writeShellScriptBin "jdownloader" ''
+    JD2_HOME="$HOME/JDownloader2"
+    JD2_JAR="$JD2_HOME/JDownloader2.jar"
+    JAVA="${pkgs.jdk17}/bin/java"
+
+    if [ ! -f "$JD2_JAR" ]; then
+      echo "JDownloader 2: pierwsze uruchomienie – instalacja do $JD2_HOME"
+      echo "(otworzy się okno instalatora, wybierz $JD2_HOME jako katalog)"
+      mkdir -p "$JD2_HOME"
+      "$JAVA" -jar "${jd2SetupJar}" -noexit -q -dir "$JD2_HOME" 2>/dev/null \
+        || "$JAVA" -jar "${jd2SetupJar}"
+    fi
+
+    if [ -f "$JD2_JAR" ]; then
+      exec "$JAVA" -jar "$JD2_JAR" "$@"
+    else
+      echo "Instalacja nie powiodła się. Uruchom ręcznie:"
+      echo "  java -jar ${jd2SetupJar}"
+      exit 1
+    fi
+  '';
+in
+
 {
   environment.systemPackages = with pkgs; [
     # --- Pulpit (extra, full) ---
@@ -48,7 +82,7 @@
     markdownlint-cli
 
     # --- AI (full) ---
-    # antigravity-cli – tylko w nixos-unstable (nie w nixpkgs 26.05); użyj nix-shell -p antigravity-cli
+    # claude-code i antigravity-cli (agy) są w programs_minimal.nix
 
     # --- Biuro / grafika / dokumenty ---
     libreoffice            # libreoffice-fresh przemianowany (nixpkgs 26.05+)
@@ -76,6 +110,7 @@
 
     # --- Chmura / transfery ---
     megatools             # T2.22: Mega.nz CLI (megaput, megaget, megals, megacopy…)
+    jdownloader2          # T2.23: JDownloader 2 – wrapper; Setup jar pobiera app do ~/JDownloader2/
 
     # --- Bezpieczeństwo ---
     maltego
