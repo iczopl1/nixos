@@ -106,21 +106,10 @@ if [[ "$NEW_MACHINE" -eq 0 ]]; then
     warn "Brak $NIXOS_DIR/PROFILE – przyjmuję 'full'. Ustaw ręcznie: echo minimal | sudo tee $NIXOS_DIR/PROFILE"
   fi
 
-  info "Kopiuję konfigurację do $NIXOS_DIR i buduję..."
-  sudo mkdir -p "$NIXOS_DIR"
-  sudo rsync -a --exclude=".git/" --exclude="hardware-configuration.nix" "$REPO_DIR/" "$NIXOS_DIR/"
-
-  PROFILE_NOW=$(cat "$NIXOS_DIR/PROFILE" 2>/dev/null || echo "full")
-  if [[ "$PROFILE_NOW" == "minimal" && -f "$NIXOS_DIR/configuration_minimal.nix" ]]; then
-    ENTRY="$NIXOS_DIR/configuration_minimal.nix"
-  else
-    ENTRY="$NIXOS_DIR/configuration.nix"
-  fi
-
-  info "Budowanie profilu: $PROFILE_NOW ($ENTRY)"
-  sudo nixos-rebuild boot -I nixos-config="$ENTRY"
-  ok "Build zakończony. Uruchom ponownie: systemctl reboot"
-  exit 0
+  # Deleguj do rebuild.sh – ma sprawdzoną logikę budowania (nix-build przez kanał nixos).
+  # rebuild.sh sam czyta PROFILE, robi sprawdzenia, commit i kopiowanie.
+  info "Uruchamiam rebuild.sh..."
+  exec "$REPO_DIR/rebuild.sh" "auto: synchronizacja konfiguracji"
 fi
 
 # ---------------------------------------------------------------------------
@@ -373,22 +362,33 @@ if [[ -z "$NIXPKGS_CHAN" || ! -d "$NIXPKGS_CHAN" ]]; then
   exit 1
 fi
 
+build_and_activate_boot() {
+  # Buduje system i ustawia jako boot (tak samo jak rebuild.sh, żeby uniknąć
+  # błędu "nixos-rebuild picks system.nix" gdy NIX_PATH wskazuje /etc/nixos/).
+  local entry="$1"
+  local link="/tmp/auto-install-$$"
+  sudo nix-build "$NIXPKGS_CHAN/nixos" \
+    --attr config.system.build.toplevel \
+    -I nixos-config="$entry" \
+    -o "$link"
+  local syspath
+  syspath=$(readlink -f "$link")
+  sudo rm -f "$link"
+  sudo nix-env --profile /nix/var/nix/profiles/system --set "$syspath"
+  sudo "$syspath/bin/switch-to-configuration" boot
+}
+
 if [[ "$IN_CHROOT" -eq 1 ]]; then
-  # Jesteśmy w nixos-install chroot
   info "Tryb chroot – używam nixos-install"
-  sudo nixos-install \
-    --no-channel-copy \
-    --system "$(sudo nix-build "$NIXPKGS_CHAN/nixos" \
-      --attr config.system.build.toplevel \
-      -I nixos-config="$NIXOS_DIR/configuration_minimal.nix" \
-      --no-out-link)" \
-    2>&1
+  SYSTEM_DRV=$(sudo nix-build "$NIXPKGS_CHAN/nixos" \
+    --attr config.system.build.toplevel \
+    -I nixos-config="$NIXOS_DIR/configuration_minimal.nix" \
+    --no-out-link 2>&1)
+  sudo nixos-install --no-channel-copy --system "$SYSTEM_DRV"
 else
-  # Działający system – używamy nixos-rebuild boot
-  info "Tryb normalny – używam nixos-rebuild boot"
-  # Tymczasowo ustaw PROFILE na minimal, zbuduj, przywróć jeśli trzeba
+  info "Tryb normalny – nix-build przez kanał nixos"
   echo "minimal" | sudo tee "$NIXOS_DIR/PROFILE" > /dev/null
-  sudo nixos-rebuild boot -I nixos-config="$NIXOS_DIR/configuration_minimal.nix" 2>&1
+  build_and_activate_boot "$NIXOS_DIR/configuration_minimal.nix"
 fi
 
 ok "Minimal zainstalowany (lub zaplanowany do bootowania)"
