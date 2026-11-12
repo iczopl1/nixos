@@ -206,16 +206,21 @@ if [[ -z "$NIXPKGS_PATH" ]]; then
   exit 1
 fi
 
-echo "Komenda: nixos-rebuild boot --no-flake --file $ENTRY [NIX_PATH=nixpkgs=$NIXPKGS_PATH]"
+# nixos-rebuild-ng (Python, NixOS 26.05+) nie obsługuje --file z modułami NixOS –
+# szuka konfiguracji w /etc/nixos/configuration.nix (lub flake.nix / system.nix).
+# Dlatego kopiujemy config do /etc/nixos/ PRZED buildem. Commit robimy tylko po sukcesie.
+# Jeśli build się wysypie, /etc/nixos/ ma nowe pliki, ale git jest czysty – bezpieczne.
+section "Kopiowanie konfiguracji do $NIXOS_DIR (przed buildem)"
+sudo rsync -a \
+  --exclude=".git/" \
+  --exclude="hardware-configuration.nix" \
+  "$REPO_DIR/" "$NIXOS_DIR/"
+ok "Konfiguracja skopiowana do $NIXOS_DIR"
+
+echo "Komenda: nixos-rebuild boot --no-flake [config: $NIXOS_DIR/$(basename "$ENTRY")]"
 BUILD_OK=0
 
-# nixos-rebuild-ng (Python, NixOS 26.05+) ignoruje nixos-config w NIX_PATH –
-# szuka konfiguracji w /etc/nixos/{configuration,system}.nix.
-# Jedyny pewny sposób: --file wskazuje plik wejściowy bezpośrednio.
-# NIX_PATH nadal potrzebny dla nixpkgs, bo root może mieć /etc/nixos w swoim PATH.
-if sudo env \
-    NIX_PATH="nixpkgs=$NIXPKGS_PATH" \
-    nixos-rebuild boot --no-flake --file "$ENTRY" 2>&1; then
+if sudo nixos-rebuild boot --no-flake 2>&1; then
   BUILD_OK=1
 else
   err "nixos-rebuild boot nie powiodło się"
@@ -247,17 +252,7 @@ else
   ok "Commit: $COMMIT_MSG"
 fi
 
-# --- 10. Kopiowanie do /etc/nixos ---
-section "Kopiowanie do $NIXOS_DIR"
-# Kopiuj wszystko oprócz .git i hardware-configuration.nix (per-maszyna, zostaje w /etc/nixos)
-# Nie kasujemy istniejących plików w /etc/nixos (bez --delete), żeby nie usunąć PROFILE, TURBO_OFF_BUILD itp.
-sudo rsync -a \
-  --exclude=".git/" \
-  --exclude="hardware-configuration.nix" \
-  "$REPO_DIR/" "$NIXOS_DIR/"
-ok "Skopiowano konfigurację do $NIXOS_DIR"
-
-# --- 11. Zmiana profilu (--full) ---
+# --- 10. Zmiana profilu (--full) ---
 if [[ "$FORCE_FULL" -eq 1 ]]; then
   echo "full" | sudo tee "$PROFILE_FILE" > /dev/null
   ok "PROFILE zmieniony na 'full'"
