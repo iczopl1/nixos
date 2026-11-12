@@ -8,7 +8,7 @@
 Odpowiadaj po polsku.
 
 Najważniejsze (szczegóły zawsze w `MASTER.md`):
-- **Claude Code musi działać w minimal**, nigdy go z minimal nie usuwaj.
+- **Narzędzia AI (Claude Code, agy) muszą działać w minimal**, nigdy ich z minimal nie usuwaj.
 - Budujesz zawsze w trybie `boot`, nigdy `switch` na niesprawdzonej konfiguracji. Commit i kopiowanie do `/etc/nixos` robisz tylko po udanym buildzie (`rebuild.sh`).
 - Minimal nie ma ciężkiej kompilacji. Full może kompilować, ale z git tylko z uzasadnieniem.
 - Nie używasz flake'ów ani flag do zapamiętania. `hardware-configuration.nix` i `local.nix` leżą poza repo.

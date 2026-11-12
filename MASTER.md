@@ -7,7 +7,7 @@
  
 ## 0. Złote reguły (zawsze)
  
-**★ Zasada najważniejsza: Claude Code (i dostęp do czatów AI) musi działać w minimal.** Kiedy coś się posypie, pomoc AI ma być pod ręką od pierwszego uruchomienia systemu (pkt 16).
+**★ Zasada najważniejsza: Narzędzia AI – Claude Code i Antigravity CLI (`agy`) (i dostęp do czatów AI) muszą działać w minimal.** Kiedy coś się posypie, pomoc AI ma być pod ręką od pierwszego uruchomienia systemu (pkt 16).
  
 1. **Agent (Claude Code) używa wyłącznie `nixos-rebuild boot` lub `build` – nigdy `switch`.** Użytkownik może używać `switch` według własnego uznania. `rebuild.sh` zawsze buduje w trybie `boot` (patrz pkt 6).
 2. **Każda działająca wersja = commit w git.** Bez commita nie kopiujemy niczego do `/etc/nixos`.
@@ -200,7 +200,7 @@ Kompilacja **jest dozwolona**, jeżeli pakiet spełnia wszystkie warunki:
 - **Neovim** (`nvim.nix`) – przypięta wersja z `vendor/nvim`, instalowana z lokalnego cache bez kompilacji (pkt 7). Wyjątek od reguł kompilacji: jeśli lokalnego cache brak, nvim wolno zbudować ze źródeł z `vendor/nvim` nawet w minimal.
 - **Przeglądarka** – binarka z cache (np. Firefox).
 - **KeePassXC**.
-- **Claude Code** (`claude` w terminalu) – zasada najważniejsza (pkt 16). Do tego przeglądarka z czatami AI jako zapas.
+- **Claude Code** (`claude` w terminalu) oraz **Antigravity CLI** (`agy` w terminalu) – zasada najważniejsza (pkt 16). Do tego przeglądarka z czatami AI jako zapas.
 - Do tego niezbędne minimum:
   - sieć: NetworkManager (+ applet / nmtui), Wi-Fi, Bluetooth opcjonalnie
   - terminal, menedżer plików, git, curl/wget, unzip
@@ -530,15 +530,15 @@ Przed commitem zmiany ROS agent wykonuje i pokazuje użytkownikowi wyniki:
 Gdy system się sypie, pomoc AI (Claude Code w terminalu, czaty w przeglądarce) często ratuje sytuację. Dlatego **dostęp do AI ma pierwszeństwo przed wszystkim innym w minimal**.
  
 ### W minimal
-- **Claude Code** zainstalowany w minimal, z nixpkgs: pakiet `claude-code-bin` (gotowa binarka) albo `claude-code`. To pakiet **unfree** – zezwalamy tylko na niego (nie na wszystko):
+- **Claude Code** (`claude`) oraz **Antigravity CLI** (`agy` z `unstable.antigravity-cli`) zainstalowane w minimal jako gotowe binarki. Pakiety **unfree** – zezwalamy tylko na nie w `allowUnfreePredicate`:
   ```nix
   nixpkgs.config.allowUnfreePredicate = pkg:
-    builtins.elem (lib.getName pkg) [ "claude-code" "claude-code-bin" ];  # + inne świadomie dopuszczone
+    builtins.elem (lib.getName pkg) [ "claude-code" "claude-code-bin" "antigravity-cli" ];  # + inne świadomie dopuszczone
   ```
-- To tylko pobranie gotowego programu – **bez kompilacji**, mieści się w zasadach minimal (pkt 4).
-- **Zapas:** przeglądarka (już w minimal) z czatami AI – działa nawet wtedy, gdy Claude Code z jakiegoś powodu nie wstanie.
+- To pobranie gotowych binarek – **bez kompilacji**, mieści się w zasadach minimal (pkt 4).
+- **Zapas:** przeglądarka (już w minimal) z czatami AI – działa nawet wtedy, gdy CLI z jakiegoś powodu nie wstanie.
 - Wymaga internetu i zalogowania – offline AI nie pomoże, więc sieć (NetworkManager, Wi-Fi) też jest w minimal priorytetem.
-- Po postawieniu minimal sprawdzamy: `claude` uruchamia się i odpowiada, przeglądarka otwiera czat.
+- Po postawieniu minimal sprawdzamy: `claude` i `agy` uruchamiają się i odpowiadają, przeglądarka otwiera czat.
 ### W full
 - Claude Code może być w najnowszej wersji (aktualizuje się bardzo często, a wersja z nixpkgs bywa w tyle) – wg kolejności z pkt 13: nixpkgs → oficjalna binarka → nic więcej. Uzasadnienie w komentarzu jak przy Discordzie.
 ### Gdy system nie wstaje (chroot / live USB)

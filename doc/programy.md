@@ -12,7 +12,7 @@ Unfree włączone w `configuration.nix` (`nixpkgs.config.allowUnfree = true`).
 | Przeglądarki / komunikacja | brave, google-chrome, discord, anydesk |
 | Edytory / IDE | neovim, vscodium, android-studio, android-tools, flutter, mesa-demos |
 | Programowanie | gcc, clang (niższy priorytet), clang-tools, cmake, ninja, gnumake, gdb, lldb, jdk17, jdk21 (niższy priorytet), maven, gradle, kotlin, go, nodejs, yarn, prettier, eslint, markdownlint-cli, grip |
-| AI | gemini-cli |
+| AI | claude-code, antigravity-cli (agy) |
 | Biuro / grafika / dokumenty | libreoffice-fresh, gimp, krita, texliveFull, texlab, pandoc, graphviz, imagemagick, hunspell (+ słowniki en_US, pl_PL) |
 | Neovim – LSP / formatery / narzędzia (zamiast Masona) | lua-language-server, stylua, google-java-format, java-language-server, zathura, glow (+ clang-tools, lldb, texlab, pyright, black, debugpy) |
 | Hasła | keepassxc |
