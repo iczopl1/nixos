@@ -12,6 +12,9 @@ ShellRoot {
     // Hints overlay – singletons Mango i BarTargets są auto-odkryte (pragma Singleton)
     Hints {}
 
+    // SUPER+H: overlay z dokumentacją skrótów klawiszowych (T3.1)
+    Shortcuts {}
+
     Variants {
         model: Quickshell.screens
 

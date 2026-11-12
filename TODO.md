@@ -106,7 +106,7 @@
 
 ## P3 – Na kiedyś / niski priorytet
 
-- [ ] **T3.1** Skrót Super+H – overlay z dokumentacją skrótów klawiszowych (Quickshell QML)
+- [x] **T3.1** Skrót Super+H – overlay z dokumentacją skrótów klawiszowych (Quickshell QML)
 - [x] **T3.2** `setn.sh` – post-install: Tailscale, SSH key, Syncthing, KeePassXC, profil NixOS
 - [ ] **T3.3** nvim – tutorial/cheatsheet skrótów (which-key lub własny overlay)
 - [ ] **T3.4** nvim – obsługa wszystkich popularnych języków (treesitter + LSP)
