@@ -107,6 +107,7 @@ map({ "n", "v" }, "<leader>fm", function()
   require("conform").format({ lsp_format = "fallback" })
 end, { desc = "Formatuj" })
 map("n", "<leader>ds", vim.diagnostic.setloclist, { desc = "Diagnostyka: lista" })
+map("n", "<leader>?",  "<cmd>WhichKey<CR>", { desc = "Wszystkie skróty (cheatsheet)" })
 map("n", "<leader>wK", "<cmd>WhichKey<CR>", { desc = "Wszystkie skróty" })
 
 ---------------------------------------------------------------------------

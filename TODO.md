@@ -109,7 +109,8 @@
 
 - [x] **T3.1** Skrót Super+H – overlay z dokumentacją skrótów klawiszowych (Quickshell QML)
 - [x] **T3.2** `setn.sh` – post-install: Tailscale, SSH key, Syncthing, KeePassXC, profil NixOS
-- [ ] **T3.3** nvim – tutorial/cheatsheet skrótów (which-key lub własny overlay)
+- [x] **T3.3** nvim – tutorial/cheatsheet skrótów (which-key lub własny overlay)
+        – rozbudowane grupy spec (g, [, ], leader-grupy LSP/kodu/termina), <leader>? = WhichKey
 - [x] **T3.4** nvim – obsługa wszystkich popularnych języków (treesitter + LSP)
 - [ ] **T3.5** nvim – animacja pisania (kolor okna ↑ przy szybszym pisaniu, 1–90 wpm)
 - [x] **T3.6** AltGr+Ctrl jako drugi Super (xkb remap)

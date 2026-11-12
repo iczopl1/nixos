@@ -69,20 +69,34 @@ return {
     },
   },
 
-  -- Podpowiedzi skrótów po naciśnięciu Spacji
+  -- Podpowiedzi skrótów po naciśnięciu Spacji (lub innego prefiksu)
   {
     "folke/which-key.nvim",
     event = "VeryLazy",
     opts = {
       preset = "modern",
+      delay = 400,
       spec = {
+        -- <leader> grupy
         { "<leader>b", group = "bufory" },
         { "<leader>t", group = "karty / motyw" },
-        { "<leader>f", group = "szukaj / formatuj" },
+        { "<leader>f", group = "szukaj / pliki" },
         { "<leader>d", group = "debugger / diagnostyka" },
         { "<leader>x", group = "trouble / zamknij bufor" },
         { "<leader>g", group = "git" },
         { "<leader>l", group = "LaTeX (vimtex)" },
+        { "<leader>s", group = "LSP: podpis / sygnatura" },
+        { "<leader>w", group = "LSP: workspace / which-key" },
+        { "<leader>r", group = "zmień nazwę / relativenumber" },
+        { "<leader>c", group = "akcje kodu" },
+        -- nawigacja
+        { "[",  group = "poprzedni" },
+        { "]",  group = "następny" },
+        { "g",  group = "idź do / nawigacja" },
+        -- terminale
+        { "<A-h>", desc = "Terminal poziomy" },
+        { "<A-v>", desc = "Terminal pionowy" },
+        { "<A-i>", desc = "Terminal pływający" },
       },
     },
   },
