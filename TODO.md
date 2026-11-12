@@ -24,7 +24,7 @@
         – minimal: boot, sieć, GUI, nvim, przeglądarka, KeePass, Claude Code, terminal, git
         – full: wszystko z minimal + crafts, python ciężki, android-studio, maltego, ros2 (via local)
         – python.nix: ciężkie biblioteki tylko do full (numpy/scipy zostają, casadi do sprawdzenia)
-- [ ] **T1.6** auto.sh – instalator na nową maszynę (MASTER §2)
+- [x] **T1.6** auto.sh – instalator na nową maszynę (MASTER §2)
         – wykrywa nową maszynę po UUID /
         – pyta minimal/full, pokazuje GB do pobrania
         – najpierw stawia minimal, potem full w tle
@@ -121,19 +121,23 @@
 
 ---
 
-## Gdzie skończyliśmy (2026-11-11)
+## Gdzie skończyliśmy (2026-11-12)
 
 **Zrobione w tej sesji:**
-- T0.1–T0.3, T1.1–T1.5 – MASTER compliance (security, kernel zen, Claude Code, dyski, skrypty, podział minimal/full)
-- ros2.nix → local.nix
-- configuration_minimal.nix + programs_minimal.nix (commit a6cd5c9)
-- keyboard-mouse.nix, tailnet-b.nix → tylko full (kompilują lokalnie)
+- brave.nix: fix Qt5/Qt6 mismatch (autoPatchelfIgnoreMissingDeps)
+- ~/.config/mango/config.conf: utworzony od zera (hylprland→mango składnia), fix hintkeys, awww-daemon
+- dotfiles/mango/ dodane do repo + tmpfiles symlink w shell.nix
+- ~/.bashrc: zastąpiony czystym plikiem (zerwany symlink z flake config)
+- services.nix: syncthing dataDir=/home/iczo (fix permission denied)
+- dotfiles/quickshell/: przeniesione z quickshell/bar/, dodano shell.qml (bar z tagami, zegarem, vol, bat)
+- mango config: exec_once=waybar → exec_once=quickshell (obu plikach)
+- ~/.config/quickshell symlink utworzony
+- T1.6: auto.sh instalator zakończony
 
 **Następne w kolejce:**
-- T1.6 – auto.sh instalator (czeka na zatwierdzenie przez użytkownika)
 - T2.1 i dalej według priorytetów
+- Zalecany rebuild: `! ./rebuild.sh "sync konfiguracji"`
 
 **Uwagi:**
-- Zalecany rebuild przed restartem: `! ./rebuild.sh "T1.5: weryfikacja"` (lub dry-build).
-- rebuild.sh musi czytać /etc/nixos/PROFILE – sprawdzić czy plik istnieje (domyślnie full).
 - T2.9 (Brave policies) – wymaga sprawdzenia czy NixOS ma `programs.chromium`/managed policies.
+- Pasek Quickshell wymaga przetestowania (quickshell musi być uruchomiony przez Mango).
