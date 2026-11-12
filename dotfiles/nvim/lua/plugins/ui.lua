@@ -41,7 +41,16 @@ return {
         lualine_a = { "mode" },
         lualine_b = { "branch", "diff", "diagnostics" },
         lualine_c = { { "filename", path = 1 } },
-        lualine_x = { "lsp_status", "filetype" },
+        lualine_x = {
+          {
+            function()
+              local clients = vim.lsp.get_clients({ bufnr = 0 })
+              if #clients == 0 then return "" end
+              return "󰒍 " .. table.concat(vim.tbl_map(function(c) return c.name end, clients), " ")
+            end,
+          },
+          "filetype",
+        },
         lualine_y = { "progress" },
         lualine_z = {
           -- T3.5: licznik WPM – widoczny tylko w trybie wpisywania, kolor zmienia się z prędkością
