@@ -217,13 +217,34 @@ sudo rsync -a \
   "$REPO_DIR/" "$NIXOS_DIR/"
 ok "Konfiguracja skopiowana do $NIXOS_DIR"
 
-echo "Komenda: nixos-rebuild boot --no-flake [config: $NIXOS_DIR/$(basename "$ENTRY")]"
+# nixos-rebuild-ng (Python, NixOS 26.05+) traktuje configuration.nix jako wyrażenie nix,
+# nie jako moduł – nie może go zewaluować bez systemu modułów, spada do system.nix.
+# Rozwiązanie: pomijamy nixos-rebuild i używamy klasycznego nix-build '<nixpkgs/nixos>'
+# z jawnym -I nixos-config=... – tak działał nixos-rebuild-bash przez lata.
+CONFIG_NAME="$(basename "$ENTRY")"
+BUILD_LINK="/tmp/nixos-rebuild-$$"
+echo "Komenda: nix-build '<nixpkgs/nixos>' -A config.system.build.toplevel -I nixos-config=$NIXOS_DIR/$CONFIG_NAME"
 BUILD_OK=0
 
-if sudo nixos-rebuild boot --no-flake 2>&1; then
+if sudo nix-build '<nixpkgs/nixos>' \
+    -A config.system.build.toplevel \
+    -I "nixpkgs=$NIXPKGS_PATH" \
+    -I "nixos-config=$NIXOS_DIR/$CONFIG_NAME" \
+    -o "$BUILD_LINK" 2>&1; then
+
+  SYSTEM_PATH=$(readlink -f "$BUILD_LINK")
+  sudo rm -f "$BUILD_LINK"
+
+  # Zarejestruj jako nową generację systemu
+  sudo nix-env --profile /nix/var/nix/profiles/system --set "$SYSTEM_PATH"
+
+  # Zainstaluj bootloader i zaktualizuj grub.cfg
+  sudo "$SYSTEM_PATH/bin/switch-to-configuration" boot
+
   BUILD_OK=1
 else
-  err "nixos-rebuild boot nie powiodło się"
+  sudo rm -f "$BUILD_LINK" 2>/dev/null || true
+  err "nix-build nie powiodło się"
 fi
 
 # Wyłącz trap turbo przed normalnym zakończeniem (trap EXIT wykona się sam)
