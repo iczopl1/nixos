@@ -4,3 +4,8 @@
 //@theme "/nix/store/h7iclz9zzwz48xd3mp426lr0zzrg1d7h-rofi-2.0.0/share/rofi/themes/arthur.rasi"
 
 @theme "/nix/store/h7iclz9zzwz48xd3mp426lr0zzrg1d7h-rofi-2.0.0/share/rofi/themes/material.rasi"
+
+configuration {
+    // Uruchamiaj przez bash żeby PATH z NixOS (/run/current-system/sw/bin) był dostępny.
+    run-command:       "bash -c '{cmd}'";
+}

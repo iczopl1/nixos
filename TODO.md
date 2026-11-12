@@ -48,6 +48,14 @@
 - [ ] **T2.8** Status Syncthing w barze – przez 1 min: liczba połączeń; potem: stan synchronizacji
         – skrypt polling SyncthingAPI (port 8384 lokalny), widget w Quickshell
 
+### Bar (Quickshell)
+- [ ] **T2.25** Bar – prawa strona: CPU%, RAM%, bateria, prędkość sieci (↓↑ KB/s lub MB/s)
+        – CPU: `/proc/stat` (diff między próbkami, timer 2s)
+        – RAM: `/proc/meminfo` (MemTotal - MemAvailable)
+        – Bateria: `/sys/class/power_supply/BAT0/` capacity + status (już jest, poprawić widoczność)
+        – Sieć: `/proc/net/dev` (diff bajtów RX/TX między próbkami, wybrany interfejs: eth0/wlan0/wlp*)
+        – Kolejność: cpu XX% | ram XX% | bat XX% | ↓X ↑X
+
 ### Brave
 - [ ] **T2.9** Brave – paczka ustawień przez `programs.brave` lub managed policies:
         – wyłącz AI (Leo), wyłącz Google jako domyślna wyszukiwarka
