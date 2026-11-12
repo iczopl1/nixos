@@ -10,8 +10,8 @@
     enable = true;
 
     # Syncthing – synchronizacja z telefonem i PC (MASTER §8: każdy port jawnie)
-    allowedTCPPorts = [ 22000 ];       # protokół synchronizacji
-    allowedUDPPorts = [ 22000 21027 ]; # QUIC + lokalne wykrywanie urządzeń
+    allowedTCPPorts = [ 22000 ];              # protokół synchronizacji
+    allowedUDPPorts = [ 22000 21027 47200 ];  # Syncthing QUIC + discovery + Linksy
 
     # Tailscale (tailscale0) – moduł NixOS sam otwiera potrzebne porty UDP.
     # tailnet-b.nix obsługuje swoje reguły przez extraCommands.

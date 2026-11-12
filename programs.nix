@@ -4,6 +4,45 @@
 { pkgs, lib, ... }:
 
 let
+  # Linksy – integracja PC↔telefon (pliki, schowek, ekran, kamera, BT).
+  # Nie ma w nixpkgs; binarka z oficjalnych GitHub Releases (MASTER §13 kolejność 2).
+  # GIT: linksy – powód: brak w nixpkgs – dodano: 2026-11-12
+  # Wymagania: GTK 4.14+, libadwaita 1.6+; screen/kamera: GStreamer + PipeWire (services.nix).
+  # Firewall: UDP 47200 otwarte w security.nix.
+  linksy = pkgs.stdenv.mkDerivation rec {
+    pname = "linksy";
+    version = "0.8.0";
+
+    src = pkgs.fetchurl {
+      url = "https://github.com/LinkSy-mg/linksy-releases/releases/download/linux-v${version}/linksy-${version}-linux-x86_64.tar.gz";
+      sha256 = "0rmym8b0b3j7j6768bbaf3pcls2jvjygqwhz6za5sq4099sii2p5";
+    };
+
+    nativeBuildInputs = [ pkgs.autoPatchelfHook ];
+
+    buildInputs = with pkgs; [
+      gtk4
+      libadwaita
+      pango
+      cairo
+      graphene
+      glib
+      gst_all_1.gstreamer
+      gst_all_1.gst-plugins-base
+      gst_all_1.gst-plugins-good
+      gst_all_1.gst-plugins-bad   # GTK4 sink (linksy-screen)
+    ];
+
+    dontBuild = true;
+
+    installPhase = ''
+      mkdir -p $out/bin $out/share/icons $out/share/applications
+      cp -r bin/* $out/bin/
+      cp -r share/icons/* $out/share/icons/ 2>/dev/null || true
+      cp share/mg.diary.linksy.Linksy.desktop $out/share/applications/ 2>/dev/null || true
+    '';
+  };
+
   # T2.23: JDownloader 2 – nie ma w nixpkgs; własna derywacja z oficjalnego Setup jara.
   # GIT: nie dotyczy – pobieramy oficjalny jar z serwera JDownloader
   # Przy pierwszym uruchomieniu (brak ~/JDownloader2/JDownloader2.jar) odpala Setup jar
@@ -52,6 +91,7 @@ in
 
     # --- Komunikacja ---
     # brave – w brave.nix (oficjalna binarka z GitHub Releases, nixpkgs 26.05 usunął pakiet)
+    linksy               # integracja PC↔telefon (pliki, schowek, ekran, kamera); binarka z Releases
     google-chrome
     discord
     # anydesk – usunięty: brak kompatybilnych bibliotek GUI dla Mango
