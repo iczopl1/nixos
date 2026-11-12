@@ -336,5 +336,6 @@ in
     "L %h/.config/scripts - - - - ${dotfiles}/scripts"
     "L %h/.bash - - - - ${dotfiles}/bash"
     "L %h/.ssh/config - - - - ${dotfiles}/ssh/config"
+    "L %h/.config/alacritty - - - - ${dotfiles}/alacritty"
   ];
 }
