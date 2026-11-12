@@ -94,11 +94,12 @@
   };
 
   # nixos-rebuild-ng (Python, NixOS 26.05+) czyta nixos-config z /etc/nix/nix.conf (nix-path),
-  # a nie z NIX_PATH env. Bez tego wpisu /etc/nix/nix.conf nie ma nix-path i rebuild-ng
-  # odpada na system.nix zamiast configuration.nix.
+  # a nie z NIX_PATH env. Wskazujemy na symlink tworzony przez rebuild.sh, który zawsze
+  # wskazuje na właściwy plik wejściowy (configuration.nix lub configuration_minimal.nix),
+  # niezależnie od profilu i lokalizacji repo.
   nix.nixPath = [
     "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos"
-    "nixos-config=/etc/nixos/configuration.nix"
+    "nixos-config=/etc/nixos/active-configuration.nix"
     "/nix/var/nix/profiles/per-user/root/channels"
   ];
 

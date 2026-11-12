@@ -22,9 +22,10 @@ in
       # --- System / przebudowa ---
       rebuild     = "cd ~/nix_conf && ./rebuild.sh";
       rebuild-dry = "cd ~/nix_conf && ./rebuild.sh -n";
-      # nixos-rebuild-ng (NixOS 26.05+) ignoruje nixos-config z NIX_PATH – wymagane --file / -I
-      update      = "sudo nixos-rebuild switch -I nixos-config=$HOME/nix_conf/configuration.nix";
-      update-boot = "sudo nixos-rebuild boot   -I nixos-config=$HOME/nix_conf/configuration.nix";
+      # active-configuration.nix to symlink tworzony przez rebuild.sh → właściwy profil.
+      # Po pierwszym rebuild.sh z tą zmianą: nixos-rebuild switch działa bez flag.
+      update      = "sudo nixos-rebuild switch -I nixos-config=/etc/nixos/active-configuration.nix";
+      update-boot = "sudo nixos-rebuild boot   -I nixos-config=/etc/nixos/active-configuration.nix";
 
       # --- Nawigacja ---
       ".."  = "cd ..";

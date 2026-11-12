@@ -217,11 +217,17 @@ sudo rsync -a \
   "$REPO_DIR/" "$NIXOS_DIR/"
 ok "Konfiguracja skopiowana do $NIXOS_DIR"
 
+# Symlink active-configuration.nix → właściwy plik wejściowy dla bieżącego profilu.
+# nixos-rebuild switch (bez flag) czyta nixos-config z /etc/nix/nix.conf (nix.nixPath),
+# który wskazuje właśnie na ten symlink – poprawny plik niezależnie od profilu i lokalizacji repo.
+CONFIG_NAME="$(basename "$ENTRY")"
+sudo ln -sf "$NIXOS_DIR/$CONFIG_NAME" "$NIXOS_DIR/active-configuration.nix"
+ok "active-configuration.nix → $CONFIG_NAME"
+
 # nixos-rebuild-ng (Python, NixOS 26.05+) traktuje configuration.nix jako wyrażenie nix,
 # nie jako moduł – nie może go zewaluować bez systemu modułów, spada do system.nix.
 # Rozwiązanie: pomijamy nixos-rebuild i używamy klasycznego nix-build '<nixpkgs/nixos>'
 # z jawnym -I nixos-config=... – tak działał nixos-rebuild-bash przez lata.
-CONFIG_NAME="$(basename "$ENTRY")"
 BUILD_LINK="/tmp/nixos-rebuild-$$"
 echo "Komenda: nix-build '<nixpkgs/nixos>' -A config.system.build.toplevel -I nixos-config=$NIXOS_DIR/$CONFIG_NAME"
 BUILD_OK=0
