@@ -92,7 +92,7 @@ in
     # --- nvim: LSP, formattery, narzędzia ---
     lua-language-server
     stylua
-    nixfmt-rfc-style    # formater .nix (nixfmt, T2.13)
+    nixfmt              # formater .nix (T2.13; nixfmt-rfc-style → nixfmt od 26.05)
     hunspell
     hunspellDicts.en_US
     hunspellDicts.pl_PL

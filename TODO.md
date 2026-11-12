@@ -80,11 +80,11 @@
         – Alacritty/Kitty/Foot obsługują natywnie, sprawdzić który jest domyślny
 
 ### Inne
-- [ ] **T2.21** `agent.md` – komenda w terminalu zwracająca info dla AI agentów:
-        – zainstalowane narzędzia, wersje, konfiguracja Python/LaTeX/nvim
-- [ ] **T2.22** Mega.nz manager – `megatools` lub `megacmd` w programs.nix
-- [ ] **T2.23** JDownloader 2 – autostart, szybkie toggle zbierania linków, obsługa torrentów
-        – sprawdzić czy jest gotowa binarka NixOS (AUR-style)
+- [x] **T2.21** Komenda `agent` w terminalu (alias w shell.nix → dotfiles/scripts/agent.sh)
+        – wypisuje: system, narzędzia deweloperskie, Python/LaTeX/nvim/AI, serwisy lokalne
+- [x] **T2.22** Mega.nz – `megatools` w programs.nix (megaput, megaget, megals, megacopy…)
+- [ ] **T2.23** JDownloader 2 – nie ma w nixpkgs; potrzebna własna derywacja z oficjalnym jarem
+        – na razie: pobierz ręcznie z jdownloader.org i uruchom przez `java -jar JDownloader.jar`
 
 ---
 
@@ -126,9 +126,10 @@
 - T2.6: keepassxc autostart + window_rule tag 9 w mango
 
 **Następne w kolejce:**
-- T2.11: nvim – relative line numbers
-- T2.14: nvim – clipboard sync
-- T2.8: Syncthing status w barze
+- T2.8: Syncthing status w barze (QML w shell.qml)
+- T3.x: zadania niskiego priorytetu
+- Uwaga: dotfiles/nvim (config bez NvChad) NIE jest aktywny – ~/.config/nvim to stary katalog.
+  Aby aktywować: `rm -rf ~/.config/nvim && systemd-tmpfiles --create --user`
 
 **Uwagi:**
 - T2.9 (Brave policies) – wymaga sprawdzenia czy NixOS ma `programs.chromium`/managed policies.
