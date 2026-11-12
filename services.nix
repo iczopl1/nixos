@@ -45,4 +45,16 @@
     configDir = "/home/iczo/.config/syncthing";
     guiAddress = "127.0.0.1:8384";
   };
+
+  # T2.4: Drukarka HP LaserJet M175n (USB, auto-wykrycie przez CUPS + hplip).
+  # Avahi wykrywa drukarki w sieci lokalnej (mdns); mDNS wymagany przez CUPS Bonjour.
+  services.printing = {
+    enable = true;
+    drivers = [ pkgs.hplip ];
+  };
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;        # host discovery (.local) w /etc/nsswitch.conf
+    openFirewall = true;    # port 5353/udp dla mDNS (sieć lokalna, nie internet)
+  };
 }

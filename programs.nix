@@ -69,6 +69,9 @@
     # --- Narzędzia sieciowe – GUI (T2.3) ---
     wireshark             # GUI analizator pakietów (setuid przez programs.wireshark)
 
+    # --- Chmura / transfery ---
+    megatools             # T2.22: Mega.nz CLI (megaput, megaget, megals, megacopy…)
+
     # --- Bezpieczeństwo ---
     maltego
 

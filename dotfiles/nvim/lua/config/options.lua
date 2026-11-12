@@ -24,8 +24,9 @@ o.fillchars = { eob = " " }
 o.ignorecase = true
 o.smartcase = true
 
--- Numery linii
+-- Numery linii (T2.11): bieżąca linia = bezwzględna, reszta = relatywna (5,4,3,2,1,{nr},1,2,3,4,5)
 o.number = true
+o.relativenumber = true
 o.numberwidth = 2
 o.ruler = false
 

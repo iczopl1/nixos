@@ -61,6 +61,7 @@ in
       th = "thunar . >/dev/null 2>&1 &";
       h = "_histpick";
       hist = "history";
+      agent = "bash ~/.config/scripts/agent.sh";  # T2.21: info dla AI agentów
     };
 
     # Funkcje bash.

@@ -39,7 +39,7 @@
 - [x] **T2.2** Narzędzia diagnostyki dysków: `smartmontools`, `nvme-cli`, `hdparm` (minimal), `gsmartcontrol` (GUI, full)
 - [x] **T2.3** Narzędzia sieciowe: `nmap`, `wireshark`, `iperf3`, `mtr`, `dig`, `tcpdump`, `bandwhich`, `nethogs`, `speedtest-cli`
         – wireshark: programs.wireshark.enable + grupa wireshark (full)
-- [ ] **T2.4** Drukarka HP LaserJet M175n – `hplip`, `cups`, auto-wykrycie przewodowej
+- [x] **T2.4** Drukarka HP LaserJet M175n – `hplip` + CUPS + Avahi mDNS w services.nix
 - [x] **T2.5** Skrót wyłączenia ekranu: `bind=SUPER,F9,spawn_shell,wlopm --off`
 - [x] **T2.6** KeePassXC zawsze na workspace 9 – autostart + window_rule w Mango
         – `window_rule=app_id:org.keepassxc.KeePassXC,tags:9`
@@ -55,42 +55,28 @@
         – Kolejność: cpu XX% | ram XX% | vol XX% | bat XX% | ↓X ↑X
 
 ### Brave
-- [ ] **T2.9** Brave – paczka ustawień przez `programs.brave` lub managed policies:
-        – wyłącz AI (Leo), wyłącz Google jako domyślna wyszukiwarka
-        – wyłącz autouzupełnianie bez Tab (Enter = szukaj, Tab = uzupełnij)
-        – wyłącz proponowanie zapisania hasła
-        – wyłącz telemetrię / opcjonalne dane
-        – PgUp/PgDown 0.5× standardowego kroku
-- [ ] **T2.10** Brave – zakładki (bookmarks policy):
-        – folder AI: ChatGPT, Gemini, Le Chat, Claude, Perplexity
+- [x] **T2.9** Brave – managed policies w `/etc/brave/policies/managed/policy.json`:
+        – BraveAIChatEnabled=false, MetricsReportingEnabled=false, PasswordManagerEnabled=false
+        – AutofillAddress/CreditCard=false, DefaultSearchProvider=DuckDuckGo, BraveRewardsEnabled=false
+        – Pominięte: PgUp/PgDown 0.5× (brak polityki), Enter=szukaj/Tab=uzupełnij (brak polityki)
+- [x] **T2.10** Brave – zakładki zarządzane (ManagedBookmarks w policy.json):
+        – folder AI: Claude, ChatGPT, Gemini, Le Chat, Perplexity
         – folder Google: Drive, Gmail, Mega.nz
-        – folder Local: lokalne usługi z tej konfiguracji (Syncthing :8384, itp.)
+        – folder Local: Syncthing :8384
 
 ### nvim
-- [ ] **T2.11** nvim – relative line numbers: `5,4,3,2,1,{nr},1,2,3,4,5`
-        – `set number relativenumber` w init.lua
-- [ ] **T2.12** nvim – auto-detect venv / środowiska per język:
-        – Python: .venv, venv, .v, v → pyright/pylsp czyta biblioteki stamtąd
-        – Node: node_modules lokalne
-        – Rust: Cargo.toml → rust-analyzer
-- [ ] **T2.13** nvim – auto-format po zapisaniu (conform.nvim lub LSP format on save)
-        – Python: black/ruff, Lua: stylua, C/C++: clang-format, Nix: nixfmt, JS: prettier
-- [ ] **T2.14** nvim – synchronizacja schowka: `y`/`p` ↔ schowek systemowy bez kombinacji
-        – `set clipboard=unnamedplus`; Super+V → historia schowka przez cliphist + rofi
-- [ ] **T2.15** nvim – skrót zmiany rozmiaru czcionki (jak w terminalu)
-- [ ] **T2.16** nvim – pełna obsługa LaTeX (vimtex) + skrót `tex` w terminalu:
-        – kompilacja z minted (shell-escape, latexmk), czyszczenie plików pomocniczych
-        – podgląd PDF w zathurze (już zainstalowany)
-- [ ] **T2.17** nvim – skróty buffer/tab/terminal:
-        – otwórz/zamknij bufor, przejście między tabami bez blokady przez terminal
-        – wyjście z terminala jedną kombinacją
-- [ ] **T2.18** nvim – layout startowy:
-        – tab 0: pliki projektu (neo-tree/oil)
-        – tab 1: terminal + terminal z claude
-        – tab 2: lazygit lub fugitive (obsługa git)
-- [ ] **T2.19** nvim – skróty build/debug per język:
-        – make build/debug, DAP dla Python/Java/Rust/Go/Lua/C++
-- [ ] **T2.20** Zmiana rozmiaru czcionki w terminalu skrótem (Ctrl+= / Ctrl+-)
+- [x] **T2.11** nvim – relative line numbers: `o.relativenumber = true` w options.lua
+- [x] **T2.12** nvim – auto-detect venv dla Python (pyright): `.venv`, `venv`, `$VIRTUAL_ENV` w lsp.lua
+- [x] **T2.13** nvim – auto-format po zapisaniu (conform.nvim):
+        – lua, python, c/cpp, java, nix (nixfmt-rfc-style), js/ts/json/css/html (prettier)
+- [x] **T2.14** nvim – clipboard=unnamedplus już w options.lua; Super+V = cliphist w mango
+- [x] **T2.15** nvim – zmiana rozmiaru czcionki: Ctrl+= / Ctrl+- / Ctrl+0 natywnie w Alacritty
+- [x] **T2.16** nvim – LaTeX (vimtex): zathura + latexmk, skróty `<leader>l*`
+- [x] **T2.17** nvim – skróty buffer (Tab/S-Tab), tab (A-l/A-j), terminal (Esc+Esc, A-h/v/i)
+- [x] **T2.18** nvim – layout startowy: `nvim .` otwiera NvimTree + pusty bufor + terminal (tło)
+        – implementacja w autocmds.lua (VimEnter, argc==1, isdirectory)
+- [x] **T2.19** nvim – DAP: Python (debugpy), C/C++ (lldb-dap), STM32 (OpenOCD)
+- [x] **T2.20** Zmiana rozmiaru czcionki w terminalu – Alacritty Ctrl+= / Ctrl+- natywne
         – Alacritty/Kitty/Foot obsługują natywnie, sprawdzić który jest domyślny
 
 ### Inne
@@ -140,9 +126,9 @@
 - T2.6: keepassxc autostart + window_rule tag 9 w mango
 
 **Następne w kolejce:**
-- T2.9/T2.10: Brave policies/zakładki
+- T2.11: nvim – relative line numbers
+- T2.14: nvim – clipboard sync
 - T2.8: Syncthing status w barze
-- T2.11+: nvim improvements
 
 **Uwagi:**
 - T2.9 (Brave policies) – wymaga sprawdzenia czy NixOS ma `programs.chromium`/managed policies.

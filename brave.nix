@@ -109,4 +109,51 @@ let
 in
 {
   environment.systemPackages = [ brave ];
+
+  # Brave managed policies – /etc/brave/policies/managed/policy.json
+  # Dokumentacja: https://github.com/brave/brave-browser/wiki/Policies + Chromium policies
+  environment.etc."brave/policies/managed/policy.json".text = builtins.toJSON {
+    # --- AI (Leo) wyłączony ---
+    BraveAIChatEnabled = false;
+
+    # --- Telemetria i raporty wyłączone ---
+    MetricsReportingEnabled          = false;
+    CloudReportingEnabled            = false;
+
+    # --- Hasła: używamy KeePassXC, nie Brave ---
+    PasswordManagerEnabled  = false;
+    AutofillAddressEnabled  = false;
+    AutofillCreditCardEnabled = false;
+
+    # --- Wyszukiwarka domyślna: DuckDuckGo zamiast Google ---
+    DefaultSearchProviderEnabled   = true;
+    DefaultSearchProviderName      = "DuckDuckGo";
+    DefaultSearchProviderSearchURL = "https://duckduckgo.com/?q={searchTerms}";
+    DefaultSearchProviderSuggestURL = "https://duckduckgo.com/ac/?q={searchTerms}&type=list";
+
+    # --- Brave Rewards wyłączone ---
+    BraveRewardsEnabled = false;
+
+    # --- T2.10: Zakładki zarządzane ---
+    ManagedBookmarks = [
+      { name = "AI"; children = [
+          { name = "Claude";      url = "https://claude.ai"; }
+          { name = "ChatGPT";     url = "https://chat.openai.com"; }
+          { name = "Gemini";      url = "https://gemini.google.com"; }
+          { name = "Le Chat";     url = "https://chat.mistral.ai"; }
+          { name = "Perplexity";  url = "https://www.perplexity.ai"; }
+        ];
+      }
+      { name = "Google"; children = [
+          { name = "Drive"; url = "https://drive.google.com"; }
+          { name = "Gmail"; url = "https://mail.google.com"; }
+          { name = "Mega.nz"; url = "https://mega.nz"; }
+        ];
+      }
+      { name = "Local"; children = [
+          { name = "Syncthing"; url = "http://localhost:8384"; }
+        ];
+      }
+    ];
+  };
 }
