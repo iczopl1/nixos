@@ -126,6 +126,11 @@ map("n", "]t", function() require("todo-comments").jump_next() end, { desc = "Na
 map("n", "[t", function() require("todo-comments").jump_prev() end, { desc = "Poprzedni TODO" })
 
 ---------------------------------------------------------------------------
+-- Zen-mode
+---------------------------------------------------------------------------
+map("n", "<leader>z", "<cmd>ZenMode<CR>", { desc = "Zen-mode: tryb skupienia" })
+
+---------------------------------------------------------------------------
 -- Oil (edytor plików)
 ---------------------------------------------------------------------------
 map("n", "-", "<cmd>Oil<CR>", { desc = "Oil: otwórz katalog bieżący" })
