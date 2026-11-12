@@ -21,5 +21,7 @@ in
     "d %h/.config/scripts 0755 - - -"
     "L+ %h/.config/scripts/phone-status.sh - - - - ${dotfiles}/scripts/phone-status.sh"
     "L+ %h/.config/scripts/bt-headset.sh   - - - - ${dotfiles}/scripts/bt-headset.sh"
+    # Tapety: ~/.config/wallpapers → dotfiles/wallpapers (switch-random-wallpaper.sh szuka tu)
+    "L %h/.config/wallpapers - - - - ${dotfiles}/wallpapers"
   ];
 }

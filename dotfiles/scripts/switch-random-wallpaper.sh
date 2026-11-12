@@ -17,8 +17,11 @@ LOG_FILE="${XDG_CACHE_HOME:-$HOME/.cache}/rotate-random-wallpaper.log"
 THEME_TRANSITION_DELAY="$(awk "BEGIN { printf \"%.3f\", $TRANSITION_DURATION / 2 }")"
 CAVA_TRANSITION_DELAY="$(awk "BEGIN { printf \"%.3f\", $TRANSITION_DURATION * $CAVA_THEME_TRANSITION_FRACTION }")"
 
-if ! command -v swww >/dev/null 2>&1; then
-  echo "error: swww is required for animated wallpaper transitions" >&2
+# nixpkgs 26.05: swww przemianowany na awww
+SWWW_CMD="$(command -v awww 2>/dev/null || command -v swww 2>/dev/null || true)"
+SWWW_DAEMON="$(command -v awww-daemon 2>/dev/null || command -v swww-daemon 2>/dev/null || true)"
+if [ -z "$SWWW_CMD" ]; then
+  echo "error: awww (swww) is required for animated wallpaper transitions" >&2
   exit 1
 fi
 
@@ -38,8 +41,9 @@ if [ "${#wallpapers[@]}" -eq 0 ]; then
   exit 1
 fi
 
-if ! pgrep -x swww-daemon >/dev/null 2>&1; then
-  swww-daemon >/dev/null 2>&1 &
+AWWW_SOCK="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/${WAYLAND_DISPLAY:-wayland-0}-awww-daemon.sock"
+if [ ! -S "$AWWW_SOCK" ] && ! pgrep -f awww-daemon >/dev/null 2>&1 && ! pgrep -f swww-daemon >/dev/null 2>&1; then
+  "$SWWW_DAEMON" >/dev/null 2>&1 &
   sleep 1
 fi
 
@@ -55,7 +59,7 @@ if [ "${#wallpapers[@]}" -gt 1 ]; then
   done
 fi
 
-swww img "$wallpaper" \
+"$SWWW_CMD" img "$wallpaper" \
   --transition-type "$TRANSITION_TYPE" \
   --transition-pos "$TRANSITION_POS" \
   --transition-duration "$TRANSITION_DURATION" \
