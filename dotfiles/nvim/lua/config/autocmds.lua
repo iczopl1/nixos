@@ -96,4 +96,7 @@ vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, {
   end,
 })
 
+-- T3.5: animacja prędkości pisania (CursorLine + lualine WPM)
+require("config.typing_speed").setup()
+
 -- LaTeX: plik *.latexmain (np. main.tex.latexmain) vimtex wykrywa sam.

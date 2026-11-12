@@ -43,7 +43,24 @@ return {
         lualine_c = { { "filename", path = 1 } },
         lualine_x = { "lsp_status", "filetype" },
         lualine_y = { "progress" },
-        lualine_z = { "location" },
+        lualine_z = {
+          -- T3.5: licznik WPM – widoczny tylko w trybie wpisywania, kolor zmienia się z prędkością
+          {
+            function()
+              local ok, ts = pcall(require, "config.typing_speed")
+              if not ok then return "" end
+              local wpm = ts.get_wpm()
+              return wpm > 0 and (wpm .. " wpm") or ""
+            end,
+            color = function()
+              local ok, ts = pcall(require, "config.typing_speed")
+              if not ok then return {} end
+              return { fg = ts.wpm_fg(ts.get_wpm()), gui = "bold" }
+            end,
+            cond = function() return vim.fn.mode() == "i" end,
+          },
+          "location",
+        },
       },
     },
   },

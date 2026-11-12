@@ -112,7 +112,8 @@
 - [x] **T3.3** nvim – tutorial/cheatsheet skrótów (which-key lub własny overlay)
         – rozbudowane grupy spec (g, [, ], leader-grupy LSP/kodu/termina), <leader>? = WhichKey
 - [x] **T3.4** nvim – obsługa wszystkich popularnych języków (treesitter + LSP)
-- [ ] **T3.5** nvim – animacja pisania (kolor okna ↑ przy szybszym pisaniu, 1–90 wpm)
+- [x] **T3.5** nvim – animacja pisania (kolor okna ↑ przy szybszym pisaniu, 1–90 wpm)
+        – CursorLine bg: spoczynek→błękit→bursztyn→czerwień wg WPM; licznik w lualine (tryb insert)
 - [x] **T3.6** AltGr+Ctrl jako drugi Super (xkb remap)
         – services.keyd: rightalt=layer(altgr), altgr/{left,right}control=leftmeta (system.nix)
 - [ ] **T3.7** Status telefonu GrapheneOS (Tailscale + BT headset switch PC↔telefon)
