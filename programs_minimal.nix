@@ -47,6 +47,8 @@ in
     udiskie               # auto-mount USB/dysków (frontend dla udisks2)
     wlopm                 # wyłączanie ekranu przez wlr-output-power-management (T2.5)
 
+    evtest                # czytanie raw input events (T3.13 – WPM border w Quickshell)
+
     # --- Diagnostyka dysków (T2.2) ---
     smartmontools         # smartctl / smartd – SMART monitoring HDD/SSD/NVMe
     nvme-cli              # nvme – narzędzia dla dysków NVMe

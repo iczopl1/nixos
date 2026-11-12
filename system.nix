@@ -45,7 +45,7 @@
     description = "iczo";
     # "ydotool": keyboard-mouse.nix (full); "adbusers"/"libvirtd": programs.nix (full)
     # Grupy tworzone przez moduły full – definiujemy je jawnie, by istniały też w minimal.
-    extraGroups = [ "networkmanager" "wheel" "adbusers" "libvirtd" "kvm" "ydotool" "dialout" "plugdev" ];
+    extraGroups = [ "networkmanager" "wheel" "adbusers" "libvirtd" "kvm" "ydotool" "dialout" "plugdev" "input" ];
     packages = [ ];
   };
 

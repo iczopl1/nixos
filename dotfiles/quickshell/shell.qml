@@ -15,6 +15,12 @@ ShellRoot {
     // SUPER+H: overlay z dokumentacją skrótów klawiszowych (T3.1)
     Shortcuts {}
 
+    // T3.13: kolor obramówki okna zmienia się z prędkością pisania (WPM)
+    WpmBorder {}
+
+    // T3.14: efekty cząsteczkowe na tle (liście / deszcz / śnieg / iskry)
+    Particles {}
+
     Variants {
         model: Quickshell.screens
 
