@@ -106,14 +106,29 @@ if [[ "$NEW_MACHINE" -eq 0 ]]; then
     warn "Brak $NIXOS_DIR/PROFILE – przyjmuję 'full'. Ustaw ręcznie: echo minimal | sudo tee $NIXOS_DIR/PROFILE"
   fi
 
+  # Jeśli brak PROFILE – zapytaj użytkownika i utwórz plik.
+  if [[ ! -f "$NIXOS_DIR/PROFILE" ]]; then
+    warn "Brak $NIXOS_DIR/PROFILE."
+    ask "Który profil budować? [minimal/full] (Enter = full): "
+    read -r PROFILE_ANSWER
+    PROFILE_ANSWER="${PROFILE_ANSWER,,}"
+    if [[ "$PROFILE_ANSWER" == "minimal" ]]; then
+      echo "minimal" | sudo tee "$NIXOS_DIR/PROFILE" > /dev/null
+      ok "PROFILE = minimal"
+    else
+      echo "full" | sudo tee "$NIXOS_DIR/PROFILE" > /dev/null
+      ok "PROFILE = full"
+    fi
+  fi
+
   # Deleguj do rebuild.sh – ma sprawdzoną logikę budowania (nix-build przez kanał nixos).
   # rebuild.sh sam czyta PROFILE, robi sprawdzenia, commit i kopiowanie.
   # Opis commitu generujemy automatycznie z listy zmienionych plików.
   AUTO_CHANGED=$(git -C "$REPO_DIR" diff --name-only HEAD 2>/dev/null \
-    | grep -v '^$' | head -4 | tr '\n' ', ' | sed 's/, $//')
+    | grep -v '^$' | head -4 | paste -sd ',' | sed 's/,/, /g')
   if [[ -z "$AUTO_CHANGED" ]]; then
     AUTO_CHANGED=$(git -C "$REPO_DIR" status --short 2>/dev/null \
-      | awk '{print $2}' | head -4 | tr '\n' ', ' | sed 's/, $//')
+      | awk '{print $2}' | head -4 | paste -sd ',' | sed 's/,/, /g')
   fi
   AUTO_MSG="auto: ${AUTO_CHANGED:-synchronizacja konfiguracji}"
   info "Uruchamiam rebuild.sh (commit: \"$AUTO_MSG\")..."
