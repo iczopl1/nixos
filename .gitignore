@@ -17,3 +17,6 @@ result-*
 
 # Zipa robionego przez make-zip.sh
 nixos-config-*.zip
+
+# Pliki generowane automatycznie przez pywal
+*-wal.conf
