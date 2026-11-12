@@ -128,10 +128,11 @@ in
   # jeśli masz już np. ~/.config/nvim, usuń/przenieś go i zaloguj się ponownie
   # (albo: systemctl --user restart systemd-tmpfiles-setup).
   # ~/.config/hypr celowo pominięte (Hyprland usunięty).
-  # Konfiguracja Mango (~/.config/mango) i quickshell - patrz SETUP.md.
   systemd.user.tmpfiles.users.iczo.rules = [
     "d %h/.config 0755 - - -"
     "d %h/.ssh 0700 - - -"
+    "L %h/.config/mango - - - - ${dotfiles}/mango"
+    "L %h/.config/quickshell - - - - ${dotfiles}/quickshell"
     "L %h/.config/waybar - - - - ${dotfiles}/waybar"
     "L %h/.config/rofi - - - - ${dotfiles}/rofi"
     "L %h/.config/cava - - - - ${dotfiles}/cava"

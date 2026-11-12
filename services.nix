@@ -38,6 +38,8 @@
   services.syncthing = {
     enable = true;
     user = "iczo";
+    dataDir = "/home/iczo";
+    configDir = "/home/iczo/.config/syncthing";
     guiAddress = "127.0.0.1:8384";
   };
 }
