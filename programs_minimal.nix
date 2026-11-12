@@ -93,6 +93,9 @@ in
     lua-language-server
     stylua
     nixfmt              # formater .nix (T2.13; nixfmt-rfc-style → nixfmt od 26.05)
+    nil                 # Nix LSP (nil_ls) – uzupełnianie, go-to-def, diagnostyka
+    statix              # linter .nix – antywzorce (używany też w rebuild.sh)
+    deadnix             # wykrywanie martwego kodu .nix (używany też w rebuild.sh)
     hunspell
     hunspellDicts.en_US
     hunspellDicts.pl_PL

@@ -1,9 +1,10 @@
 -- LSP. Serwery są instalowane przez NixOS (nie Mason):
---   lua_ls               -> lua-language-server   (programs.nix)
+--   lua_ls               -> lua-language-server   (programs_minimal.nix)
 --   pyright              -> pyright               (python.nix)
 --   clangd               -> clang-tools           (programs.nix)
 --   java_language_server -> java-language-server  (programs.nix)
 --   texlab               -> texlab                (programs.nix)
+--   nil_ls               -> nil                   (programs_minimal.nix) – Nix LSP
 -- nvim-lspconfig dostarcza tylko gotowe ustawienia (komendy, root_markers).
 
 -- Python: użyj venv projektu ($VIRTUAL_ENV, .venv/, venv/) - jak w starej konfiguracji.
@@ -128,7 +129,16 @@ return {
 
       vim.lsp.config("texlab", {})
 
-      vim.lsp.enable({ "lua_ls", "pyright", "clangd", "java_language_server", "texlab" })
+      vim.lsp.config("nil_ls", {
+        settings = {
+          ["nil"] = {
+            formatting = { command = { "nixfmt" } },
+            nix = { flake = { autoArchive = false } },
+          },
+        },
+      })
+
+      vim.lsp.enable({ "lua_ls", "pyright", "clangd", "java_language_server", "texlab", "nil_ls" })
     end,
   },
 }
