@@ -33,6 +33,9 @@
   # Tailscale = tailnet A (tailscale0). tailnet-b.nix uruchamia obok drugi demon.
   services.tailscale.enable = true;
 
+  # udisks2 – D-Bus daemon do zarządzania dyskami; wymagany przez udiskie (auto-mount USB).
+  services.udisks2.enable = true;
+
   # Syncthing - synchronizacja z telefonem i PC.
   # Porty otwarte jawnie w security.nix (nie openDefaultPorts).
   services.syncthing = {

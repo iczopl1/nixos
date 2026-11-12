@@ -44,6 +44,7 @@ in
     networkmanagerapplet
     wvkbd                 # klawiatura ekranowa (tablet/touch)
     yad                   # dialogi GUI dla skryptów
+    udiskie               # auto-mount USB/dysków (frontend dla udisks2)
 
     # --- Narzędzia terminalowe ---
     jq
