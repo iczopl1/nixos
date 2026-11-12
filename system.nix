@@ -75,5 +75,9 @@
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  # Wyłącz budowanie dokumentacji NixOS (options.json, man-pages) – nie potrzebne na desktopie,
+  # a moduły custom mogą powodować błędy eval-cacheable-options w sandboxie.
+  documentation.nixos.enable = false;
+
   system.stateVersion = "25.11";
 }
