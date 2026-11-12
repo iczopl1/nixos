@@ -79,7 +79,7 @@
     enable = true;
     keyboards = {
       default = {
-        ids = [ "*" ];
+        ids = [ "k:*" ];  # tylko klawiatury – "*" przechwytywało też mysz i blokało klikanie
         settings = {
           main = {
             rightalt = "layer(altgr)";
