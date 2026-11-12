@@ -87,7 +87,8 @@ let
       makeWrapper $out/lib/brave/brave-browser $out/bin/brave \
         --set NIXOS_OZONE_WL "1" \
         --add-flags "--enable-features=WaylandWindowDecorations" \
-        --add-flags "--ozone-platform-hint=auto"
+        --add-flags "--ozone-platform-hint=auto" \
+        --add-flags "--force-renderer-accessibility"
 
       # Plik .desktop i ikony
       mkdir -p $out/share

@@ -57,4 +57,8 @@
     nssmdns4 = true;        # host discovery (.local) w /etc/nsswitch.conf
     openFirewall = true;    # port 5353/udp dla mDNS (sieć lokalna, nie internet)
   };
+
+  # AT-SPI2 accessibility bus – wymagany przez hintd (Super+D hints) do wykrywania
+  # klikalnych elementów w GTK/Qt i innych aplikacjach przez D-Bus accessibility API.
+  services.gnome.at-spi2-core.enable = true;
 }
