@@ -110,6 +110,10 @@ Scope {
             required property var modelData
             screen: modelData
 
+            // gdy nieaktywna – ukryj całe okno, nie tylko treść;
+            // transparentny PanelWindow nadal przechwytuje kliknięcia myszki w Wayland
+            visible: root.active
+
             color: "transparent"
             anchors { top: true; bottom: true; left: true; right: true }
             exclusionMode: ExclusionMode.Ignore
