@@ -46,8 +46,8 @@
         – `window_rule=app_id:org.keepassxc.KeePassXC,tags:9`
 - [x] **T2.7** Super+Tab – window switcher z wszystkich workspaces
         – `rofi -show window -theme ~/.config/rofi/rofi.rosi` (zastąpił focusstack,next)
-- [ ] **T2.8** Status Syncthing w barze – przez 1 min: liczba połączeń; potem: stan synchronizacji
-        – skrypt polling SyncthingAPI (port 8384 lokalny), widget w Quickshell
+- [x] **T2.8** Status Syncthing w barze – przez 1 min: liczba połączeń; potem: stan synchronizacji
+        – syncthing-status.sh (polling REST API) + syncLabel widget w shell.qml (T2.8 było zrobione)
 
 ### Bar (Quickshell)
 - [x] **T2.25** Bar – prawa strona: CPU%, RAM%, bateria, prędkość sieci (↓↑ KB/s lub MB/s)
@@ -110,7 +110,7 @@
 - [x] **T3.1** Skrót Super+H – overlay z dokumentacją skrótów klawiszowych (Quickshell QML)
 - [x] **T3.2** `setn.sh` – post-install: Tailscale, SSH key, Syncthing, KeePassXC, profil NixOS
 - [ ] **T3.3** nvim – tutorial/cheatsheet skrótów (which-key lub własny overlay)
-- [ ] **T3.4** nvim – obsługa wszystkich popularnych języków (treesitter + LSP)
+- [x] **T3.4** nvim – obsługa wszystkich popularnych języków (treesitter + LSP)
 - [ ] **T3.5** nvim – animacja pisania (kolor okna ↑ przy szybszym pisaniu, 1–90 wpm)
 - [ ] **T3.6** AltGr+Ctrl jako drugi Super (xkb remap)
 - [ ] **T3.7** Status telefonu GrapheneOS (Tailscale + BT headset switch PC↔telefon)

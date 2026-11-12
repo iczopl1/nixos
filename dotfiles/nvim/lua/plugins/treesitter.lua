@@ -8,11 +8,20 @@ return {
     main = "nvim-treesitter.configs",
     opts = {
       ensure_installed = {
+        -- Core nvim
         "lua", "vim", "vimdoc", "query",
-        "python", "c", "cpp", "java", "kotlin", "go",
-        "bash", "nix", "json", "yaml", "toml",
+        -- Systemy / skrypty
+        "bash", "nix", "cmake", "dockerfile", "make",
+        -- Języki (minimal)
+        "python", "c", "cpp",
+        -- Języki (full)
+        "java", "kotlin", "go", "rust", "typescript", "javascript",
+        -- Dane / konfiguracja
+        "json", "yaml", "toml", "xml", "sql",
+        -- Web
+        "html", "css",
+        -- Dokumentacja
         "markdown", "markdown_inline",
-        "html", "css", "javascript",
       },
       -- bez "latex": ten parser wymaga tree-sitter CLI; LaTeX koloruje vimtex
       auto_install = false,

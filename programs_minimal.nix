@@ -1,7 +1,7 @@
 # Programy dla profilu minimal.
 # Wymóg: GUI (Mango+Quickshell), nvim, przeglądarka, KeePass, Claude Code, terminal, git.
 # Bez ciężkiej kompilacji – wszystko z cache nixpkgs (MASTER §4).
-{ pkgs, lib, ... }:
+{ pkgs, lib, unstable, ... }:
 
 let
   # Biblioteki uruchomieniowe dla binarek spoza Nix (claude-code i inne).
@@ -93,6 +93,7 @@ in
 
     # --- AI: zasada najważniejsza (MASTER §0/§16) ---
     claude-code
+    unstable.antigravity-cli  # agy – Antigravity CLI (MASTER §0/§16)
 
     # --- nvim: LSP, formattery, narzędzia ---
     lua-language-server
@@ -101,9 +102,10 @@ in
     nil                 # Nix LSP (nil_ls) – uzupełnianie, go-to-def, diagnostyka
     statix              # linter .nix – antywzorce (używany też w rebuild.sh)
     deadnix             # wykrywanie martwego kodu .nix (używany też w rebuild.sh)
-    bash-language-server  # T3.4: Bash/Shell LSP
-    yaml-language-server  # T3.4: YAML LSP
-    marksman              # T3.4: Markdown LSP
+    bash-language-server    # T3.4: Bash/Shell LSP
+    yaml-language-server    # T3.4: YAML LSP
+    marksman                # T3.4: Markdown LSP
+    cmake-language-server   # T3.4: CMake LSP (neocmake)
     hunspell
     hunspellDicts.en_US
     hunspellDicts.pl_PL
