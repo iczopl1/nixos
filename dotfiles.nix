@@ -23,5 +23,8 @@ in
     "L+ %h/.config/scripts/bt-headset.sh   - - - - ${dotfiles}/scripts/bt-headset.sh"
     # Tapety: ~/.config/wallpapers → dotfiles/wallpapers (switch-random-wallpaper.sh szuka tu)
     "L %h/.config/wallpapers - - - - ${dotfiles}/wallpapers"
+    # Mango: config linkowany z repo (bez tego zmiany w repo nie trafiają do kompozytora)
+    "d %h/.config/mango 0755 - - -"
+    "L+ %h/.config/mango/config.conf - - - - ${dotfiles}/mango/config.conf"
   ];
 }
