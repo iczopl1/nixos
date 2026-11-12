@@ -29,6 +29,17 @@
         – wykrywa nową maszynę po UUID /
         – pyta minimal/full, pokazuje GB do pobrania
         – najpierw stawia minimal, potem full w tle
+- [ ] **T1.11** Napraw Super+D (hintd) – nakładka klikalnych elementów
+        – cel: Super+D pokazuje litery nad każdym miejscem gdzie można kliknąć myszką
+          (linki, przyciski, pola, zakładki, itp.) – jak Vimium ale systemowo
+        – priorytet: działać w Brave (Chromium/Wayland) – tam najważniejsze
+        – sprawdzić dlaczego hintd nie wykrywa elementów w Brave:
+          a) hintd może nie obsługiwać protokołu accessibility w Chromium (at-spi2)
+          b) alternatywa dla Brave: wymusić Vimium/Vimium-C jako rozszerzenie
+             (ManagedExtensions w brave.nix – obok KeePassXC)
+          c) jeśli hintd działa tylko w GTK/Qt – rozważyć zastąpienie lub uzupełnienie
+             czymś co obsługuje Chromium (np. xdotool-based lub at-spi2)
+        – sprawdzić też czy hintd startuje poprawnie (logi: journalctl --user -u hintd)
 - [ ] **T1.8** Thunderbird – klient e-mail
         – `thunderbird` z nixpkgs (full); unfree: nie (jest wolny)
 - [ ] **T1.9** Beeper – komunikator all-in-one (Signal, WhatsApp, Telegram, iMessage…)
