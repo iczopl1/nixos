@@ -73,10 +73,17 @@ if [[ ! -f "$CURRENT_HW" ]]; then
   info "Brak $CURRENT_HW – nowa maszyna."
   NEW_MACHINE=1
 else
-  OLD_UUID=$(grep -oP 'fileSystems\."/".*?device\s*=\s*"\K[^"]+' "$CURRENT_HW" 2>/dev/null \
-             | head -1 | sed 's|.*/by-uuid/||' || true)
-  NEW_UUID=$(grep -oP 'fileSystems\."/".*?device\s*=\s*"\K[^"]+' "$NEW_HW" 2>/dev/null \
-             | head -1 | sed 's|.*/by-uuid/||' || true)
+  # hardware-configuration.nix ma wieloliniowy format, grep musi wybrać blok "/" a potem device
+  extract_root_uuid() {
+    local f="$1"
+    # Znajdź linię z device = "..." w sekcji fileSystems."/" (zakładamy < 10 linii po nagłówku)
+    awk '/fileSystems\."\/"/,/^\s*};/' "$f" 2>/dev/null \
+      | grep 'device\s*=' \
+      | grep -oP 'by-uuid/\K[^"]+' \
+      | head -1
+  }
+  OLD_UUID=$(extract_root_uuid "$CURRENT_HW")
+  NEW_UUID=$(extract_root_uuid "$NEW_HW")
 
   if [[ -z "$OLD_UUID" || -z "$NEW_UUID" ]]; then
     warn "Nie mogę porównać UUID / – przyjmuję nową maszynę dla bezpieczeństwa."
@@ -147,7 +154,7 @@ while IFS= read -r line; do
   if [[ "$PARTTYPE" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" ]] || [[ "$FSTYPE" == "vfat" ]]; then
     EFI_CANDIDATES+=("$DEV")
   fi
-done < <(lsblk -n -o NAME,SIZE,FSTYPE,PARTTYPE,MOUNTPOINT -p | grep -v "^$")
+done < <(lsblk -lp -n -o NAME,SIZE,FSTYPE,PARTTYPE,MOUNTPOINT | grep -v "^$")
 
 # Sprawdź, które kandydaty mają katalog EFI/Microsoft (to ESP Windowsa)
 EFI_LINUX=()
@@ -189,7 +196,7 @@ else
   info "Znaleziono wiele kandydatów:"
   for i in "${!EFI_LINUX[@]}"; do
     echo "  $((i+1)). ${EFI_LINUX[$i]}"
-    lsblk -n -o NAME,SIZE,FSTYPE,LABEL "${EFI_LINUX[$i]}" | sed 's/^/     /'
+    lsblk -lp -n -o NAME,SIZE,FSTYPE,LABEL "${EFI_LINUX[$i]}" | sed 's/^/     /'
   done
   ask "Wybierz numer: "
   read -r NUM
@@ -209,7 +216,7 @@ if [[ -n "$ACTIVE_SWAP" ]]; then
   info "Aktywny swap: $SWAP_PART"
 else
   # Szukaj po typie partycji GPT swap
-  SWAP_CAND=$(lsblk -n -o NAME,PARTTYPE,FSTYPE -p 2>/dev/null \
+  SWAP_CAND=$(lsblk -lp -n -o NAME,PARTTYPE,FSTYPE 2>/dev/null \
     | awk '$2=="0657fd6d-a4ab-43c4-84e5-0933c84b4f4f" || $3=="swap" {print $1}' \
     | head -1 || true)
   if [[ -n "$SWAP_CAND" ]]; then
