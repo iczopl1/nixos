@@ -31,7 +31,13 @@ return {
     dependencies = { "nvim-tree/nvim-web-devicons", "catppuccin/nvim" },
     opts = {
       options = {
-        theme = "catppuccin",
+        -- "catppuccin" nie istnieje jako nazwa motywu lualine (catppuccin.nvim rejestruje
+        -- tylko warianty per-flavour: catppuccin-mocha/latte/frappe/macchiato) – stąd warning
+        -- "Theme catppuccin not found" na starcie i przy każdej zmianie motywu (<Space>th,
+        -- Telescope colorscheme z live-preview odpala ColorScheme wielokrotnie). "auto" robi
+        -- dokładnie to, na co lualine i tak się cofał, ale bez warninga – i działa z każdym
+        -- motywem wybranym w Telescope, nie tylko z catppuccin.
+        theme = "auto",
         globalstatus = true,
         section_separators = { left = "", right = "" },
         component_separators = { left = "", right = "" },
