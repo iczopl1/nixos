@@ -13,6 +13,9 @@ Singleton {
 
     readonly property string stateFile: Quickshell.env("HOME") + "/.config/particle-effect"
     readonly property var themes: ["off", "leaves", "rain", "snow", "sparks"]
+    readonly property var themeLabels: ({
+        off: "wyłączone", leaves: "liście", rain: "deszcz", snow: "śnieg", sparks: "iskry"
+    })
     property string currentTheme: "off"
     property bool active: currentTheme !== "off"
 
@@ -48,6 +51,7 @@ Singleton {
                     if (root.themes.indexOf(t) >= 0) {
                         root.currentTheme = t
                         saveState.start()
+                        root.notifyTheme()
                     }
                 }
             }
@@ -66,6 +70,7 @@ Singleton {
         var i = themes.indexOf(currentTheme)
         currentTheme = themes[(i + 1) % themes.length]
         saveState.start()
+        notifyTheme()
     }
 
     Process {
@@ -75,6 +80,16 @@ Singleton {
             running = false; running = true
         }
     }
+
+    // Powiadomienie (mako) po każdej zmianie motywu – SUPER+F6 i `effects particles <nazwa>`
+    function notifyTheme() {
+        var label = themeLabels[currentTheme] || currentTheme
+        notifyProc.command = ["notify-send", "Cząsteczki", label, "-t", "1500"]
+        notifyProc.running = false
+        notifyProc.running = true
+    }
+
+    Process { id: notifyProc }
 
     // --- Okna cząsteczkowe – jedno per ekran ---
     Variants {

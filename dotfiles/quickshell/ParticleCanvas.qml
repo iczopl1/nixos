@@ -26,7 +26,7 @@ Canvas {
             p.vy = rand(0.8, 2.0)
             p.rot = rand(0, 360)
             p.vrot = rand(-3, 3)
-            p.size = rand(8, 18)
+            p.size = rand(24, 54)  // 3x (było 8-18)
             p.decay = rand(0.002, 0.004)
             p.color = ["#c0a060","#d4833a","#b85c1a","#8b4513","#e8a830"][randInt(0,4)]
             p.swing = rand(0.3, 1.0)
@@ -36,7 +36,7 @@ Canvas {
             p.y = rand(-20, 0)
             p.vx = rand(-0.3, 0.3)
             p.vy = rand(8, 14)
-            p.length = rand(10, 20)
+            p.length = rand(30, 60)  // 3x (było 10-20)
             p.decay = rand(0.004, 0.008)
             p.color = "#6ab0d4"
             p.alpha = rand(0.3, 0.7)
@@ -45,7 +45,7 @@ Canvas {
             p.y = rand(-10, 0)
             p.vx = rand(-0.5, 0.5)
             p.vy = rand(0.5, 1.5)
-            p.size = rand(2, 7)
+            p.size = rand(6, 21)  // 3x (było 2-7)
             p.decay = rand(0.002, 0.005)
             p.color = "#ddeeff"
             p.swing = rand(0.2, 0.8)
@@ -56,7 +56,7 @@ Canvas {
             p.y = height + rand(0, 20)
             p.vx = rand(-2.5, 2.5)
             p.vy = rand(-6, -2)
-            p.size = rand(2, 5)
+            p.size = rand(6, 15)  // 3x (było 2-5)
             p.decay = rand(0.01, 0.025)
             p.color = ["#ff9900","#ffcc00","#ff6600","#ffffff"][randInt(0,3)]
             p.gravity = 0.07
@@ -77,7 +77,7 @@ Canvas {
         } else if (theme === "rain") {
             p.x += p.vx; p.y += p.vy
             p.life -= p.decay
-            if (p.y > height + 25) p.life = 0
+            if (p.y > height + 65) p.life = 0  // margines ≥ max długości smugi (60, 3x)
 
         } else if (theme === "snow") {
             p.swingT += 0.02
@@ -111,7 +111,7 @@ Canvas {
         } else if (theme === "rain") {
             ctx.strokeStyle = p.color
             ctx.globalAlpha *= p.alpha
-            ctx.lineWidth = 1
+            ctx.lineWidth = 3  // 3x (było 1)
             ctx.beginPath()
             ctx.moveTo(p.x, p.y)
             ctx.lineTo(p.x + p.vx * 2, p.y - p.length)
