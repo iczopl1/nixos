@@ -324,6 +324,9 @@ in
         export PYENV_ROOT="$HOME/.pyenv"
         eval "$(pyenv init - bash)"
       fi
+
+      # T2.31: direnv hook – auto-ładuje .envrc przy wejściu do katalogu
+      command -v direnv >/dev/null 2>&1 && eval "$(direnv hook bash)"
     '';
   };
 

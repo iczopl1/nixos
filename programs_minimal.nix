@@ -122,6 +122,11 @@ in
     gnumake
     cmake
     python3
+
+    # T2.31: direnv + nix-direnv – auto nix-shell przy wejściu do katalogu z .envrc
+    # nix-direnv cache'uje env w /nix/store – nie przebudowuje przy każdym cd
+    direnv
+    nix-direnv
   ] ++ runtimeLibs;
 
   # Blokada ekranu (pakiet + usługa PAM)

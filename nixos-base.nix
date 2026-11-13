@@ -110,6 +110,12 @@
     "/nix/var/nix/profiles/per-user/root/channels"
   ];
 
+  # T2.31: nix-direnv – używa flake-less nix-shell (keep-env-derivations)
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+  };
+
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
 
