@@ -5,6 +5,13 @@
   # Kernel zen – responsywność desktopu (MASTER §3). Pochodzi z cache nixpkgs, bez kompilacji.
   boot.kernelPackages = pkgs.linuxPackages_zen;
 
+  # T1.13: zram – swap kompresowany w RAM (MASTER §3 "opcjonalnie, z cache, bez kompilacji").
+  # Na 8 GB RAM: 50% → 4 GB zram. Mniej przycinania gdy build full zajmuje dużo pamięci.
+  zramSwap = {
+    enable    = true;
+    algorithm = "zstd";   # najlepszy stosunek kompresji do CPU na Broadwell
+  };
+
   boot.loader = {
     timeout = 10;
     grub = {
