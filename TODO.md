@@ -129,7 +129,7 @@
         – `zen-mode.nvim`: tryb skupienia (<leader>z)
         – `nvim-colorizer.lua`: podgląd kolorów hex/rgb w edytorze
 
-- [ ] **T2.29** Super+F11 – naprawa toggle baru (ghost bar + brak przełączania)
+- [x] **T2.29** Super+F11 – naprawa toggle baru (ghost bar + brak przełączania)
         – obecny problem: pkill quickshell nie usuwa warstwy wlr-layer-shell od razu;
           stary bar zostaje widoczny przez chwilę lub na stałe (ghost surface)
         – przy ponownym starcie może uruchomić się drugi egzemplarz na tej samej warstwie
