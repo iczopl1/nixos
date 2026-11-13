@@ -117,7 +117,13 @@ return {
         end,
       })
 
-      vim.lsp.config("clangd", {})
+      -- --query-driver: pozwala clangd odpytać arm-none-eabi-gcc (i inne cross-kompilatory)
+      -- o jego wbudowane ścieżki include – bez tego embedded projekty (STM32/Cortex-M)
+      -- sypią błędami "stddef.h not found" itp., bo clangd domyślnie nie ufa nieznanym
+      -- kompilatorom. Glob **/* zamiast store-hasha – przeżywa aktualizacje nixpkgs.
+      vim.lsp.config("clangd", {
+        cmd = { "clangd", "--query-driver=**/arm-none-eabi-*,**/gcc,**/g++,**/clang,**/clang++" },
+      })
 
       vim.lsp.config("java_language_server", {
         cmd = { "java-language-server" },

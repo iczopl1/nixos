@@ -319,6 +319,7 @@ in
     stm32flash            # flash STM32 przez UART (alternatywa dla ST-Link)
     platformio            # PlatformIO CLI – ESP32, AVR, STM32, nRF (framework+upload)
     esptool               # esptool.py – flash ESP32/ESP8266 przez UART
+    bear                  # `bear -- make` generuje compile_commands.json dla clangd (projekty z Makefile)
   ];
 
   # Steam – moduł NixOS: obsługuje 32-bit libs, udev, gamescope opcjonalnie
