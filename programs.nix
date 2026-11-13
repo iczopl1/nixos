@@ -338,6 +338,14 @@ in
   # OpenTabletDriver (graficzny tablet)
   hardware.opentabletdriver.enable = true;
 
+  # T2.32: Podman – kontenery bez roota (rootless); lżejsze niż Docker/libvirt.
+  # Użycie: podman run -it nixos/nix bash    (nie potrzeba sudo)
+  virtualisation.podman = {
+    enable = true;
+    dockerCompat = true;    # `docker` → `podman` (aliasy); istniejące skrypty działają bez zmian
+    defaultNetwork.settings.dns_enabled = true;
+  };
+
   # Wirtualizacja (libvirt/QEMU)
   virtualisation.libvirtd.enable = true;
 
