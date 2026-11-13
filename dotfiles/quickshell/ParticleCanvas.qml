@@ -28,10 +28,10 @@ Canvas {
         if (theme === "leaves") {
             p.y = rand(-20, -5)
             p.vx = rand(-0.6, 0.6)
-            p.vy = rand(0.8, 2.0)
+            p.vy = rand(2, 4)        // szybszy spadek – więcej ruchu, łatwiej zauważyć
             p.rot = rand(0, 360)
             p.vrot = rand(-3, 3)
-            p.size = rand(24, 54)  // 3x (było 8-18)
+            p.size = rand(24, 54)
             p.decay = rand(0.002, 0.004)
             p.color = ["#c0a060","#d4833a","#b85c1a","#8b4513","#e8a830"][randInt(0,4)]
             p.swing = rand(0.3, 1.0)
@@ -49,8 +49,8 @@ Canvas {
         } else if (theme === "snow") {
             p.y = rand(-10, 0)
             p.vx = rand(-0.5, 0.5)
-            p.vy = rand(0.5, 1.5)
-            p.size = rand(6, 21)  // 3x (było 2-7)
+            p.vy = rand(1.5, 3)      // szybszy spadek – więcej ruchu, łatwiej zauważyć
+            p.size = rand(6, 21)
             p.decay = rand(0.002, 0.005)
             p.color = "#ddeeff"
             p.swing = rand(0.2, 0.8)
@@ -120,14 +120,18 @@ Canvas {
             // ctx.ellipse() nie jest wspierane przez Canvas2D w Qt/Quickshell – rysowało się
             // "po cichu" nic (QML Canvas gubi wyjątki JS w onPaint bez żadnego logu/błędu).
             // Zastąpione uniwersalnym arc() + scale() – ten sam spłaszczony kształt listka.
+            // Czarny obrys: widoczne na KAŻDYM tle, nie tylko na kontrastowym.
             ctx.save()
             ctx.translate(p.x, p.y)
             ctx.rotate(p.rot * Math.PI / 180)
             ctx.scale(1, 0.6)
-            ctx.fillStyle = p.color
             ctx.beginPath()
             ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2)
+            ctx.fillStyle = p.color
             ctx.fill()
+            ctx.lineWidth = 3 / 0.6  // kompensacja ctx.scale(1,0.6) na obrysie
+            ctx.strokeStyle = "#1a1a1aee"
+            ctx.stroke()
             ctx.restore()
 
         } else if (theme === "rain") {
@@ -140,10 +144,14 @@ Canvas {
             ctx.stroke()
 
         } else if (theme === "snow") {
-            ctx.fillStyle = p.color
+            // niebieskawy obrys: biały płatek na jasnej/białej tapecie był praktycznie niewidoczny
             ctx.beginPath()
             ctx.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2)
+            ctx.fillStyle = p.color
             ctx.fill()
+            ctx.lineWidth = 2
+            ctx.strokeStyle = "#5a7a99"
+            ctx.stroke()
 
         } else if (theme === "sparks") {
             ctx.fillStyle = p.color
@@ -178,7 +186,7 @@ Canvas {
 
             // Spawn rate wg motywu
             var spawnRate = {
-                leaves: 0.3, rain: 2.5, snow: 0.8, sparks: 1.5,
+                leaves: 1.2, rain: 2.5, snow: 2.0, sparks: 1.5,
                 cursor: canvas.cursorActive ? 4 : 0  // piksele tylko na ekranie z kursorem
             }
             var rate = spawnRate[canvas.theme] || 0
