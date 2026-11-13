@@ -17,7 +17,11 @@ ShellRoot {
     // SUPER+H: overlay z dokumentacją skrótów klawiszowych (T3.1)
     Shortcuts {}
 
-    // WpmBorder i Particles: pragma Singleton – Quickshell auto-odkrywa z katalogu, nie tworzyć ręcznie
+    // WpmBorder: pragma Singleton, ale faktycznie "dotknięty" przez odczyt WpmBorder.wpm niżej w tym
+    // pliku (pasek WPM) – to go instancjonuje. Particles nie ma takiego odwołania nigdzie w configu,
+    // więc Quickshell NIGDY go nie tworzy (singleton bez żadnego odczytu właściwości = martwy kod,
+    // jego SocketServery dla SUPER+F6 / `effects particles` się nie uruchamiają). Wymuszamy istnienie:
+    Component.onCompleted: { var _ = Particles.active }
 
     // T2.29: toggle baru przez socket (SUPER+F11) – zamiast kill/restart procesu.
     // kill + restart zostawiał ghost surface w wlr-layer-shell; visible=false unmapuje czysto.
