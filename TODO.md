@@ -16,6 +16,15 @@
 
 ## P1 – Ważne / blokujące inne
 
+- [ ] **T1.13** zramSwap – swap w RAM (MASTER §3; `zramSwap.enable` w nixos-base.nix)
+        – zmniejsza przycinanie przy buildach w tle na 8 GB RAM
+- [ ] **T1.14** TLP + progi ładowania baterii ThinkPad X250
+        – `services.tlp.enable` + `START_CHARGE_THRESH_BAT0=40 STOP=80`
+        – wydłuża żywotność ogniw; per-maszyna przez local.nix lub bezpośrednio w services.nix
+- [ ] **T1.15** throttled (lenovo-throttling-fix) dla X250
+        – BIOS celowo dławuje CPU przez PL1/PL2; throttled przywraca pełną wydajność
+        – `services.throttled.enable` w services.nix (tylko minimal, lekki daemon)
+
 - [x] **T1.1** kernel zen w system.nix
 - [x] **T1.2** Claude Code w programs.nix (MASTER §0 – zasada najważniejsza)
 - [x] **T1.7** agy (antigravity-cli z unstable) w programs_minimal.nix (MASTER §0/§16)
@@ -131,6 +140,27 @@
           toggle przez SocketServer w QML zamiast kill/restart procesu (jak Shortcuts/Particles),
           lub: `mmsg dispatch focusmon,…` + warunkowe `visible: false` na PanelWindow w QML
 
+### System
+- [ ] **T2.30** nix.gc.automatic – automatyczne czyszczenie starych generacji (cotygodniowo, keep 5)
+- [ ] **T2.31** direnv + nix-direnv – auto `nix-shell` przy wejściu do katalogu projektu
+        – `direnv allow` w katalogu z `.envrc`; `nix-direnv` cache'uje env, nie przebudowuje każdorazowo
+- [ ] **T2.32** podman – kontenery bez roota (full; `virtualisation.podman.enable`)
+- [ ] **T2.37** age – nowoczesne szyfrowanie plików (`age -r`, kompatybilne z SSH keys; minimal)
+- [ ] **T2.38** dnscrypt-proxy – DNS over HTTPS (blokada reklam/trackerów systemowo; ustalić wyjątek firewall)
+
+### Bar (Quickshell)
+- [ ] **T2.33** Bar – temperatura CPU (°C) przed/po fps
+        – `/sys/class/thermal/thermal_zone*/temp`, najwyższa ze stref; timer 3s; kolor: <70°C szary, 70–85°C amber, >85°C czerwień
+- [ ] **T2.34** Bar – media player (playerctl + MPRIS)
+        – `playerctl metadata --format '{{artist}} – {{title}}'`; przyciski ◀ ▶ ▮▮ klikalne
+        – widoczny tylko gdy coś gra; znika gdy brak odtwarzacza
+
+### Narzędzia
+- [ ] **T2.35** wl-screenrec lub wf-recorder – nagrywanie ekranu Wayland
+        – bind `SUPER+F5` = start/stop; zapis do `~/Videos/`
+- [ ] **T2.36** satty – adnotacje na screenshotach (strzałki, tekst, blur obszaru)
+        – pipe z grim: `grim -g "$(slurp)" - | satty -f -`; zastępuje dotychczasowe `grim | wl-copy`
+
 ### Inne
 - [x] **T2.21** Komenda `agent` w terminalu (alias w shell.nix → dotfiles/scripts/agent.sh)
         – wypisuje: system, narzędzia deweloperskie, Python/LaTeX/nvim/AI, serwisy lokalne
@@ -217,8 +247,9 @@
 - T1.11: Brave --force-renderer-accessibility + at-spi2-core (w kodzie, wymaga rebuild)
 - T1.12: v4l2loopback dla Linksy camera; XDG portal + trusted.json Pixel 9 OK
 
-**Gdzie skończyliśmy (2026-11-13):**
-Wszystkie zadania z TODO wykonane. Lista `[ ]` pusta.
+**Gdzie skończyliśmy (2026-11-13 sesja 5):**
+Nowe zadania T1.13–T1.15, T2.30–T2.38 dodane. Implementacja w toku – kolejność:
+T2.30 → T1.13 → T1.14 → T1.15 → T2.31 → T2.37 → T2.36 → T2.35 → T2.33 → T2.34 → T2.32 → T2.38
 
 **Po następnym rebuild sprawdzić:**
 - Super+F11 toggle baru (bez ghost surface)

@@ -127,6 +127,15 @@
   nix.daemonCPUSchedPolicy = "idle";
   nix.daemonIOSchedClass = "idle";
 
+  # T2.30: cotygodniowy GC – usuwa generacje starsze niż 14 dni, zostawia >= 5
+  # Bez tego każdy rebuild zostawia generację na dysku na zawsze.
+  nix.gc = {
+    automatic = true;
+    dates     = "weekly";
+    options   = "--delete-older-than 14d";
+  };
+  nix.settings.min-free = 1024 * 1024 * 512;   # 512 MB – trigger GC gdy dysk się kończy
+
   # Wyłącz budowanie dokumentacji NixOS (options.json, man-pages) – nie potrzebne na desktopie,
   # a moduły custom mogą powodować błędy eval-cacheable-options w sandboxie.
   documentation.nixos.enable = false;
