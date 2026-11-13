@@ -62,6 +62,11 @@
   # klikalnych elementów w GTK/Qt i innych aplikacjach przez D-Bus accessibility API.
   services.gnome.at-spi2-core.enable = true;
 
+  # T1.15: throttled (lenovo-throttling-fix) – naprawia BIOS-owe dławienie CPU na X250.
+  # BIOS ustawia PL1=15W / PL2=25W i co ~28s resetuje limity mocy do minimalnych,
+  # powodując regularne "dropy" wydajności. throttled przywraca pełne PL1/PL2.
+  services.throttled.enable = true;
+
   # T1.14: TLP – zarządzanie energią laptopa + progi ładowania baterii ThinkPad X250.
   # START=40 / STOP=80: ładuje od 40% do 80% → ogniwo rzadziej w ekstremalnych SoC,
   # co znacząco wydłuża jego żywotność (badania Lenovo: 3× więcej cykli niż 0–100%).
