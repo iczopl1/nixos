@@ -29,7 +29,10 @@ Singleton {
     property int    _borderPx:    2       // aktualny poziom bazowy (bez pulsu)
     property real   _smoothed:    0.0    // EMA WPM
     property bool   _pulsing:     false  // puls już aktywny → nie nakładaj kolejnego
-    property bool   enabled:      true
+    // Rozdzielone: kolor obramówki i "ruszanie się" okna (border_px/gap + puls) to dwa
+    // osobne efekty (effects-ctl.sh) – można wyłączyć jeden bez drugiego.
+    property bool   colorEnabled: true
+    property bool   moveEnabled:  true
 
     readonly property int    baseGap:    7   // gap_inner default (config.conf)
     readonly property int    baseBorder: 2   // border_px default (config.conf)
@@ -37,21 +40,30 @@ Singleton {
 
     // --- Toggle on/off (effects-ctl.sh) ---
     SocketServer {
-        id: wpmToggleServer
+        id: colorToggleServer
         active: true
-        path: Quickshell.env("XDG_RUNTIME_DIR") + "/qs-wpm-" + Quickshell.env("WAYLAND_DISPLAY") + ".sock"
-        handler: Socket { Component.onCompleted: root.enabled = !root.enabled }
+        path: Quickshell.env("XDG_RUNTIME_DIR") + "/qs-wpm-color-" + Quickshell.env("WAYLAND_DISPLAY") + ".sock"
+        handler: Socket { Component.onCompleted: root.colorEnabled = !root.colorEnabled }
+    }
+
+    SocketServer {
+        id: moveToggleServer
+        active: true
+        path: Quickshell.env("XDG_RUNTIME_DIR") + "/qs-wpm-move-" + Quickshell.env("WAYLAND_DISPLAY") + ".sock"
+        handler: Socket { Component.onCompleted: root.moveEnabled = !root.moveEnabled }
     }
 
     Timer {
         interval: 800; running: true
-        onTriggered: { wpmToggleServer.active = false; wpmToggleServer.active = true }
+        onTriggered: {
+            colorToggleServer.active = false; colorToggleServer.active = true
+            moveToggleServer.active = false; moveToggleServer.active = true
+        }
     }
 
     // --- Kolory progowe (format mango 0xRRGGBBAA) ---
     // Progi: 15 / 35 / 60 wpm (łagodniejsze niż poprzednie 5/20/45/70)
     function colorForWpm(w) {
-        if (!enabled)     return defaultColor
         if (w >= 60)      return "0xf7768eff"   // czerwień
         else if (w >= 35) return "0xff9e64ff"   // pomarańcz
         else if (w >= 15) return "0xe0af68ff"   // bursztyn
@@ -120,7 +132,7 @@ Singleton {
 
         // Puls: chwilowe +1 do border_px (120 ms), bez korekty gap
         // → animacja mango przesunie okna o ~1 px i wróci → efekt ruchu
-        if (!_pulsing) {
+        if (root.moveEnabled && !_pulsing) {
             _pulsing = true
             mmsgPulseOn.start()
             pulseTimer.restart()
@@ -131,33 +143,21 @@ Singleton {
     Timer {
         interval: 300; running: true; repeat: true
         onTriggered: {
-            if (!root.enabled) {
-                // Wyłączone (effects-ctl.sh) – wróć do stanu bazowego raz, potem nic nie rób
-                if (root._borderPx !== root.baseBorder || root._color !== root.defaultColor) {
-                    root._smoothed = 0
-                    root.wpm = 0
-                    root._color = root.defaultColor
-                    mmsgColor.start()
-                    root._borderPx = root.baseBorder
-                    if (!root._pulsing) mmsgBorder.start()
-                    mmsgGapH.start()
-                    mmsgGapV.start()
-                }
-                return
-            }
             var raw = root.calcWpm()
             // EMA α=0.3: wolno się podnosi i wolno opada → płynne kolory i grubości
             root._smoothed = 0.7 * root._smoothed + 0.3 * raw
             var w = Math.floor(root._smoothed)
             root.wpm = w
 
-            var color = root.colorForWpm(w)
+            // Kolor obramówki – osobny toggle
+            var color = root.colorEnabled ? root.colorForWpm(w) : root.defaultColor
             if (color !== root._color) {
                 root._color = color
                 mmsgColor.start()
             }
 
-            var px = root.borderPxForWpm(w)
+            // Grubość border + gap (= "ruszanie się" okna) – osobny toggle
+            var px = root.moveEnabled ? root.borderPxForWpm(w) : root.baseBorder
             if (px !== root._borderPx) {
                 root._borderPx = px
                 if (!root._pulsing) mmsgBorder.start()   // nie nadpisuj pulsu

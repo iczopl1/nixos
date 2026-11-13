@@ -10,7 +10,9 @@
 #   effects animations [on|off]      animacje Mango (okna)
 #   effects layer      [on|off]      layer_animations (animacje warstw Quickshell/bar)
 #   effects particles  [off|leaves|rain|snow|sparks|cursor]
-#   effects wpm                      przełącz obramówkę WPM (T3.13)
+#   effects wpm-color                przełącz kolor obramówki wg prędkości pisania (T3.13)
+#   effects wpm-move                 przełącz "ruszanie się" okna (border_px/gap + puls) przy pisaniu
+#   effects cava       [on|off]      wizualizator muzyki na pulpicie (cava-bg, na środku)
 #   effects bar                      przełącz widoczność baru (SUPER+F11)
 #
 # Bez argumentu do blur/shadows/animations/layer: przełącza (toggle).
@@ -64,6 +66,33 @@ particles_set() {
   esac
 }
 
+cava_running() {
+  pgrep -f 'kitty.*kitten panel .*cava-bg' >/dev/null 2>&1
+}
+
+# UWAGA: bgm-power-monitor.sh sam odpala/zabija cava-bg wg stanu zasilania (poll co 5s) –
+# ręczne wyłączenie tutaj może zostać nadpisane przy następnej zmianie AC/baterii.
+cava_set() {
+  local mode="${1:-toggle}"
+  case "$mode" in
+    on)
+      cava_running && { echo "cava: już włączone"; return; }
+      local launcher="$HOME/.config/scripts/launch-cava-bg.sh"
+      [ -x "$launcher" ] && nohup "$launcher" >/dev/null 2>&1 &
+      disown 2>/dev/null || true
+      echo "cava: on"
+      ;;
+    off)
+      pkill -f 'kitty.*kitten panel .*cava-bg' >/dev/null 2>&1 || true
+      pkill -f 'cava -p .*/config-bg' >/dev/null 2>&1 || true
+      echo "cava: off"
+      ;;
+    *)
+      if cava_running; then cava_set off; else cava_set on; fi
+      ;;
+  esac
+}
+
 status() {
   echo "--- Mango (config.conf) ---"
   printf "  blur:              %s\n" "$(mango_get blur)"
@@ -72,8 +101,11 @@ status() {
   printf "  layer_animations:  %s\n" "$(mango_get layer_animations)"
   echo "--- Quickshell ---"
   printf "  particles:         %s\n" "$(cat "$HOME/.config/particle-effect" 2>/dev/null || echo off)"
-  echo "  wpm border:        (socket toggle – stan tylko w QS)"
+  echo "  wpm-color:         (socket toggle – stan tylko w QS)"
+  echo "  wpm-move:          (socket toggle – stan tylko w QS)"
   echo "  bar:               (socket toggle – SUPER+F11)"
+  echo "--- Pulpit ---"
+  if cava_running; then printf "  cava (muzyka):     on\n"; else printf "  cava (muzyka):     off\n"; fi
 }
 
 usage() {
@@ -88,7 +120,9 @@ case "$cmd" in
   animations)  mango_onoff animations "${2:-}" ;;
   layer)       mango_onoff layer_animations "${2:-}" ;;
   particles)   particles_set "${2:?podaj motyw: off|leaves|rain|snow|sparks|cursor}" ;;
-  wpm)         socket_ping qs-wpm ;;
+  wpm-color)   socket_ping qs-wpm-color ;;
+  wpm-move)    socket_ping qs-wpm-move ;;
+  cava)        cava_set "${2:-toggle}" ;;
   bar)         socket_ping qs-bar ;;
   help|-h|--help) usage ;;
   menu)
@@ -101,8 +135,9 @@ case "$cmd" in
       echo " 3) animations toggle  4) layer_animations toggle"
       echo " 5) particles: off     6) particles: leaves"
       echo " 7) particles: rain    8) particles: snow"
-      echo " 9) particles: sparks  c) particles: cursor (piksele za myszką)"
-      echo " w) wpm border toggle  b) bar toggle         q) wyjście"
+      echo " 9) particles: sparks  p) particles: cursor (piksele za myszką)"
+      echo " k) wpm kolor toggle   r) wpm ruch toggle      m) cava (muzyka) toggle"
+      echo " b) bar toggle         q) wyjście"
       read -rp "> " choice
       case "$choice" in
         1) mango_onoff blur ;;
@@ -114,8 +149,10 @@ case "$cmd" in
         7) particles_set rain ;;
         8) particles_set snow ;;
         9) particles_set sparks ;;
-        c) particles_set cursor ;;
-        w) socket_ping qs-wpm ;;
+        p) particles_set cursor ;;
+        k) socket_ping qs-wpm-color ;;
+        r) socket_ping qs-wpm-move ;;
+        m) cava_set toggle ;;
         b) socket_ping qs-bar ;;
         q) exit 0 ;;
         *) ;;
