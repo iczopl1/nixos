@@ -44,5 +44,6 @@
       "steam-unwrapped"
       "steam-run"
       "beeper"             # T1.9: komunikator all-in-one
+      "grayjay"            # T1.10: agregator wideo (YouTube, Twitch, Nebula…)
     ];
 }

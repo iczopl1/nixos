@@ -40,15 +40,13 @@
           c) jeśli hintd działa tylko w GTK/Qt – rozważyć zastąpienie lub uzupełnienie
              czymś co obsługuje Chromium (np. xdotool-based lub at-spi2)
         – sprawdzić też czy hintd startuje poprawnie (logi: journalctl --user -u hintd)
-- [ ] **T1.8** Thunderbird – klient e-mail
+- [x] **T1.8** Thunderbird – klient e-mail
         – `thunderbird` z nixpkgs (full); unfree: nie (jest wolny)
-- [ ] **T1.9** Beeper – komunikator all-in-one (Signal, WhatsApp, Telegram, iMessage…)
-        – sprawdzić czy jest w nixpkgs; jeśli nie – binarka z oficjalnych Releases (MASTER §13)
-        – unfree: dodać do allowUnfreePredicate jeśli wymagane
-- [ ] **T1.10** Grayjay – agregator wideo (YouTube, Twitch, Nebula…) by FUTO
-        – nie ma w nixpkgs; binarka/AppImage z oficjalnych Releases lub flathub
-        – własna derywacja jak Linksy (autoPatchelfHook)
-- [ ] **T1.11b** Quickshell – pin do nowszej wersji z GitHuba (full: kompilacja per MASTER §12)
+- [x] **T1.9** Beeper – komunikator all-in-one (Signal, WhatsApp, Telegram, iMessage…)
+        – jest w nixpkgs (unfree beeper 4.2.808); dodano do allowUnfreePredicate
+- [x] **T1.10** Grayjay – agregator wideo (YouTube, Twitch, Nebula…) by FUTO
+        – jest w nixpkgs (unfree grayjay 17); dodano do allowUnfreePredicate
+- [x] **T1.11b** Quickshell – pin do nowszej wersji z GitHuba (full: kompilacja per MASTER §12)
         – 0.3.0 z nixpkgs brakuje: layer_animations, nowych API (ExclusionMode i in.), animacji
         – full: skompilować nowszą wersję ze źródeł (fetchFromGitHub + nix-build, bez flake'ów)
           wzorem obecnej derywacji Brave/Linksy; wersję z nixpkgs zostawić w minimal (bez kompilacji)
