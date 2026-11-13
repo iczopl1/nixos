@@ -85,6 +85,7 @@ in
     bc                    # ]: kalkulator (bc -l)
     libnotify             # pp: notify-send (testowanie powiadomień mako)
     mpv
+    vlc
 
     # T2.37: age – szyfrowanie plików (RSA/Ed25519 keys; prostsze niż GPG do backupów)
     # Użycie: age -r $(cat ~/.ssh/id_ed25519.pub) plik.txt > plik.txt.age
