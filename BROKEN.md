@@ -51,3 +51,28 @@
 - Status: **obejście** – używamy oficjalnej binarki ZIP zamiast nixpkgs
 - Obejście: własna derywacja `grayjay` w `programs.nix` – pobiera oficjalny ZIP z `updater.grayjay.app`, CEF już bundlowany w ZIP (nie kompilujemy). Eksportuje `.desktop` do drun.
 
+### nvim-treesitter (markdown_inline) – crash przy otwieraniu .md
+- Kiedy: 2026-11-13, nvim-treesitter branch `master` @ `cf12346a`
+- Profil: nvim (dotfiles/nvim) – oba profile, każda maszyna z tym repo
+- Objaw: otwarcie pliku `.md` (zaobserwowane na `readme.md` projektu linefolower) czasem rzuca
+  błąd: `vim.schedule callback: .../treesitter/languagetree.lua:215: .../treesitter.lua:197: attempt to call`
+  (stack: `tcall` → `languagetree.lua:596`). Intermittentny – nie reprodukuje się w każdej sesji;
+  headless (`nvim --headless`) go NIE łapie, bo wymaga realnego redraw (highlighter działa tylko
+  na faktycznym repaintcie). `marksman` (LSP) jest przy tym czysty – to NIE błąd LSP, tylko crash
+  silnika treesitter podczas parsowania wstrzykniętego języka `markdown_inline` w `markdown`.
+- Przyczyna: prawdopodobnie regresja/race w async parserze treesitter dla injected languages.
+  Próba "naprawy przez update": `nvim-treesitter` branch `master` jest **zamrożony od 2026-03-23**
+  (`cf12346a3414fa1b06af75c79faebe7f76df080a` = tip origin/master, zero nowych commitów od miesięcy).
+  Cała aktywność deweloperska przeniosła się na branch `main` z **innym, niekompatybilnym API**
+  (nowa architektura, inny sposób `ensure_installed`/`highlight` – nasza konfiguracja w
+  `lua/plugins/treesitter.lua` używa starego `require("nvim-treesitter.configs").setup{...}`,
+  które na `main` już nie istnieje). Migracja na `main` = osobny, większy projekt, nie quick-fix.
+  UWAGA przy próbie: `:Lazy! update nvim-treesitter` (z `!`) zaktualizował też NIEZWIĄZANE wtyczki
+  (gitsigns.nvim, mini.splitjoin, vimtex) – wycofane (`git checkout -- lazy-lock.json`).
+  Do aktualizacji JEDNEJ wtyczki: `:Lazy update nvim-treesitter` BEZ `!`.
+- Status: **zablokowane** (update na `master` nic nie da – nie ma nowszego commita)
+- Obejście: do zrobienia – wyłączyć highlight dla `markdown_inline` (albo całego `markdown`) w
+  `treesitter.lua` (`highlight.disable`), żeby uniknąć ścieżki crashującego parsera, kosztem
+  utraty kolorowania inline (bold/italic/linki) albo całego kolorowania .md.
+  Migracja na branch `main` (nowe API) – do rozważenia jako osobne zadanie, nie na szybko.
+
