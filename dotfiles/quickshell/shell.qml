@@ -433,6 +433,38 @@ ShellRoot {
                     }
                 }
 
+                Item { width: 10 }
+
+                // ===== WPM – prędkość pisania (T3.5/T3.13) =====
+                Text {
+                    id: wpmLabel
+                    Layout.alignment: Qt.AlignVCenter
+                    font.pixelSize: 12
+                    font.family: "JetBrains Mono"
+                    color: "#565f89"
+                    text: ""
+                    visible: false
+
+                    Behavior on color { ColorAnimation { duration: 200 } }
+
+                    Timer {
+                        interval: 300; running: true; repeat: true
+                        onTriggered: {
+                            var w = WpmBorder.wpm
+                            if (w > 0) {
+                                wpmLabel.visible = true
+                                wpmLabel.text  = w + " wpm"
+                                wpmLabel.color = w >= 70 ? "#f7768e"
+                                              : w >= 45 ? "#ff9e64"
+                                              : w >= 20 ? "#e0af68"
+                                              :           "#9eeaf9"
+                            } else {
+                                wpmLabel.visible = false
+                            }
+                        }
+                    }
+                }
+
                 Item { width: 4 }
             }
         }
