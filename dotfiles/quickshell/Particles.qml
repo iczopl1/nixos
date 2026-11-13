@@ -66,7 +66,7 @@ Singleton {
             visible: root.active
             color: "transparent"
             anchors { top: true; bottom: true; left: true; right: true }
-            exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.exclusiveZone: -1
             WlrLayershell.layer: WlrLayer.Background
             WlrLayershell.namespace: "qs-particles"
 
