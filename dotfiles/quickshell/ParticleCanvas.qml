@@ -71,7 +71,7 @@ Canvas {
             p.y = cursorY + rand(-4, 4)
             p.vx = rand(-0.4, 0.4)
             p.vy = rand(-0.8, -0.2)  // leciutko w górę, jak iskierki z kursora
-            p.size = rand(2, 6)      // dosłownie "piksele"
+            p.size = rand(20, 60)    // 10x (było 2-6)
             p.decay = rand(0.03, 0.06)  // szybko gasną – ślad, nie smuga na cały ekran
             p.color = ["#9eeaf9","#e0af68","#f7768e","#c0caf5"][randInt(0,3)]
         }
@@ -182,8 +182,9 @@ Canvas {
                 cursor: canvas.cursorActive ? 4 : 0  // piksele tylko na ekranie z kursorem
             }
             var rate = spawnRate[canvas.theme] || 0
+            var capForTheme = (canvas.theme === "cursor") ? 10 : canvas.maxParticles
             spawnAccum += rate
-            while (spawnAccum >= 1 && canvas.particles.length < canvas.maxParticles) {
+            while (spawnAccum >= 1 && canvas.particles.length < capForTheme) {
                 canvas.particles.push(canvas.spawn())
                 spawnAccum -= 1
             }

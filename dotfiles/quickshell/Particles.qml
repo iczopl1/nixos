@@ -131,7 +131,11 @@ Singleton {
             color: "transparent"
             anchors { top: true; bottom: true; left: true; right: true }
             WlrLayershell.exclusiveZone: -1
-            WlrLayershell.layer: WlrLayer.Background
+            // "background" jest zajęte przez cava-bg i awww-daemon (tapeta) – particles tam
+            // były zasłaniane, niezależnie od motywu (mmsg get all-layers). "bottom" to warstwa
+            // zawsze NAD "background" (gwarancja protokołu, nie zależy od kolejności mapowania).
+            // "cursor" (na żądanie) zawsze na overlay – nad wszystkimi oknami.
+            WlrLayershell.layer: root.currentTheme === "cursor" ? WlrLayer.Overlay : WlrLayer.Bottom
             WlrLayershell.namespace: "qs-particles"
 
             ParticleCanvas {
