@@ -75,6 +75,10 @@ let
     '';
   };
 
+  # T3.13/T3.5: globalny licznik WPM – blokuje na select(), ~0% CPU, ~0.5 MB RAM.
+  # Czyta /dev/input/event* (wymaga grupy `input`), ustawia focus_color w Mango.
+  wpm-global = pkgs.callPackage ./wpm-global { };
+
   # T2.23: JDownloader 2 – nie ma w nixpkgs; własna derywacja z oficjalnego Setup jara.
   # GIT: nie dotyczy – pobieramy oficjalny jar z serwera JDownloader
   # Przy pierwszym uruchomieniu (brak ~/JDownloader2/JDownloader2.jar) odpala Setup jar
@@ -129,6 +133,7 @@ in
     # --- Komunikacja ---
     # brave – w brave.nix (oficjalna binarka z GitHub Releases, nixpkgs 26.05 usunął pakiet)
     linksy
+    wpm-global          # T3.13: globalny WPM → kolor obramówki w Mango
     google-chrome
     discord
     thunderbird     # T1.8: klient e-mail (wolny, z nixpkgs)
