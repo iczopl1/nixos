@@ -156,6 +156,38 @@ ShellRoot {
 
                 Item { Layout.fillWidth: true }
 
+                // ===== FPS (klatki compositora – FrameAnimation zlicza każdy vsync) =====
+                Text {
+                    id: fpsLabel
+                    Layout.alignment: Qt.AlignVCenter
+                    color: "#a9b1d6"
+                    font.pixelSize: 12
+                    font.family: "JetBrains Mono"
+                    text: "fps --"
+
+                    property int  _frames: 0
+                    property real _t0:     Date.now()
+
+                    FrameAnimation {
+                        running: true
+                        onTriggered: {
+                            fpsLabel._frames++
+                            var now = Date.now()
+                            if (now - fpsLabel._t0 >= 1000) {
+                                var fps = Math.round(fpsLabel._frames * 1000 / (now - fpsLabel._t0))
+                                fpsLabel.text  = "fps " + fps
+                                fpsLabel.color = fps < 50 ? "#f7768e"
+                                              : fps < 55 ? "#e0af68"
+                                              :            "#a9b1d6"
+                                fpsLabel._frames = 0
+                                fpsLabel._t0     = now
+                            }
+                        }
+                    }
+                }
+
+                Item { width: 10 }
+
                 // ===== CPU (T2.25) =====
                 Text {
                     id: cpuLabel
