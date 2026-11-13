@@ -61,4 +61,34 @@
   # AT-SPI2 accessibility bus – wymagany przez hintd (Super+D hints) do wykrywania
   # klikalnych elementów w GTK/Qt i innych aplikacjach przez D-Bus accessibility API.
   services.gnome.at-spi2-core.enable = true;
+
+  # T1.14: TLP – zarządzanie energią laptopa + progi ładowania baterii ThinkPad X250.
+  # START=40 / STOP=80: ładuje od 40% do 80% → ogniwo rzadziej w ekstremalnych SoC,
+  # co znacząco wydłuża jego żywotność (badania Lenovo: 3× więcej cykli niż 0–100%).
+  # TLP nadpisuje power-profiles-daemon; obie usługi nie mogą działać jednocześnie.
+  services.power-profiles-daemon.enable = false;
+  services.tlp = {
+    enable = true;
+    settings = {
+      # Progi ładowania dla BAT0 (główna) i BAT1 (jeśli jest slice battery)
+      START_CHARGE_THRESH_BAT0 = 40;
+      STOP_CHARGE_THRESH_BAT0  = 80;
+      START_CHARGE_THRESH_BAT1 = 40;
+      STOP_CHARGE_THRESH_BAT1  = 80;
+
+      # CPU na zasilaniu sieciowym – pozwól na turbo (rebuild.sh go i tak wyłącza podczas buildu)
+      CPU_SCALING_GOVERNOR_ON_AC  = "performance";
+      CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
+      CPU_BOOST_ON_AC  = 1;
+      CPU_BOOST_ON_BAT = 0;
+
+      # Dysk: APM + czas wyciszenia (oszczędność energii na baterii)
+      DISK_APM_LEVEL_ON_BAT  = "128";
+      DISK_IOSCHED_ON_BAT    = "mq-deadline";
+
+      # WiFi – nie wyłączaj po hibernacji
+      WIFI_PWR_ON_AC  = "off";
+      WIFI_PWR_ON_BAT = "on";
+    };
+  };
 }
