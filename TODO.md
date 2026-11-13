@@ -48,6 +48,14 @@
 - [ ] **T1.10** Grayjay – agregator wideo (YouTube, Twitch, Nebula…) by FUTO
         – nie ma w nixpkgs; binarka/AppImage z oficjalnych Releases lub flathub
         – własna derywacja jak Linksy (autoPatchelfHook)
+- [ ] **T1.11b** Quickshell – pin do nowszej wersji z GitHuba (full: kompilacja per MASTER §12)
+        – 0.3.0 z nixpkgs brakuje: layer_animations, nowych API (ExclusionMode i in.), animacji
+        – full: skompilować nowszą wersję ze źródeł (fetchFromGitHub + nix-build, bez flake'ów)
+          wzorem obecnej derywacji Brave/Linksy; wersję z nixpkgs zostawić w minimal (bez kompilacji)
+        – minimal: zostaje quickshell z nixpkgs (0.3.0), konfiguracja QML musi działać na obu
+        – po aktualizacji: sprawdzić czy layer_animations/animacje baru działają
+        – UWAGA: punkt powrotu przed kompilacją (tag git + działający pasek na 0.3.0)
+        – GIT: quickshell – nixpkgs 0.3.0 nie ma animacji i nowych API; dodano: 2026-11-13
 - [ ] **T1.12** Linksy – extended screen na Pixel 9 (zależności + auto-akceptacja)
         – sprawdzić które zależności systemowe są potrzebne do trybu „extended screen"
           (Linksy udostępnia ekran PC na telefonie lub odwrotnie przez Wi-Fi/USB)
@@ -122,6 +130,15 @@
         – `zen-mode.nvim`: tryb skupienia (<leader>z)
         – `nvim-colorizer.lua`: podgląd kolorów hex/rgb w edytorze
 
+- [ ] **T2.29** Super+F11 – naprawa toggle baru (ghost bar + brak przełączania)
+        – obecny problem: pkill quickshell nie usuwa warstwy wlr-layer-shell od razu;
+          stary bar zostaje widoczny przez chwilę lub na stałe (ghost surface)
+        – przy ponownym starcie może uruchomić się drugi egzemplarz na tej samej warstwie
+        – cel: SUPER+F11 = czyste hide/show baru bez artefaktów
+        – propozycja: użyć `quickshell -n` (--no-duplicate) przy starcie autorun,
+          toggle przez SocketServer w QML zamiast kill/restart procesu (jak Shortcuts/Particles),
+          lub: `mmsg dispatch focusmon,…` + warunkowe `visible: false` na PanelWindow w QML
+
 ### Inne
 - [x] **T2.21** Komenda `agent` w terminalu (alias w shell.nix → dotfiles/scripts/agent.sh)
         – wypisuje: system, narzędzia deweloperskie, Python/LaTeX/nvim/AI, serwisy lokalne
@@ -194,6 +211,8 @@
 - T3.6: AltGr+Ctrl = drugi Super (services.keyd w system.nix)
 
 **Następne w kolejce:**
+- T1.11b: Quickshell pin do nowszej wersji (full: kompilacja z GitHub)
+- T2.29: Super+F11 toggle baru (ghost bar + fix)
 - T1.12: Linksy extended screen (Pixel 9, zależności + auto-akceptacja)
 - T3.3: nvim tutorial/cheatsheet skrótów (which-key lub własny overlay)
 - T3.5: nvim animacja pisania (kolor okna przy szybkim pisaniu)
