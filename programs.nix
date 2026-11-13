@@ -75,6 +75,109 @@ let
     '';
   };
 
+  # Grayjay Desktop – agregator wideo (YouTube, Twitch, Nebula…) by FUTO.
+  # Nie ma w nixpkgs (nixpkgs buduje CEF ze źródeł – patrz BROKEN.md).
+  # Tu: oficjalna binarka zip z updater.grayjay.app (bundlowany CEF, .NET self-contained).
+  # GIT: grayjay-desktop – powód: brak w nixpkgs, nixpkgs kompiluje CEF – dodano: 2026-11-13
+  grayjay = pkgs.stdenv.mkDerivation rec {
+    pname = "grayjay-desktop";
+    version = "20";
+
+    src = pkgs.fetchzip {
+      url = "https://updater.grayjay.app/Apps/Grayjay.Desktop/Grayjay.Desktop-linux-x64.zip";
+      # Aktualizacja hasha: nix-prefetch-url --unpack <url>
+      hash = lib.fakeHash;
+      # fetchzip odpakowuje i strip-uje top-level katalog → src = zawartość Grayjay.Desktop-linux-x64-v20/
+    };
+
+    nativeBuildInputs = with pkgs; [
+      autoPatchelfHook
+      makeWrapper
+    ];
+
+    buildInputs = with pkgs; [
+      # .NET self-contained (patchujemy ELF)
+      stdenv.cc.cc.lib   # libstdc++, libgcc_s
+      zlib
+      openssl
+      # CEF / Chromium bundlowane w cef/ – potrzebują system libs
+      xorg.libX11
+      xorg.libXcomposite
+      xorg.libXcursor
+      xorg.libXdamage
+      xorg.libXext
+      xorg.libXfixes
+      xorg.libXi
+      xorg.libXrandr
+      xorg.libXrender
+      xorg.libXtst
+      xorg.libxcb
+      xorg.libXScrnSaver
+      nss
+      nspr
+      atk
+      at-spi2-atk
+      at-spi2-core
+      cups
+      dbus
+      expat
+      fontconfig
+      freetype
+      gdk-pixbuf
+      glib
+      gtk3
+      pango
+      alsa-lib
+      libdrm
+      mesa
+      libxkbcommon
+      wayland
+      pipewire
+    ];
+
+    # Grayjay ładuje część libs przez dlopen – nie blokuj buildu na brakujących
+    autoPatchelfIgnoreMissingDeps = true;
+
+    dontBuild = true;
+    dontConfigure = true;
+
+    installPhase = ''
+      runHook preInstall
+
+      mkdir -p $out/opt/grayjay
+      cp -r . $out/opt/grayjay/
+      chmod +x $out/opt/grayjay/Grayjay $out/opt/grayjay/Portable \
+               $out/opt/grayjay/ffmpeg 2>/dev/null || true
+
+      # Wrapper: LD_LIBRARY_PATH zawiera bundlowane cef/ i katalog główny
+      mkdir -p $out/bin
+      makeWrapper $out/opt/grayjay/Grayjay $out/bin/grayjay \
+        --prefix LD_LIBRARY_PATH : "$out/opt/grayjay/cef:$out/opt/grayjay"
+
+      # Ikona 256×256
+      mkdir -p $out/share/icons/hicolor/256x256/apps
+      cp grayjay.png $out/share/icons/hicolor/256x256/apps/app.grayjay.Grayjay.png \
+        2>/dev/null || true
+
+      # .desktop entry dla drun / rofi
+      mkdir -p $out/share/applications
+      cat > $out/share/applications/app.grayjay.Grayjay.desktop << 'DESKTOP'
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Grayjay
+Comment=Universal media aggregator (YouTube, Twitch, Nebula…)
+Categories=AudioVideo;Player;
+Icon=app.grayjay.Grayjay
+Exec=grayjay
+Terminal=false
+StartupWMClass=cef
+DESKTOP
+
+      runHook postInstall
+    '';
+  };
+
   # T3.13/T3.5: globalny licznik WPM – blokuje na select(), ~0% CPU, ~0.5 MB RAM.
   # Czyta /dev/input/event* (wymaga grupy `input`), ustawia focus_color w Mango.
   wpm-global = pkgs.callPackage ./wpm-global { };
@@ -138,7 +241,7 @@ in
     discord
     thunderbird     # T1.8: klient e-mail (wolny, z nixpkgs)
     beeper          # T1.9: komunikator all-in-one (Signal, WhatsApp, Telegram…) – unfree
-    # grayjay – usunięty: nixpkgs buduje ze źródeł (JustCef/CEF = ogromna kompilacja) – patrz BROKEN.md
+    grayjay          # T1.10: agregator wideo FUTO; oficjalna binarka zip (CEF bundlowany, NIE kompilowany)
     # anydesk – usunięty: brak kompatybilnych bibliotek GUI dla Mango
 
     # --- IDE / edytory ---

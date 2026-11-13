@@ -43,11 +43,11 @@
 - Status: zablokowane w minimal; w full dopuszczalne tylko budowane z działającego systemu
 - Obejście: tylko w `program.nix` (full). Najpierw sprawdzić dry-buildem, czy przychodzi z cache, i nie stosować override'ów zmieniających flagi.
 
-### Grayjay (agregator wideo by FUTO)
+### Grayjay (agregator wideo by FUTO) – nixpkgs
 - Kiedy: 2026-11-13, nixpkgs: 26.05
 - Profil: full
 - Objaw: `nixpkgs.grayjay` klonuje submoduły FUTO.MDNS, Grayjay.Engine, JustCef (Chromium Embedded Framework) – ogromna kompilacja CEF; build przerwany przez użytkownika
 - Przyczyna: pakiet w nixpkgs kompiluje ze źródeł, nie dostarcza gotowej binarki z cache
-- Status: zablokowane
-- Obejście: pobrać AppImage z oficjalnej strony FUTO (https://grayjay.app) i uruchomić przez `appimage-run` albo poczekać aż nixpkgs doda prebuilt binarkę
+- Status: **obejście** – używamy oficjalnej binarki ZIP zamiast nixpkgs
+- Obejście: własna derywacja `grayjay` w `programs.nix` – pobiera oficjalny ZIP z `updater.grayjay.app`, CEF już bundlowany w ZIP (nie kompilujemy). Eksportuje `.desktop` do drun.
 
