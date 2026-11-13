@@ -99,6 +99,7 @@ let
       stdenv.cc.cc.lib   # libstdc++, libgcc_s
       zlib
       openssl
+      icu                # libicuuc/libicui18n/libicudata – .NET globalization (bez tego: FailFast przy starcie)
       # CEF / Chromium bundlowane w cef/ – potrzebują system libs
       libx11
       libxcomposite
