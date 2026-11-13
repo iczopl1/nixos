@@ -96,7 +96,8 @@ in
 
       # --- Własne skrypty ---
       agent    = "bash ~/.config/scripts/agent.sh";
-      effects  = "bash ~/.config/scripts/toggle-effects.sh";
+      effects  = "bash ~/.config/scripts/effects-ctl.sh";  # menu: blur/shadows/animations/particles/wpm/bar jednym programem
+      "effects-quick" = "bash ~/.config/scripts/toggle-effects.sh";  # stary on/off wszystkiego naraz (SUPER+F8)
       throttle = "bash ~/.config/scripts/throttle.sh";  # T3.11: ograniczanie prędkości (tc)
     };
 

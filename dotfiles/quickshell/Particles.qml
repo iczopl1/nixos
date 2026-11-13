@@ -36,9 +36,30 @@ Singleton {
         handler: Socket { Component.onCompleted: root.nextTheme() }
     }
 
+    // --- Ustawienie konkretnego motywu (effects-ctl.sh) – payload = nazwa motywu ---
+    SocketServer {
+        id: setServer
+        active: true
+        path: Quickshell.env("XDG_RUNTIME_DIR") + "/qs-particles-set-" + Quickshell.env("WAYLAND_DISPLAY") + ".sock"
+        handler: Socket {
+            parser: SplitParser {
+                onRead: line => {
+                    var t = line.trim()
+                    if (root.themes.indexOf(t) >= 0) {
+                        root.currentTheme = t
+                        saveState.start()
+                    }
+                }
+            }
+        }
+    }
+
     Timer {
         interval: 800; running: true
-        onTriggered: { toggleServer.active = false; toggleServer.active = true }
+        onTriggered: {
+            toggleServer.active = false; toggleServer.active = true
+            setServer.active = false; setServer.active = true
+        }
     }
 
     function nextTheme() {

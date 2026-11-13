@@ -35,6 +35,19 @@ Singleton {
     readonly property int    baseBorder: 2   // border_px default (config.conf)
     readonly property string defaultColor: "0x9eeaf9ff"
 
+    // --- Toggle on/off (effects-ctl.sh) ---
+    SocketServer {
+        id: wpmToggleServer
+        active: true
+        path: Quickshell.env("XDG_RUNTIME_DIR") + "/qs-wpm-" + Quickshell.env("WAYLAND_DISPLAY") + ".sock"
+        handler: Socket { Component.onCompleted: root.enabled = !root.enabled }
+    }
+
+    Timer {
+        interval: 800; running: true
+        onTriggered: { wpmToggleServer.active = false; wpmToggleServer.active = true }
+    }
+
     // --- Kolory progowe (format mango 0xRRGGBBAA) ---
     // Progi: 15 / 35 / 60 wpm (łagodniejsze niż poprzednie 5/20/45/70)
     function colorForWpm(w) {
@@ -118,6 +131,20 @@ Singleton {
     Timer {
         interval: 300; running: true; repeat: true
         onTriggered: {
+            if (!root.enabled) {
+                // Wyłączone (effects-ctl.sh) – wróć do stanu bazowego raz, potem nic nie rób
+                if (root._borderPx !== root.baseBorder || root._color !== root.defaultColor) {
+                    root._smoothed = 0
+                    root.wpm = 0
+                    root._color = root.defaultColor
+                    mmsgColor.start()
+                    root._borderPx = root.baseBorder
+                    if (!root._pulsing) mmsgBorder.start()
+                    mmsgGapH.start()
+                    mmsgGapV.start()
+                }
+                return
+            }
             var raw = root.calcWpm()
             // EMA α=0.3: wolno się podnosi i wolno opada → płynne kolory i grubości
             root._smoothed = 0.7 * root._smoothed + 0.3 * raw
