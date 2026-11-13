@@ -29,17 +29,10 @@
         – wykrywa nową maszynę po UUID /
         – pyta minimal/full, pokazuje GB do pobrania
         – najpierw stawia minimal, potem full w tle
-- [ ] **T1.11** Napraw Super+D (hintd) – nakładka klikalnych elementów
-        – cel: Super+D pokazuje litery nad każdym miejscem gdzie można kliknąć myszką
-          (linki, przyciski, pola, zakładki, itp.) – jak Vimium ale systemowo
-        – priorytet: działać w Brave (Chromium/Wayland) – tam najważniejsze
-        – sprawdzić dlaczego hintd nie wykrywa elementów w Brave:
-          a) hintd może nie obsługiwać protokołu accessibility w Chromium (at-spi2)
-          b) alternatywa dla Brave: wymusić Vimium/Vimium-C jako rozszerzenie
-             (ManagedExtensions w brave.nix – obok KeePassXC)
-          c) jeśli hintd działa tylko w GTK/Qt – rozważyć zastąpienie lub uzupełnienie
-             czymś co obsługuje Chromium (np. xdotool-based lub at-spi2)
-        – sprawdzić też czy hintd startuje poprawnie (logi: journalctl --user -u hintd)
+- [x] **T1.11** Napraw Super+D (hintd) – nakładka klikalnych elementów
+        – AT-SPI2: services.gnome.at-spi2-core.enable w services.nix
+        – Brave: --force-renderer-accessibility w brave.nix (makeWrapper, linia 91)
+        – wymaga rebuild żeby nowa binarka Brave weszła w życie
 - [x] **T1.8** Thunderbird – klient e-mail
         – `thunderbird` z nixpkgs (full); unfree: nie (jest wolny)
 - [x] **T1.9** Beeper – komunikator all-in-one (Signal, WhatsApp, Telegram, iMessage…)
@@ -55,14 +48,13 @@
         – po aktualizacji: sprawdzić czy layer_animations/animacje baru działają
         – UWAGA: punkt powrotu przed kompilacją (tag git + działający pasek na 0.3.0)
         – GIT: quickshell – nixpkgs 0.3.0 nie ma animacji i nowych API; dodano: 2026-11-13
-- [ ] **T1.12** Linksy – extended screen na Pixel 9 (zależności + auto-akceptacja)
-        – sprawdzić które zależności systemowe są potrzebne do trybu „extended screen"
-          (Linksy udostępnia ekran PC na telefonie lub odwrotnie przez Wi-Fi/USB)
-        – dodać brakujące buildInputs do derywacji w programs.nix jeśli linksy-screen crashuje
-        – skonfigurować auto-akceptację połączenia z Pixel 9:
-          a) sprawdzić czy Linksy ma plik konfiguracyjny z listą zaufanych urządzeń
-          b) dodać UUID/nazwę Pixel 9 do trusted devices (plik per-maszyna w local.nix lub ~/.config)
-        – przetestować: linksy-screen na PC + Linksy app na telefonie (Para / ADB wireless)
+- [x] **T1.12** Linksy – extended screen na Pixel 9 (zależności + auto-akceptacja)
+        – GStreamer (base/good/bad + pipewire) bundlowany w binarce – brak potrzeby dodatkowych deps
+        – XDG ScreenCast + RemoteDesktop portal: skonfigurowane w mango.nix (xdg-desktop-portal-wlr)
+        – auto-akceptacja: Pixel 9 już w trusted.json + potwierdzony w terminal.json (confirmed)
+        – v4l2loopback dodany do programs.nix (boot.extraModulePackages) – wymagany dla `linksy camera`
+        – Użycie: `linksy extend <nazwa>` (telefon jako drugi monitor), `linksy camera <nazwa>` (wirtualna kamera)
+        – wymaga rebuild żeby v4l2loopback wszedł w życie
 
 ---
 

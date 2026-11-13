@@ -1,7 +1,7 @@
 # Programy dla profilu full (dodatki ponad minimal).
 # Ciężkie, kompilowane lub rzadko potrzebne narzędzia i IDE.
 # mango.nix, keyboard-mouse.nix, crafts.nix i python.nix mają własne moduły.
-{ pkgs, lib, unstable, ... }:
+{ pkgs, lib, config, unstable, ... }:
 
 let
   # Linksy – integracja PC↔telefon (pliki, schowek, ekran, kamera, BT).
@@ -215,6 +215,15 @@ in
   # Wireshark – setuid wrapper dla dumpcap (przechwytywanie bez root) + udev (T2.3)
   programs.wireshark.enable = true;
   users.users.iczo.extraGroups = [ "wireshark" ];
+
+  # T1.12: Linksy camera – wirtualna kamera (v4l2loopback kernel module).
+  # `linksy camera <device>` tworzy /dev/videoN z obrazem telefonu.
+  # Użycie: linksy camera <nazwa-urządzenia>
+  boot.extraModulePackages = with config.boot.kernelPackages; [ v4l2loopback ];
+  boot.kernelModules = [ "v4l2loopback" ];
+  boot.extraModprobeConfig = ''
+    options v4l2loopback video_nr=10 card_label="Linksy Camera" exclusive_caps=1
+  '';
 
   # OpenTabletDriver (graficzny tablet)
   hardware.opentabletdriver.enable = true;
