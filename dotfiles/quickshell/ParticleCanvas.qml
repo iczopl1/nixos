@@ -10,6 +10,11 @@ Canvas {
     property var particles: []
     property int maxParticles: 80
 
+    // Motyw "cursor" – pozycja kursora na TYM ekranie (Particles.qml, polling mmsg)
+    property bool cursorActive: false
+    property real cursorX: 0
+    property real cursorY: 0
+
     // Seed dla pseudo-losowości
     function rand(min, max) { return min + Math.random() * (max - min) }
     function randInt(min, max) { return Math.floor(rand(min, max + 1)) }
@@ -60,6 +65,15 @@ Canvas {
             p.decay = rand(0.01, 0.025)
             p.color = ["#ff9900","#ffcc00","#ff6600","#ffffff"][randInt(0,3)]
             p.gravity = 0.07
+
+        } else if (theme === "cursor") {
+            p.x = cursorX + rand(-4, 4)
+            p.y = cursorY + rand(-4, 4)
+            p.vx = rand(-0.4, 0.4)
+            p.vy = rand(-0.8, -0.2)  // leciutko w górę, jak iskierki z kursora
+            p.size = rand(2, 6)      // dosłownie "piksele"
+            p.decay = rand(0.03, 0.06)  // szybko gasną – ślad, nie smuga na cały ekran
+            p.color = ["#9eeaf9","#e0af68","#f7768e","#c0caf5"][randInt(0,3)]
         }
         return p
     }
@@ -72,7 +86,7 @@ Canvas {
             p.y  += p.vy
             p.rot += p.vrot
             p.life -= p.decay
-            if (p.y > height + 20) p.life = 0
+            if (p.y > height + 60) p.life = 0  // margines ≥ max rozmiaru listka (54, 3x)
 
         } else if (theme === "rain") {
             p.x += p.vx; p.y += p.vy
@@ -90,6 +104,10 @@ Canvas {
             p.vy += p.gravity
             p.x  += p.vx; p.y += p.vy
             p.life -= p.decay
+
+        } else if (theme === "cursor") {
+            p.x += p.vx; p.y += p.vy
+            p.life -= p.decay
         }
         return p
     }
@@ -99,18 +117,22 @@ Canvas {
         ctx.globalAlpha = Math.max(0, p.life)
 
         if (theme === "leaves") {
+            // ctx.ellipse() nie jest wspierane przez Canvas2D w Qt/Quickshell – rysowało się
+            // "po cichu" nic (QML Canvas gubi wyjątki JS w onPaint bez żadnego logu/błędu).
+            // Zastąpione uniwersalnym arc() + scale() – ten sam spłaszczony kształt listka.
             ctx.save()
             ctx.translate(p.x, p.y)
             ctx.rotate(p.rot * Math.PI / 180)
+            ctx.scale(1, 0.6)
             ctx.fillStyle = p.color
             ctx.beginPath()
-            ctx.ellipse(-p.size/2, -p.size*0.3, p.size, p.size*0.6, 0, 0, Math.PI*2)
+            ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2)
             ctx.fill()
             ctx.restore()
 
         } else if (theme === "rain") {
             ctx.strokeStyle = p.color
-            ctx.globalAlpha *= p.alpha
+            ctx.globalAlpha = Math.max(0, p.life) * Math.max(p.alpha, 0.6)  // podniesiona widoczność
             ctx.lineWidth = 3  // 3x (było 1)
             ctx.beginPath()
             ctx.moveTo(p.x, p.y)
@@ -129,6 +151,11 @@ Canvas {
             ctx.beginPath()
             ctx.arc(p.x, p.y, Math.max(0.5, s / 2), 0, Math.PI * 2)
             ctx.fill()
+
+        } else if (theme === "cursor") {
+            // dosłowne "piksele" – kwadraty, nie kółka
+            ctx.fillStyle = p.color
+            ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
         }
 
         ctx.globalAlpha = 1.0
@@ -150,7 +177,10 @@ Canvas {
             canvas.particles = canvas.particles.filter(p => p.life > 0)
 
             // Spawn rate wg motywu
-            var spawnRate = { leaves: 0.3, rain: 2.5, snow: 0.8, sparks: 1.5 }
+            var spawnRate = {
+                leaves: 0.3, rain: 2.5, snow: 0.8, sparks: 1.5,
+                cursor: canvas.cursorActive ? 4 : 0  // piksele tylko na ekranie z kursorem
+            }
             var rate = spawnRate[canvas.theme] || 0
             spawnAccum += rate
             while (spawnAccum >= 1 && canvas.particles.length < canvas.maxParticles) {

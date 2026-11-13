@@ -1,5 +1,5 @@
 // T3.14: Efekty cząsteczkowe na tle ekranu (Quickshell QML).
-// SUPER+F6 przełącza motyw: off → leaves → rain → snow → sparks → off
+// SUPER+F6 przełącza motyw: off → leaves → rain → snow → sparks → cursor → off
 // Plik stanu: ~/.config/particle-effect (nazwa motywu lub "off")
 // Warstwa Background pod oknami, max 80 cząsteczek, domyślnie wyłączone (MASTER §11).
 pragma Singleton
@@ -12,12 +12,40 @@ Singleton {
     id: root
 
     readonly property string stateFile: Quickshell.env("HOME") + "/.config/particle-effect"
-    readonly property var themes: ["off", "leaves", "rain", "snow", "sparks"]
+    readonly property var themes: ["off", "leaves", "rain", "snow", "sparks", "cursor"]
     readonly property var themeLabels: ({
-        off: "wyłączone", leaves: "liście", rain: "deszcz", snow: "śnieg", sparks: "iskry"
+        off: "wyłączone", leaves: "liście", rain: "deszcz", snow: "śnieg", sparks: "iskry",
+        cursor: "piksele za kursorem"
     })
     property string currentTheme: "off"
     property bool active: currentTheme !== "off"
+
+    // --- Pozycja kursora (motyw "cursor") – mmsg nie ma "watch cursorpos", więc polling ---
+    property real cursorX: 0
+    property real cursorY: 0
+    property string cursorMonitor: ""
+
+    Timer {
+        interval: 80  // ~12.5 Hz – wystarczy dla efektu, nie zasypuje CPU procesami co klatkę
+        running: root.active && root.currentTheme === "cursor"
+        repeat: true
+        onTriggered: { cursorPoll.running = false; cursorPoll.running = true }
+    }
+
+    Process {
+        id: cursorPoll
+        command: ["mmsg", "get", "cursorpos"]
+        stdout: SplitParser {
+            onRead: line => {
+                try {
+                    var d = JSON.parse(line)
+                    root.cursorX = d.x
+                    root.cursorY = d.y
+                    root.cursorMonitor = d.monitor
+                } catch (e) {}
+            }
+        }
+    }
 
     // --- Wczytaj motyw ze stanu przy starcie ---
     Process {
@@ -110,6 +138,9 @@ Singleton {
                 anchors.fill: parent
                 theme: root.currentTheme
                 running: root.active
+                cursorActive: root.cursorMonitor === win.modelData.name
+                cursorX: root.cursorX
+                cursorY: root.cursorY
             }
         }
     }

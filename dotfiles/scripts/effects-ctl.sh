@@ -9,7 +9,7 @@
 #   effects shadows    [on|off]
 #   effects animations [on|off]      animacje Mango (okna)
 #   effects layer      [on|off]      layer_animations (animacje warstw Quickshell/bar)
-#   effects particles  [off|leaves|rain|snow|sparks]
+#   effects particles  [off|leaves|rain|snow|sparks|cursor]
 #   effects wpm                      przełącz obramówkę WPM (T3.13)
 #   effects bar                      przełącz widoczność baru (SUPER+F11)
 #
@@ -59,8 +59,8 @@ socket_send() {
 particles_set() {
   local theme="$1"
   case "$theme" in
-    off|leaves|rain|snow|sparks) socket_send qs-particles-set "$theme" ;;
-    *) echo "Nieznany motyw: $theme (off|leaves|rain|snow|sparks)" >&2; return 1 ;;
+    off|leaves|rain|snow|sparks|cursor) socket_send qs-particles-set "$theme" ;;
+    *) echo "Nieznany motyw: $theme (off|leaves|rain|snow|sparks|cursor)" >&2; return 1 ;;
   esac
 }
 
@@ -87,7 +87,7 @@ case "$cmd" in
   shadows)     mango_onoff shadows    "${2:-}" ;;
   animations)  mango_onoff animations "${2:-}" ;;
   layer)       mango_onoff layer_animations "${2:-}" ;;
-  particles)   particles_set "${2:?podaj motyw: off|leaves|rain|snow|sparks}" ;;
+  particles)   particles_set "${2:?podaj motyw: off|leaves|rain|snow|sparks|cursor}" ;;
   wpm)         socket_ping qs-wpm ;;
   bar)         socket_ping qs-bar ;;
   help|-h|--help) usage ;;
@@ -101,8 +101,8 @@ case "$cmd" in
       echo " 3) animations toggle  4) layer_animations toggle"
       echo " 5) particles: off     6) particles: leaves"
       echo " 7) particles: rain    8) particles: snow"
-      echo " 9) particles: sparks  w) wpm border toggle"
-      echo " b) bar toggle         q) wyjście"
+      echo " 9) particles: sparks  c) particles: cursor (piksele za myszką)"
+      echo " w) wpm border toggle  b) bar toggle         q) wyjście"
       read -rp "> " choice
       case "$choice" in
         1) mango_onoff blur ;;
@@ -114,6 +114,7 @@ case "$cmd" in
         7) particles_set rain ;;
         8) particles_set snow ;;
         9) particles_set sparks ;;
+        c) particles_set cursor ;;
         w) socket_ping qs-wpm ;;
         b) socket_ping qs-bar ;;
         q) exit 0 ;;
