@@ -12,7 +12,7 @@
     # keyboard-mouse.nix – tylko w full (kompiluje wl-kbptr i hintd)
     # tailnet-b.nix      – tylko w full (drugi Tailscale w namespace)
     ./security.nix        # SSH off, firewall, otwarte porty
-    ./system.nix          # boot, sieć, locale, użytkownik, bluetooth, libvirt
+    ./nixos-base.nix      # boot, sieć, locale, użytkownik, bluetooth, libvirt
     ./services.nix        # greetd -> mango, pipewire, tailscale (tailnet A), syncthing
     ./power.nix           # usypia tylko przycisk zasilania; klapa/bezczynność nic nie robią
     ./programs_minimal.nix  # programy profilu minimal
