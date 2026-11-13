@@ -1,7 +1,7 @@
 # Programy dla profilu full (dodatki ponad minimal).
 # Ciężkie, kompilowane lub rzadko potrzebne narzędzia i IDE.
 # mango.nix, keyboard-mouse.nix, crafts.nix i python.nix mają własne moduły.
-{ pkgs, lib, ... }:
+{ pkgs, lib, unstable, ... }:
 
 let
   # Linksy – integracja PC↔telefon (pliki, schowek, ekran, kamera, BT).
@@ -110,6 +110,11 @@ in
 
 {
   environment.systemPackages = with pkgs; [
+    # T1.11b: Quickshell nowsza wersja z unstable (full zastępuje stable z minimal).
+    # GIT: quickshell – nixpkgs 26.05 (0.3.0) brakuje layer_animations i nowych API; dodano: 2026-11-13
+    # lib.hiPrio: wyższy priorytet niż stable quickshell z programs_minimal.nix
+    (lib.hiPrio unstable.quickshell)
+
     # --- Pulpit (extra, full) ---
     kitty
     waybar
@@ -126,6 +131,8 @@ in
     linksy
     google-chrome
     discord
+    thunderbird     # T1.8: klient e-mail (wolny, z nixpkgs)
+    beeper          # T1.9: komunikator all-in-one (Signal, WhatsApp, Telegram…) – unfree
     # anydesk – usunięty: brak kompatybilnych bibliotek GUI dla Mango
 
     # --- IDE / edytory ---

@@ -43,5 +43,6 @@
       "steam"
       "steam-unwrapped"
       "steam-run"
+      "beeper"             # T1.9: komunikator all-in-one
     ];
 }
