@@ -130,29 +130,25 @@
         – `dashboard-nvim` lub `alpha-nvim`: ekran startowy
         – `zen-mode.nvim`: tryb skupienia (<leader>z)
         – `nvim-colorizer.lua`: podgląd kolorów hex/rgb w edytorze
-- [ ] **T2.39** nvim-treesitter: migracja branch `master` → `main` (nowe API)
+- [x] **T2.39** nvim-treesitter: crash przy .md – `highlight.disable = {"markdown_inline"}`
         – Powód: crash treesitter przy otwieraniu .md (injected `markdown_inline`,
           `languagetree.lua:215`/`treesitter.lua:197` "attempt to call"; intermittentny,
-          nie łapie się headless – patrz BROKEN.md, wpis 2026-11-13). `marksman` (LSP) jest
-          czysty, to crash silnika treesitter, nie LSP. Branch `master` jest **zamrożony od
-          2026-03-23** (`cf12346a`, tip = nasz obecny commit) – update na master nic nie da.
-        – a) Research: nowe API `main` (`require('nvim-treesitter').setup()`,
-          `require('nvim-treesitter').install({...})`, highlight przez `vim.treesitter.start()`
-          per-filetype – stary `require("nvim-treesitter.configs").setup{ensure_installed=...,
-          highlight={enable=true}}` nie istnieje na `main`).
-        – b) Przepisać `lua/plugins/treesitter.lua`: `branch = "main"`, nowy sposób instalacji
-          parserów i włączania highlight/indent (prawdopodobnie `FileType` autocmd →
-          `vim.treesitter.start()`, do sprawdzenia w README `main`).
-        – c) Kryterium „nvim działa” (MASTER §7) dla WSZYSTKICH języków z `ensure_installed`
-          (lua, python, c, cpp, java, kotlin, go, rust, ts/js, nix, yaml, json, html, css, sql,
-          markdown…) – zmiana API wpływa na każdy, nie tylko markdown.
-        – d) Stress-test interaktywny (PTY, nie headless) na kilku plikach .md – otwórz/zamknij
-          wielokrotnie, potwierdź że oryginalny crash faktycznie zniknął (był intermittentny).
-        – e) `doc/nvim.md`: zaktualizować opis treesitter (branch, nowe API) + nowy `lazy-lock.json`.
-        – MASTER §7: to zmiana wersji/API pluginu → punkt powrotu (git tag) + limit 1h +
-          rollback jeśli się nie uda w tym czasie (nie tylko dla markdown – dla całego treesitter).
-        – Priorytet: proponuję **P2** (crash jest denerwujący, ale nie blokuje pracy – edycja .md
-          i tak działa, LSP jest czysty). Do potwierdzenia/zmiany przez użytkownika.
+          nie łapie się headless, trzeba PTY – patrz BROKEN.md, wpis 2026-11-13). `marksman`
+          (LSP) czysty, to crash silnika treesitter, nie LSP.
+        – ZMIANA PLANU (po researchu): migracja branch `master`→`main` **nie naprawiłaby tego**
+          – sprawdzone w kodzie `main`: cały faktyczny parsing wstrzykiwanych języków to kod
+          wbudowany w Neovima (core runtime `vim/treesitter/*`), identyczny niezależnie od
+          brancha wtyczki. Migracja = tylko przepisanie na niekompatybilne API, bez naprawy.
+          Branch `master` dodatkowo zamrożony od 2026-03-23 (`cf12346a`) – nic nowego do update.
+        – Realny fix: `highlight.disable = { "markdown_inline" }` w `treesitter.lua` (commit
+          `180eaff`) – parser instaluje się, ale nie jest używany do highlight, więc crashująca
+          ścieżka async-parse nigdy się nie odpala. `markdown` (nagłówki/kod/listy) koloruje się
+          normalnie, strata: kolorowanie inline (bold/italic/linki).
+        – Zweryfikowane: 14 plików .md w projekcie linefolower + wielokrotne przebiegi PTY
+          (`script`, nie headless) – zero crashy. Headless sanity check (`nvim configuration.nix`)
+          – czysto.
+        – Migracja na `main` (nowe API, lepsze wsparcie upstream) zostaje jako możliwe zadanie
+          na kiedyś, ale bez obietnicy naprawy tego konkretnego crasha – patrz BROKEN.md.
 
 - [x] **T2.29** Super+F11 – naprawa toggle baru (ghost bar + brak przełączania)
         – obecny problem: pkill quickshell nie usuwa warstwy wlr-layer-shell od razu;
@@ -277,7 +273,7 @@ Lista `[ ]` pusta. Gotowe do `./rebuild.sh`.
 **Sesja 6 (2026-11-13, ad-hoc poza TODO – Beeper workspace 8, sudoers NOPASSWD dla agenta,
 Grayjay icu fix, Linksy udev+gtk4paintablesink, effects-ctl.sh, STM32 nvim LSP/DAP, lualine
 theme fix):** wszystko zcommitowane (zob. `git log`). Jedyne niezrobione: **T2.39** (nowe,
-czeka na zatwierdzenie priorytetu) – crash treesitter przy .md, patrz BROKEN.md.
+zrobione: fix) – crash treesitter przy .md, `highlight.disable markdown_inline`, patrz BROKEN.md.
 
 **Po następnym rebuild sprawdzić:**
 - Super+F11 toggle baru (bez ghost surface)

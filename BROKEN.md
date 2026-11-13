@@ -70,9 +70,18 @@
   UWAGA przy próbie: `:Lazy! update nvim-treesitter` (z `!`) zaktualizował też NIEZWIĄZANE wtyczki
   (gitsigns.nvim, mini.splitjoin, vimtex) – wycofane (`git checkout -- lazy-lock.json`).
   Do aktualizacji JEDNEJ wtyczki: `:Lazy update nvim-treesitter` BEZ `!`.
-- Status: **zablokowane** (update na `master` nic nie da – nie ma nowszego commita)
-- Obejście: do zrobienia – wyłączyć highlight dla `markdown_inline` (albo całego `markdown`) w
-  `treesitter.lua` (`highlight.disable`), żeby uniknąć ścieżki crashującego parsera, kosztem
-  utraty kolorowania inline (bold/italic/linki) albo całego kolorowania .md.
-  Migracja na branch `main` (nowe API) – do rozważenia jako osobne zadanie, nie na szybko.
+- Status: **obejście** (2026-11-13, commit `180eaff`): `highlight.disable = { "markdown_inline" }`
+  w `treesitter.lua` – parser `markdown_inline` zostaje zainstalowany, ale nie jest używany do
+  highlight → crashująca ścieżka async-parse nigdy się nie odpala. `markdown` (nagłówki/blok
+  kodu/listy) koloruje się normalnie; stracone jest tylko kolorowanie inline (bold/italic/linki).
+  Zweryfikowane: 14 plików .md (projekt linefolower) + kilka przebiegów przez PTY (`script`,
+  nie headless – headless nie łapie tego crasha, bo wymaga realnego redraw) – zero crashy.
+- WAŻNE (poprawka wcześniejszego wniosku): migracja nvim-treesitter branch `master` → `main`
+  **NIE naprawiłaby tego** – sprawdzone w kodzie `main`: cały faktyczny parsing wstrzykiwanych
+  języków (`languagetree.lua`, `treesitter.lua`) to kod **wbudowany w Neovima** (core runtime,
+  `/nix/store/.../neovim-0.12.4/share/nvim/runtime/lua/vim/treesitter/...`), identyczny
+  niezależnie od brancha wtyczki nvim-treesitter (ta tylko instaluje parsery/query, main branch
+  też w pełni deleguje do `vim.treesitter.*` core). Zanim próbować migracji ponownie w innym
+  celu (nowe API, lepsze wsparcie) – to nie naprawi żadnego crasha w core, tylko przepisze
+  config na nowszy, ale nie-kompatybilny interfejs.
 
