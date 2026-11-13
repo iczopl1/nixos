@@ -40,6 +40,10 @@ o.updatetime = 250
 o.whichwrap:append("<>[]hl")
 o.hidden = true -- przełączanie buforów bez zapisywania (terminal zostaje w tle)
 
+-- Sprawdzanie pisowni (domyślnie wyłączone; <leader>sp = toggle)
+o.spelllang = { "pl", "en" }
+o.spell = false
+
 -- Wbudowane wtyczki, których nie używamy (netrw zastępuje nvim-tree)
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1

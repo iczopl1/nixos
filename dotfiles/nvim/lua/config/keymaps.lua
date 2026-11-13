@@ -145,3 +145,11 @@ map("n", "<leader>gg", "<cmd>LazyGit<CR>", { desc = "LazyGit" })
 -- Git blame
 ---------------------------------------------------------------------------
 map("n", "<leader>gB", "<cmd>GitBlameToggle<CR>", { desc = "Git blame: toggle" })
+
+---------------------------------------------------------------------------
+-- Spell (sprawdzanie pisowni pl+en)
+---------------------------------------------------------------------------
+map("n", "<leader>sp", function()
+  vim.opt.spell = not vim.opt.spell:get()
+  vim.notify("Spell: " .. (vim.opt.spell:get() and "włączone (pl+en)" or "wyłączone"))
+end, { desc = "Toggle sprawdzania pisowni (pl+en)" })

@@ -135,6 +135,10 @@ in
     # --- Brave Rewards wyłączone ---
     BraveRewardsEnabled = false;
 
+    # --- spell: sprawdzanie pisowni (pl + en) ---
+    SpellCheckServiceEnabled = true;
+    SpellcheckLanguage      = [ "pl" "en-US" ];
+
     # --- T3.8: Rozszerzenia wymuszone (KeePassXC) ---
     # ID: pdffhmdngcdnblkagkiocabomlahoihh = KeePassXC-Browser (Chrome Web Store)
     ExtensionInstallForcelist = [
