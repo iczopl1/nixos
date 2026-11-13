@@ -48,6 +48,14 @@
 - [ ] **T1.10** Grayjay – agregator wideo (YouTube, Twitch, Nebula…) by FUTO
         – nie ma w nixpkgs; binarka/AppImage z oficjalnych Releases lub flathub
         – własna derywacja jak Linksy (autoPatchelfHook)
+- [ ] **T1.12** Linksy – extended screen na Pixel 9 (zależności + auto-akceptacja)
+        – sprawdzić które zależności systemowe są potrzebne do trybu „extended screen"
+          (Linksy udostępnia ekran PC na telefonie lub odwrotnie przez Wi-Fi/USB)
+        – dodać brakujące buildInputs do derywacji w programs.nix jeśli linksy-screen crashuje
+        – skonfigurować auto-akceptację połączenia z Pixel 9:
+          a) sprawdzić czy Linksy ma plik konfiguracyjny z listą zaufanych urządzeń
+          b) dodać UUID/nazwę Pixel 9 do trusted devices (plik per-maszyna w local.nix lub ~/.config)
+        – przetestować: linksy-screen na PC + Linksy app na telefonie (Para / ADB wireless)
 
 ---
 
@@ -186,6 +194,7 @@
 - T3.6: AltGr+Ctrl = drugi Super (services.keyd w system.nix)
 
 **Następne w kolejce:**
+- T1.12: Linksy extended screen (Pixel 9, zależności + auto-akceptacja)
 - T3.3: nvim tutorial/cheatsheet skrótów (which-key lub własny overlay)
 - T3.5: nvim animacja pisania (kolor okna przy szybkim pisaniu)
 - T3.7: Status telefonu GrapheneOS (Tailscale + BT headset switch)
