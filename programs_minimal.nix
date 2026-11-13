@@ -153,5 +153,9 @@ in
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1";
     XDG_SESSION_TYPE = "wayland";
+    # Chromium/Electron (Brave, Beeper, VSCodium…) czyta DICPATH żeby znaleźć
+    # słowniki hunspell. hunspellWithDicts ustawia DICPATH tylko dla samego
+    # binarki hunspell, a nie dla innych procesów.
+    DICPATH = "${pkgs.hunspellDicts.pl_PL}/share/hunspell:${pkgs.hunspellDicts.en_US}/share/hunspell";
   };
 }

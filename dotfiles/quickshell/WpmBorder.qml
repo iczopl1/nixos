@@ -1,6 +1,15 @@
 // T3.13: Kolor i grubość obramówki aktywnego okna zmieniają się z prędkością pisania.
 // Monitoruje WSZYSTKIE klawiatury systemowo przez evtest (wymaga grupy input).
 // Nie loguje treści klawiszy – liczy tylko zdarzenia key-down.
+//
+// Naprawione w stosunku do v1:
+//  - Stałe okno 10 s (nie span między pierwszym a ostatnim stempelkiem) → brak "1 klawisz = 100 WPM"
+//  - Wygładzanie wykładnicze (EMA α=0.3) → płynne przejścia między prędkościami
+//  - border_px 2→3→4 (nie 2→6), progi 15/35/60 wpm
+//  - Kompensacja gap_inner: wzrost border o X zmniejsza gap o 2X → okna nie skaczą
+//  - Puls na każde naciśnięcie: chwilowe +1 do border (120 ms) bez korekty gap
+//    → mikroskopijne przesunięcie okna = efekt ruchu (animowane przez mango)
+//
 // Eksponuje: wpm (int), keypressed (signal) – używane przez TypingGlow i shell.qml
 pragma Singleton
 import QtQuick
@@ -10,45 +19,55 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    // --- Stan WPM (publiczny) ---
-    property int    wpm:     0       // aktualny WPM – do odczytu przez inne QML
-    signal          keypressed()     // emitowany przy każdym naciśnięciu klawisza
+    // --- Stan publiczny ---
+    property int    wpm:          0
+    signal          keypressed()
 
     // --- Stan wewnętrzny ---
-    property var    _timestamps: []
-    property string _color:     "0x9eeaf9ff"
-    property int    _borderPx:  2
-    property bool   enabled:    true
+    property var    _timestamps:  []
+    property string _color:       "0x9eeaf9ff"
+    property int    _borderPx:    2       // aktualny poziom bazowy (bez pulsu)
+    property real   _smoothed:    0.0    // EMA WPM
+    property bool   _pulsing:     false  // puls już aktywny → nie nakładaj kolejnego
+    property bool   enabled:      true
 
+    readonly property int    baseGap:    7   // gap_inner default (config.conf)
+    readonly property int    baseBorder: 2   // border_px default (config.conf)
     readonly property string defaultColor: "0x9eeaf9ff"
 
-    // --- Progi kolorów (format mango 0xRRGGBBAA) ---
+    // --- Kolory progowe (format mango 0xRRGGBBAA) ---
+    // Progi: 15 / 35 / 60 wpm (łagodniejsze niż poprzednie 5/20/45/70)
     function colorForWpm(w) {
-        if (!enabled)      return defaultColor
-        if (w >= 70)       return "0xf7768eff"   // czerwień
-        else if (w >= 45)  return "0xff9e64ff"   // pomarańcz
-        else if (w >= 20)  return "0xe0af68ff"   // bursztyn
-        else               return "0x9eeaf9ff"   // błękit
+        if (!enabled)     return defaultColor
+        if (w >= 60)      return "0xf7768eff"   // czerwień
+        else if (w >= 35) return "0xff9e64ff"   // pomarańcz
+        else if (w >= 15) return "0xe0af68ff"   // bursztyn
+        else              return "0x9eeaf9ff"   // błękit
     }
 
-    // grubość obramówki: 2px spoczynek → 6px szybko
+    // border 2→3→4 (zakres zmniejszony, żeby kompensacja gap miała sens)
     function borderPxForWpm(w) {
-        if (w >= 70) return 6
-        if (w >= 45) return 5
-        if (w >= 20) return 4
-        if (w >= 5)  return 3
+        if (w >= 60) return 4
+        if (w >= 15) return 3
         return 2
     }
 
-    // --- Oblicz WPM z rolling-window 5 s ---
+    // gap_inner = baseGap - 2*(border - baseBorder)
+    // Każdy px wzrostu border = 2px redukcji gap → łączna "ramka okna" stała
+    function gapForBorder(px) {
+        return Math.max(1, baseGap - 2 * (px - baseBorder))
+    }
+
+    // --- Oblicz WPM: stałe okno 10 s, minimum 4 naciśnięcia ---
+    // Stały mianownik (10 s) zapobiega gigantycznym wartościom przy szybkich,
+    // krótkich burstach (np. 2 klawisze w 0.1 s nie dają 240 WPM).
     function calcWpm() {
-        var now = Date.now() / 1000.0
-        var cutoff = now - 5.0
+        var now    = Date.now() / 1000.0
+        var window = 10.0
+        var cutoff = now - window
         _timestamps = _timestamps.filter(t => t > cutoff)
-        if (_timestamps.length < 2) return 0
-        var elapsed = now - _timestamps[0]
-        if (elapsed < 0.1) return 0
-        return Math.floor((_timestamps.length / 5.0) / (elapsed / 60.0))
+        if (_timestamps.length < 4) return 0
+        return Math.floor((_timestamps.length / 5.0) / (window / 60.0))
     }
 
     // --- Znajdź urządzenia klawiatury (wszystkie *-event-kbd z by-path) ---
@@ -81,19 +100,28 @@ Singleton {
         }
     }
 
-    // Rejestracja naciśnięcia (wywołuje EvtestReader) + sygnał dla TypingGlow
+    // Rejestracja naciśnięcia + puls
     function registerKeypress() {
         _timestamps.push(Date.now() / 1000.0)
         keypressed()
+
+        // Puls: chwilowe +1 do border_px (120 ms), bez korekty gap
+        // → animacja mango przesunie okna o ~1 px i wróci → efekt ruchu
+        if (!_pulsing) {
+            _pulsing = true
+            mmsgPulseOn.start()
+            pulseTimer.restart()
+        }
     }
 
-    // --- Timer: co 300 ms przelicz WPM, zaktualizuj kolor i grubość ---
+    // --- Timer 300 ms: EMA + kolor + border + gap ---
     Timer {
-        interval: 300
-        running: true
-        repeat: true
+        interval: 300; running: true; repeat: true
         onTriggered: {
-            var w = root.calcWpm()
+            var raw = root.calcWpm()
+            // EMA α=0.3: wolno się podnosi i wolno opada → płynne kolory i grubości
+            root._smoothed = 0.7 * root._smoothed + 0.3 * raw
+            var w = Math.floor(root._smoothed)
             root.wpm = w
 
             var color = root.colorForWpm(w)
@@ -105,9 +133,18 @@ Singleton {
             var px = root.borderPxForWpm(w)
             if (px !== root._borderPx) {
                 root._borderPx = px
-                mmsgWidth.start()
+                if (!root._pulsing) mmsgBorder.start()   // nie nadpisuj pulsu
+                mmsgGapH.start()
+                mmsgGapV.start()
             }
         }
+    }
+
+    // Puls: po 120 ms wróć do poziomu bazowego
+    Timer {
+        id: pulseTimer
+        interval: 120; repeat: false
+        onTriggered: { root._pulsing = false; mmsgBorder.start() }
     }
 
     Process {
@@ -119,11 +156,44 @@ Singleton {
         }
     }
 
+    // border_px do poziomu bazowego (lub po pulsie)
     Process {
-        id: mmsgWidth
+        id: mmsgBorder
         function start() {
             running = false
             command = ["mmsg", "dispatch", "setoption,border_px," + root._borderPx]
+            running = true
+        }
+    }
+
+    // puls: border_px + 1 (bez korekty gap → mikroskopijny ruch okien)
+    Process {
+        id: mmsgPulseOn
+        function start() {
+            running = false
+            command = ["mmsg", "dispatch", "setoption,border_px," + (root._borderPx + 1)]
+            running = true
+        }
+    }
+
+    // gap_inner_horizontal skalowany odwrotnie do border
+    Process {
+        id: mmsgGapH
+        function start() {
+            running = false
+            command = ["mmsg", "dispatch",
+                "setoption,gap_inner_horizontal," + root.gapForBorder(root._borderPx)]
+            running = true
+        }
+    }
+
+    // gap_inner_vertical – osobna opcja w mango
+    Process {
+        id: mmsgGapV
+        function start() {
+            running = false
+            command = ["mmsg", "dispatch",
+                "setoption,gap_inner_vertical," + root.gapForBorder(root._borderPx)]
             running = true
         }
     }
