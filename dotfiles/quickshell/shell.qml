@@ -9,6 +9,8 @@ import Quickshell.Io
 import Quickshell.Wayland
 
 ShellRoot {
+    id: root
+
     // Hints overlay – singletons Mango i BarTargets są auto-odkryte (pragma Singleton)
     Hints {}
 
@@ -17,6 +19,23 @@ ShellRoot {
 
     // WpmBorder i Particles: pragma Singleton – Quickshell auto-odkrywa z katalogu, nie tworzyć ręcznie
 
+    // T2.29: toggle baru przez socket (SUPER+F11) – zamiast kill/restart procesu.
+    // kill + restart zostawiał ghost surface w wlr-layer-shell; visible=false unmapuje czysto.
+    property bool barVisible: true
+
+    SocketServer {
+        id: barToggleServer
+        active: true
+        path: Quickshell.env("XDG_RUNTIME_DIR") + "/qs-bar-" + Quickshell.env("WAYLAND_DISPLAY") + ".sock"
+        handler: Socket { Component.onCompleted: root.barVisible = !root.barVisible }
+    }
+
+    // Rebind po live-reload – czyści stary plik gniazda (jak w Shortcuts.qml)
+    Timer {
+        interval: 800; running: true
+        onTriggered: { barToggleServer.active = false; barToggleServer.active = true }
+    }
+
     Variants {
         model: Quickshell.screens
 
@@ -24,6 +43,8 @@ ShellRoot {
             id: bar
             required property var modelData
             screen: modelData
+
+            visible: root.barVisible
 
             anchors { top: true; left: true; right: true }
             implicitHeight: 28
