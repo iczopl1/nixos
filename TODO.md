@@ -162,10 +162,12 @@
         – phone-status.sh: tailscale status --json | grep pixel; wskaźnik ph ●/○ w QS barze
         – bt-headset.sh: toggle connect/disconnect (MAC z ~/.config/bt-headset-mac); SUPER+F7
 - [x] **T3.8** Brave – KeePassXC extension auto-install (ExtensionInstallForcelist w brave.nix)
-- [ ] **T3.9** Kalendarz + plan zajęć PRz (A3S, A3S-L3) z synchronizacją z telefonem
+- [x] **T3.9** Kalendarz + plan zajęć PRz (A3S, A3S-L3) z synchronizacją z telefonem
         – scraper `https://pei.prz.edu.pl/as/Zima2026_groups_days_horizontal.html`
+        – zaimplementowany w dotfiles/scripts/prz-schedule.py (z opcją --ics)
 - [x] **T3.10** Embedded: platformio (ESP32), esptool dodane; STM32/nRF/arm-none-eabi/openocd już były
-- [ ] **T3.11** Ograniczanie prędkości internetu per-aplikacja (tc/wondershaper/sqm)
+- [x] **T3.11** Ograniczanie prędkości internetu per-aplikacja (tc/wondershaper/sqm)
+        – skrypt dotfiles/scripts/throttle.sh (HTB qdisc + IFB dla ingress); alias `throttle` w shell.nix
 - [x] **T3.12** Efekty graficzne: toggle-effects.sh (blur/animacje), bind=SUPER+F8, alias `effects`
 - [x] **T3.13** Obramówka aktywnego okna zmienia kolor z prędkością pisania (WPM)
         – spoczynek→błękit→bursztyn→czerwień (jak T3.5 w lualine, ale border_color w mango)
@@ -208,19 +210,24 @@
 - T2.26–T2.28: nvim pluginy (surround, flash, trouble, noice, todo-comments, oil, lazygit, git-blame, mini.splitjoin, alpha, zen-mode, colorizer)
 - T3.6: AltGr+Ctrl = drugi Super (services.keyd w system.nix)
 
+**Zrobione (sesja 4):**
+- nixos-base.nix (renamed from system.nix – fix nixos-rebuild-ng)
+- active-configuration.nix symlink w rebuild.sh (nix.nixPath profile-aware)
+- T2.29: Super+F11 toggle baru przez SocketServer (ghost bar naprawiony)
+- T1.11b: Quickshell unstable z lib.hiPrio w programs.nix
+- T1.8: Thunderbird w programs.nix
+- T1.9: Beeper w programs.nix + allowUnfreePredicate
+- T1.10: Grayjay w programs.nix + allowUnfreePredicate
+- T3.11: throttle.sh (tc HTB+IFB) + alias `throttle` w shell.nix
+- Quickshell: animacje włączone (config.conf), Particles.qml fix ExclusionMode→exclusiveZone, shell.qml fix Singleton
+
 **Następne w kolejce:**
-- T1.11b: Quickshell pin do nowszej wersji (full: kompilacja z GitHub)
-- T2.29: Super+F11 toggle baru (ghost bar + fix)
-- T1.12: Linksy extended screen (Pixel 9, zależności + auto-akceptacja)
-- T3.3: nvim tutorial/cheatsheet skrótów (which-key lub własny overlay)
-- T3.5: nvim animacja pisania (kolor okna przy szybkim pisaniu)
-- T3.7: Status telefonu GrapheneOS (Tailscale + BT headset switch)
-- T3.9: Kalendarz PRz (scraper pei.prz.edu.pl)
-- T3.11: Per-aplikacja ograniczanie internetu (tc/wondershaper)
-- T3.13: Obramówka okna zmienia kolor z WPM pisania
-- T3.14: Efekty cząsteczkowe na tle (liście, deszcz, śnieg – Quickshell QML)
+- T1.12: Linksy extended screen (Pixel 9, zależności + auto-akceptacja) [wymaga rebuild]
+- T1.11: hintd/Super+D fix (AT-SPI2 + Brave --force-renderer-accessibility) [wymaga rebuild]
+- **REBUILD WYMAGANY** dla: T1.8/T1.9/T1.10/T1.11b (thunderbird, beeper, grayjay, quickshell unstable)
 
 **Uwagi:**
 - NvChad backup: ~/.config/nvim.nvchad-backup-20261112, ~/.local/share/nvim.nvchad-backup-20261112
 - nvim: 31 pluginów, startuje bez warningów/błędów (exit 0, puste messages i stderr)
 - Syncthing: folder Dane sync w toku (pixel9: ~68%, 929 MB do odebrania, brak błędów)
+- Quickshell: animacje i layer_animations=1 w config.conf; `quickshell -n` w exec_once

@@ -95,8 +95,9 @@ in
       hist  = "history";
 
       # --- Własne skrypty ---
-      agent   = "bash ~/.config/scripts/agent.sh";
-      effects = "bash ~/.config/scripts/toggle-effects.sh";
+      agent    = "bash ~/.config/scripts/agent.sh";
+      effects  = "bash ~/.config/scripts/toggle-effects.sh";
+      throttle = "bash ~/.config/scripts/throttle.sh";  # T3.11: ograniczanie prędkości (tc)
     };
 
     interactiveShellInit = ''
