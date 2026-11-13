@@ -108,8 +108,8 @@ in
     yaml-language-server    # T3.4: YAML LSP
     marksman                # T3.4: Markdown LSP
     cmake-language-server   # T3.4: CMake LSP (neocmake)
-    # hunspellWithDicts tworzy wrapper ustawiający DICPATH → `hunspell -l` widzi pl/en od razu
-    (hunspellWithDicts [ hunspellDicts.pl_PL hunspellDicts.en_US ])
+    # hunspell.withDicts tworzy wrapper ustawiający DICPATH → `hunspell -l` widzi pl/en od razu
+    (hunspell.withDicts [ hunspellDicts.pl_PL hunspellDicts.en_US ])
     zathura               # podgląd PDF (vimtex)
     glow                  # podgląd Markdown (:Glow)
     imagemagick
