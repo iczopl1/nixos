@@ -156,6 +156,78 @@ ShellRoot {
 
                 Item { Layout.fillWidth: true }
 
+                // ===== Media player (T2.34) – playerctl MPRIS =====
+                Text {
+                    id: mediaLabel
+                    Layout.alignment: Qt.AlignVCenter
+                    font.pixelSize: 12
+                    font.family: "JetBrains Mono"
+                    color: "#7aa2f7"
+                    text: ""
+                    visible: false
+                    elide: Text.ElideRight
+                    maximumLineCount: 1
+
+                    Process {
+                        id: mediaProc
+                        command: ["playerctl", "metadata", "--format",
+                                  "{{artist}} – {{title}}"]
+                        running: false
+                        stdout: SplitParser {
+                            onRead: line => {
+                                const s = line.trim()
+                                mediaLabel.visible = s.length > 0
+                                // ogranicz do 40 znaków żeby pasek nie pękał
+                                mediaLabel.text = s.length > 40 ? s.slice(0, 38) + "…" : s
+                            }
+                        }
+                        onExited: code => { if (code !== 0) mediaLabel.visible = false }
+                    }
+
+                    Timer {
+                        interval: 3000; running: true; repeat: true; triggeredOnStart: true
+                        onTriggered: { mediaProc.running = false; mediaProc.running = true }
+                    }
+                }
+
+                Item { width: 10; visible: mediaLabel.visible }
+
+                // ===== Temperatura CPU (T2.33) – najwyższa strefa thermal =====
+                Text {
+                    id: tempLabel
+                    Layout.alignment: Qt.AlignVCenter
+                    color: "#a9b1d6"
+                    font.pixelSize: 12
+                    font.family: "JetBrains Mono"
+                    text: "tmp --"
+
+                    Process {
+                        id: tempProc
+                        // Czyta wszystkie thermal_zone*/temp, bierze maksimum
+                        command: ["/bin/sh", "-c",
+                            "cat /sys/class/thermal/thermal_zone*/temp 2>/dev/null " +
+                            "| awk 'BEGIN{m=0} {v=$1+0; if(v>m)m=v} END{print int(m/1000)}'"]
+                        running: false
+                        stdout: SplitParser {
+                            onRead: line => {
+                                const t = parseInt(line.trim())
+                                if (isNaN(t) || t <= 0) return
+                                tempLabel.text  = t + "°C"
+                                tempLabel.color = t >= 85 ? "#f7768e"
+                                              : t >= 70  ? "#e0af68"
+                                              :            "#a9b1d6"
+                            }
+                        }
+                    }
+
+                    Timer {
+                        interval: 3000; running: true; repeat: true; triggeredOnStart: true
+                        onTriggered: { tempProc.running = false; tempProc.running = true }
+                    }
+                }
+
+                Item { width: 10 }
+
                 // ===== FPS (klatki compositora – FrameAnimation zlicza każdy vsync) =====
                 Text {
                     id: fpsLabel
