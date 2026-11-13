@@ -210,17 +210,22 @@
 - T1.11b: Quickshell unstable z lib.hiPrio w programs.nix
 - T1.8: Thunderbird w programs.nix
 - T1.9: Beeper w programs.nix + allowUnfreePredicate
-- T1.10: Grayjay w programs.nix + allowUnfreePredicate
+- T1.10: Grayjay ZABLOKOWANE (nixpkgs kompiluje JustCef/CEF) – wpis BROKEN.md
 - T3.11: throttle.sh (tc HTB+IFB) + alias `throttle` w shell.nix
 - Quickshell: animacje włączone (config.conf), Particles.qml fix ExclusionMode→exclusiveZone, shell.qml fix Singleton
+- T1.11: Brave --force-renderer-accessibility + at-spi2-core (w kodzie, wymaga rebuild)
+- T1.12: v4l2loopback dla Linksy camera; XDG portal + trusted.json Pixel 9 OK
 
-**Następne w kolejce:**
-- T1.12: Linksy extended screen (Pixel 9, zależności + auto-akceptacja) [wymaga rebuild]
-- T1.11: hintd/Super+D fix (AT-SPI2 + Brave --force-renderer-accessibility) [wymaga rebuild]
-- **REBUILD WYMAGANY** dla: T1.8/T1.9/T1.10/T1.11b (thunderbird, beeper, grayjay, quickshell unstable)
+**Gdzie skończyliśmy (2026-11-13):**
+Wszystkie zadania z TODO wykonane. Lista `[ ]` pusta.
+
+**Po następnym rebuild sprawdzić:**
+- Super+F11 toggle baru (bez ghost surface)
+- Super+D w Brave (hintd + --force-renderer-accessibility)
+- linksy extend / linksy camera (v4l2loopback)
+- Thunderbird, Beeper (nowe pakiety)
 
 **Uwagi:**
 - NvChad backup: ~/.config/nvim.nvchad-backup-20261112, ~/.local/share/nvim.nvchad-backup-20261112
 - nvim: 31 pluginów, startuje bez warningów/błędów (exit 0, puste messages i stderr)
-- Syncthing: folder Dane sync w toku (pixel9: ~68%, 929 MB do odebrania, brak błędów)
 - Quickshell: animacje i layer_animations=1 w config.conf; `quickshell -n` w exec_once
