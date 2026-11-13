@@ -168,7 +168,7 @@ Wejście do bufora z terminalem od razu włącza tryb wpisywania.
 |---|---|---|---|
 | Lua | lua-language-server | stylua | – |
 | Python | pyright (z venv projektu) | black | debugpy (`python3`) |
-| C / C++ | clangd | clang-format | lldb-dap; STM32: arm-none-eabi-gdb |
+| C / C++ | clangd (`--query-driver` dla cross-kompilatorów) | clang-format | lldb-dap; STM32: `gdb` (host, multiarch) + st-util |
 | Java | java-language-server | google-java-format | – |
 | LaTeX | texlab | – | – |
 
@@ -203,8 +203,10 @@ Aktualizacja: `:TSUpdate`.
 
 ## Uwagi
 
-- **STM32:** konfiguracja „STM32 (OpenOCD :3333)” podłącza się do działającego OpenOCD przez `arm-none-eabi-gdb --interpreter=dap` (gdb ≥ 14).
-  `gcc-arm-embedded` i `openocd` nie są zainstalowane; nie ma też automatycznego `load` / `monitor reset` jak w starej wersji.
+- **STM32:** konfiguracja „STM32: make debug + st-util (ST-Link)” sama odpala `make debug` w katalogu projektu
+  (konwencja Makefile – patrz `agent` w terminalu), szuka `.elf` w `build/debug/` i startuje `st-util` (stlink, :4242).
+  Adapter to `gdb` (host, multiarch, ma Python) – **nie** `arm-none-eabi-gdb` z `gcc-arm-embedded`, bo ten jest
+  budowany `--without-python` i `--interpreter=dap` się w nim nie odpala.
 - **lazy-lock.json** musi być zapisywalny – jeśli konfiguracja leży w `/etc/nixos` (root), lazy nie zapisze wersji wtyczek.
 - **blink.cmp** pobiera gotowy moduł dopasowywania (Rust); jeśli się nie uda, działa wolniejsza wersja w Lua z ostrzeżeniem.
 - Pierwsze uruchomienie: `:Lazy` pokazuje instalację wtyczek, `:checkhealth` – brakujące programy.
