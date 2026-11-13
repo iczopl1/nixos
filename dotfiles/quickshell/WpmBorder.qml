@@ -33,6 +33,9 @@ Singleton {
     // osobne efekty (effects-ctl.sh) – można wyłączyć jeden bez drugiego.
     property bool   colorEnabled: true
     property bool   moveEnabled:  true
+    // Master switch: zatrzymuje same procesy evtest (EvtestReader.qml) – realny koszt CPU,
+    // nie tylko efekt wizualny. colorEnabled/moveEnabled bez tego nadal liczyłyby WPM w tle.
+    property bool   countingEnabled: true
 
     readonly property int    baseGap:    7   // gap_inner default (config.conf)
     readonly property int    baseBorder: 2   // border_px default (config.conf)
@@ -53,9 +56,17 @@ Singleton {
         handler: Socket { Component.onCompleted: root.moveEnabled = !root.moveEnabled }
     }
 
+    SocketServer {
+        id: countToggleServer
+        active: true
+        path: Quickshell.env("XDG_RUNTIME_DIR") + "/qs-wpm-count-" + Quickshell.env("WAYLAND_DISPLAY") + ".sock"
+        handler: Socket { Component.onCompleted: root.countingEnabled = !root.countingEnabled }
+    }
+
     Timer {
         interval: 800; running: true
         onTriggered: {
+            countToggleServer.active = false; countToggleServer.active = true
             colorToggleServer.active = false; colorToggleServer.active = true
             moveToggleServer.active = false; moveToggleServer.active = true
         }
@@ -143,9 +154,10 @@ Singleton {
     Timer {
         interval: 300; running: true; repeat: true
         onTriggered: {
-            var raw = root.calcWpm()
+            var raw = root.countingEnabled ? root.calcWpm() : 0
             // EMA α=0.3: wolno się podnosi i wolno opada → płynne kolory i grubości
-            root._smoothed = 0.7 * root._smoothed + 0.3 * raw
+            // (gdy wyłączone liczenie: zeruj natychmiast, nie czekaj na wygaszenie EMA)
+            root._smoothed = root.countingEnabled ? (0.7 * root._smoothed + 0.3 * raw) : 0
             var w = Math.floor(root._smoothed)
             root.wpm = w
 
