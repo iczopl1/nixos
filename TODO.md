@@ -44,8 +44,9 @@
         – `thunderbird` z nixpkgs (full); unfree: nie (jest wolny)
 - [x] **T1.9** Beeper – komunikator all-in-one (Signal, WhatsApp, Telegram, iMessage…)
         – jest w nixpkgs (unfree beeper 4.2.808); dodano do allowUnfreePredicate
-- [x] **T1.10** Grayjay – agregator wideo (YouTube, Twitch, Nebula…) by FUTO
-        – jest w nixpkgs (unfree grayjay 17); dodano do allowUnfreePredicate
+- [-] **T1.10** Grayjay – agregator wideo (YouTube, Twitch, Nebula…) by FUTO
+        – nixpkgs `grayjay` kompiluje JustCef (CEF) ze źródeł – ogromna kompilacja, zablokowane (patrz BROKEN.md)
+        – obejście: AppImage z https://grayjay.app + `appimage-run` z nixpkgs
 - [x] **T1.11b** Quickshell – pin do nowszej wersji z GitHuba (full: kompilacja per MASTER §12)
         – 0.3.0 z nixpkgs brakuje: layer_animations, nowych API (ExclusionMode i in.), animacji
         – full: skompilować nowszą wersję ze źródeł (fetchFromGitHub + nix-build, bez flake'ów)

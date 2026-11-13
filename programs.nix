@@ -133,7 +133,7 @@ in
     discord
     thunderbird     # T1.8: klient e-mail (wolny, z nixpkgs)
     beeper          # T1.9: komunikator all-in-one (Signal, WhatsApp, Telegram…) – unfree
-    grayjay         # T1.10: agregator wideo (YouTube, Twitch, Nebula…) by FUTO – unfree
+    # grayjay – usunięty: nixpkgs buduje ze źródeł (JustCef/CEF = ogromna kompilacja) – patrz BROKEN.md
     # anydesk – usunięty: brak kompatybilnych bibliotek GUI dla Mango
 
     # --- IDE / edytory ---
