@@ -36,7 +36,8 @@ let
       gst_all_1.gstreamer
       gst_all_1.gst-plugins-base
       gst_all_1.gst-plugins-good
-      gst_all_1.gst-plugins-bad
+      gst_all_1.gst-plugins-bad       # H.264: openh264dec/enc (libgstopenh264.so)
+      gst_all_1.gst-plugins-rs        # gtk4paintablesink – linksy-app renderuje tu obraz telefonu
       # Sieć i TLS
       libsoup_3
       glib-networking
