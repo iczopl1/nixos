@@ -6,6 +6,27 @@
   # Serwer SSH całkowicie wyłączony. Klient SSH działa normalnie (git, ssh do serwerów).
   services.openssh.enable = false;
 
+  # NOPASSWD dla iczo – wyłącznie komendy, które rebuild.sh wykonuje przez sudo (MASTER.md §6).
+  # Powód: agent (Claude Code) działa bez TTY, sudo nie może poprosić o hasło interaktywnie.
+  # Celowo NIE "ALL" – każda reguła ograniczona do konkretnego programu i (gdzie możliwe) argumentów.
+  # Dodano: 2026-11-13
+  security.sudo.extraRules = [
+    {
+      users = [ "iczo" ];
+      commands = [
+        { command = "/run/current-system/sw/bin/nixos-rebuild dry-build -I nixos-config=*"; options = [ "NOPASSWD" ]; }
+        { command = "/run/current-system/sw/bin/nix-instantiate --find-file nixpkgs"; options = [ "NOPASSWD" ]; }
+        { command = "/run/current-system/sw/bin/rsync -a --exclude=.git/ --exclude=hardware-configuration.nix /home/iczo/nix_conf/ /etc/nixos/"; options = [ "NOPASSWD" ]; }
+        { command = "/run/current-system/sw/bin/ln -sf /etc/nixos/* /etc/nixos/active-configuration.nix"; options = [ "NOPASSWD" ]; }
+        { command = "/run/current-system/sw/bin/nix-build <nixpkgs/nixos> -A config.system.build.toplevel -I nixpkgs=* -I nixos-config=* -o /tmp/nixos-rebuild-*"; options = [ "NOPASSWD" ]; }
+        { command = "/run/current-system/sw/bin/rm -f /tmp/nixos-rebuild-*"; options = [ "NOPASSWD" ]; }
+        { command = "/run/current-system/sw/bin/nix-env --profile /nix/var/nix/profiles/system --set /nix/store/*"; options = [ "NOPASSWD" ]; }
+        { command = "/nix/store/*/bin/switch-to-configuration boot"; options = [ "NOPASSWD" ]; }
+        { command = "/run/current-system/sw/bin/tee /etc/nixos/PROFILE"; options = [ "NOPASSWD" ]; }
+      ];
+    }
+  ];
+
   # T2.38: dnscrypt-proxy – DNS over HTTPS (szyfrowany, blokada reklam/trackerów)
   # Nasłuchuje na 127.0.0.1:53; NetworkManager przekierowany na localhost.
   # Lista blokad: odblokowane – pozwolone domeny (syncthing, tailscale, avahi pracują normalnie).
