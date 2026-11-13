@@ -86,6 +86,19 @@ in
     libnotify             # pp: notify-send (testowanie powiadomień mako)
     mpv
 
+    # T2.37: age – szyfrowanie plików (RSA/Ed25519 keys; prostsze niż GPG do backupów)
+    # Użycie: age -r $(cat ~/.ssh/id_ed25519.pub) plik.txt > plik.txt.age
+    age
+
+    # T2.36: satty – adnotacje na screenshotach (strzałki, tekst, blur, highlight)
+    # Użycie: grim -g "$(slurp)" - | satty -f -   (SUPER+SHIFT+A w mango.conf)
+    satty
+
+    # T2.35: wl-screenrec – nagrywanie ekranu Wayland (H.264/HEVC, Wayland native)
+    # Użycie: wl-screenrec -f ~/Videos/rec.mp4  (SUPER+F5 start/stop w mango.conf)
+    wl-screenrec
+    playerctl            # T2.34: sterowanie odtwarzaczami MPRIS (media widget w barze)
+
     # --- Przeglądarka ---
     # brave – usunięty z nixpkgs 26.05 (brak maintainerów); TODO: binarka z oficjalnych Releases
     firefox
