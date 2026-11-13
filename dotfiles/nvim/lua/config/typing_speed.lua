@@ -57,14 +57,21 @@ local function wpm_to_color(wpm)
   return string.format("#%02x%02x%02x", last[2], last[3], last[4])
 end
 
+local WPM_FILE = "/tmp/nvim-wpm-" .. tostring(vim.uv.getuid())
+
 local function apply_hl(wpm)
   local bg = wpm_to_color(wpm)
   vim.api.nvim_set_hl(0, "CursorLine", { bg = bg })
+  -- Zapisz WPM dla wpm-border.sh (T3.13)
+  local f = io.open(WPM_FILE, "w")
+  if f then f:write(tostring(wpm)); f:close() end
 end
 
 local function restore_hl()
   timestamps = {}
   vim.api.nvim_set_hl(0, "CursorLine", {})  -- powrót do wartości colorscheme
+  -- Usuń plik WPM żeby wpm-border.sh wiedział, że wyszliśmy z insert
+  os.remove(WPM_FILE)
 end
 
 -- Publiczne: pobierz bieżące WPM (dla lualine)

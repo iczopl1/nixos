@@ -36,6 +36,7 @@ return {
         section_separators = { left = "", right = "" },
         component_separators = { left = "", right = "" },
         disabled_filetypes = { statusline = { "NvimTree" } },
+        refresh = { statusline = 300 },  -- odśwież co 300 ms (WPM + CursorLine)
       },
       sections = {
         lualine_a = { "mode" },

@@ -97,6 +97,10 @@ vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, {
 })
 
 -- T3.5: animacja prędkości pisania (CursorLine + lualine WPM)
-require("config.typing_speed").setup()
+-- Uruchom po ColorScheme żeby catppuccin nie nadpisał CursorLine
+vim.api.nvim_create_autocmd("ColorScheme", {
+  once = true,
+  callback = function() require("config.typing_speed").setup() end,
+})
 
 -- LaTeX: plik *.latexmain (np. main.tex.latexmain) vimtex wykrywa sam.
