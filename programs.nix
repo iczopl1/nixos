@@ -327,6 +327,20 @@ in
   programs.wireshark.enable = true;
   users.users.iczo.extraGroups = [ "wireshark" ];
 
+  # Linksy USB – reguła udev do połączenia telefonu kablem (AOA/ADB/MTP dostęp bez sudo).
+  # `sudo linksy-system-setup usb` nie działa na NixOS (/etc/udev/rules.d jest read-only,
+  # zarządzane deklaratywnie) – ta sama treść reguły co w .linksy-usb-setup-wrapped.
+  services.udev.extraRules = ''
+    ACTION=="remove", GOTO="linksy_usb_end"
+    SUBSYSTEM!="usb", GOTO="linksy_usb_end"
+    ENV{DEVTYPE}!="usb_device", GOTO="linksy_usb_end"
+    ATTR{idVendor}=="18d1", ATTR{idProduct}=="2d0[0-5]", TAG+="uaccess", GOTO="linksy_usb_end"
+    IMPORT{builtin}="usb_id"
+    ENV{ID_USB_INTERFACES}=="*:060101:*", TAG+="uaccess"
+    ENV{ID_USB_INTERFACES}=="*:ff4201:*", TAG+="uaccess"
+    LABEL="linksy_usb_end"
+  '';
+
   # T1.12: Linksy camera – wirtualna kamera (v4l2loopback kernel module).
   # `linksy camera <device>` tworzy /dev/videoN z obrazem telefonu.
   # Użycie: linksy camera <nazwa-urządzenia>
