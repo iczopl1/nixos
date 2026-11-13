@@ -85,8 +85,7 @@ let
 
     src = pkgs.fetchurl {
       url = "https://updater.grayjay.app/Apps/Grayjay.Desktop/Grayjay.Desktop-linux-x64.zip";
-      # sha256sum pobranego pliku | python3 -c "import base64,binascii,sys; h=sys.stdin.read().split()[0]; print('sha256-'+base64.b64encode(binascii.unhexlify(h)).decode())"
-      hash = "sha256-011NbLZlrw3NUUXQPhkTEmgSzuikfEfCe8TAJeDkntg=";
+      hash = "sha256-zzX71K2xm0plvHCV28KGSMTgJEONLPdweLP+46FPmzA=";
     };
 
     nativeBuildInputs = with pkgs; [
