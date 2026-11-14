@@ -312,6 +312,7 @@ in
 
     # --- Embedded / mikrokontrolery (T3.10) ---
     arduino-ide           # IDE 2.x – Nice Nano (nRF52840) przez UF2/DFU
+    arduino-cli           # CLI – `arduino-cli core/lib install ...` bez GUI, do skryptów/CI
     gcc-arm-embedded      # arm-none-eabi toolchain (STM32, nRF52, Cortex-M)
     openocd               # On-Chip Debugger – flash/debug STM32 przez ST-Link
     stlink                # ST-Link narzędzia CLI (st-flash, st-info, st-util)
