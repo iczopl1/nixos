@@ -1,7 +1,11 @@
 /*
- * wpm-global – globalny licznik WPM z /dev/input, ustawia kolor obramówki w Mango.
- * Blokuje na select() z 300 ms timeout – praktycznie 0% CPU w spoczynku.
+ * wpm-global – globalny licznik WPM z /dev/input, zapisuje do pliku dla nvim (typing_speed.lua,
+ * T3.5 – licznik w lualine). Blokuje na select() z 300 ms timeout – praktycznie 0% CPU w spoczynku.
  * Wymaga grupy `input` (dostęp do /dev/input/event*).
+ *
+ * NIE ustawia koloru obramówki (focus_color) – to robi WpmBorder.qml (Quickshell), z własnymi
+ * togglami `effects wpm-color`/`wpm-move`/`wpm-count`. Oba programy ustawiające focus_color
+ * naraz = użytkownik nie ma kontroli przez effects-ctl.sh (patrz BROKEN.md/git log 2026-11-14).
  *
  * Kompilacja: cc -O2 -o wpm-global wpm-global.c
  * Użycie: wpm-global [--wpm-file /tmp/nvim-wpm-1000]
@@ -22,43 +26,9 @@
 /* ── konfiguracja ───────────────────────────────────────────────── */
 #define WINDOW_S        5       /* okno rolling (s) */
 #define CHARS_PER_WORD  5
-#define REFRESH_MS      300     /* co ile ms odświeżamy kolor */
+#define REFRESH_MS      300     /* co ile ms odświeżamy plik WPM */
 #define MAX_DEVS        16
 #define MAX_TS          512     /* max znaczników w oknie */
-#define IDLE_RESET_S    3       /* po ilu sekundach bez pisania wróć do default */
-
-/* ── kolory (gradient błękit→bursztyn→czerwień) ─────────────────── */
-static const char *DEFAULT_COLOR = "0x9eeaf9ff";
-
-typedef struct { int wpm; unsigned char r, g, b; } Stop;
-static const Stop STOPS[] = {
-    {  0, 0x1e, 0x1e, 0x2e },
-    { 20, 0x9e, 0xea, 0xf9 },
-    { 50, 0xe0, 0xaf, 0x68 },
-    { 90, 0xf7, 0x76, 0x8e },
-};
-#define NSTOPS (int)(sizeof(STOPS)/sizeof(STOPS[0]))
-
-static int lerp(int a, int b, double t) {
-    if (t < 0) t = 0; if (t > 1) t = 1;
-    return (int)(a + (b - a) * t);
-}
-
-static void wpm_to_color(int wpm, char out[16]) {
-    for (int i = 1; i < NSTOPS; i++) {
-        if (wpm <= STOPS[i].wpm) {
-            double t = (double)(wpm - STOPS[i-1].wpm) /
-                       (STOPS[i].wpm - STOPS[i-1].wpm);
-            snprintf(out, 16, "0x%02x%02x%02xff",
-                lerp(STOPS[i-1].r, STOPS[i].r, t),
-                lerp(STOPS[i-1].g, STOPS[i].g, t),
-                lerp(STOPS[i-1].b, STOPS[i].b, t));
-            return;
-        }
-    }
-    snprintf(out, 16, "0x%02x%02x%02xff",
-        STOPS[NSTOPS-1].r, STOPS[NSTOPS-1].g, STOPS[NSTOPS-1].b);
-}
 
 /* ── timestampy naciśnięć ───────────────────────────────────────── */
 static double ts[MAX_TS];
@@ -162,14 +132,7 @@ static int open_keyboards(int fds[MAX_DEVS]) {
     return n;
 }
 
-/* ── mmsg + WPM plik ────────────────────────────────────────────── */
-static void set_color(const char *color) {
-    char cmd[128];
-    snprintf(cmd, sizeof(cmd),
-             "mmsg dispatch setoption,focus_color,%s 2>/dev/null", color);
-    system(cmd);
-}
-
+/* ── WPM plik (dla typing_speed.lua w nvim) ─────────────────────── */
 static void write_wpm_file(const char *path, int wpm) {
     if (!path) return;
     FILE *f = fopen(path, "w");
@@ -196,10 +159,6 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    char cur_color[16];
-    strncpy(cur_color, DEFAULT_COLOR, sizeof(cur_color));
-    double last_keypress = 0;
-
     for (;;) {
         fd_set rfds;
         FD_ZERO(&rfds);
@@ -220,31 +179,13 @@ int main(int argc, char **argv) {
                 while (read(fds[i], &ev, sizeof(ev)) == sizeof(ev)) {
                     if (ev.type == EV_KEY && ev.value == 1 &&
                         !ignore_key(ev.code)) {
-                        double t = now_s();
-                        ts_push(t);
-                        last_keypress = t;
+                        ts_push(now_s());
                     }
                 }
             }
         }
 
-        /* Odśwież kolor co REFRESH_MS (niezależnie od eventów) */
-        int wpm = calc_wpm();
-        write_wpm_file(wpm_file, wpm);
-
-        char new_color[16];
-        double idle = now_s() - last_keypress;
-        if (wpm > 0) {
-            wpm_to_color(wpm, new_color);
-        } else if (idle >= IDLE_RESET_S) {
-            strncpy(new_color, DEFAULT_COLOR, sizeof(new_color));
-        } else {
-            strncpy(new_color, cur_color, sizeof(new_color));
-        }
-
-        if (strcmp(new_color, cur_color)) {
-            set_color(new_color);
-            strncpy(cur_color, new_color, sizeof(cur_color));
-        }
+        /* Odśwież plik co REFRESH_MS (niezależnie od eventów) */
+        write_wpm_file(wpm_file, calc_wpm());
     }
 }
