@@ -166,6 +166,28 @@
 - [x] **T2.32** podman – kontenery bez roota (full; `virtualisation.podman.enable`)
 - [x] **T2.37** age – nowoczesne szyfrowanie plików (`age -r`, kompatybilne z SSH keys; minimal)
 - [x] **T2.38** dnscrypt-proxy – DNS over HTTPS (blokada reklam/trackerów systemowo; ustalić wyjątek firewall)
+- [ ] **T2.40** Program throttlujący CPU przy przegrzaniu: 85°C → ogranicz moc, aż spadnie do 70°C
+        – Powód: X250 pod długim obciążeniem (np. build full, kompilacja) może grzać się mocno
+          mimo `services.throttled` (T1.15 – throttled naprawia tylko BIOS-owe PL1/PL2, nie
+          chroni przed przegrzaniem przy realnym długim 100% obciążeniu). To osobny mechanizm:
+          nie "napraw sztuczne dławienie", a "aktywnie dław, gdy naprawdę gorąco".
+        – a) Odczyt temperatury: `/sys/class/thermal/thermal_zone*/temp`, najwyższa ze stref
+          (ten sam wzorzec co bar T2.33 – `dotfiles/quickshell` ma już tę logikę, do podglądu).
+        – b) Throttle: `/sys/devices/system/cpu/intel_pstate/max_perf_pct` – obniżyć (np. do
+          ~50%) gdy temp ≥ 85°C. NIE to samo co `no_turbo` (TURBO_OFF_BUILD w rebuild.sh) –
+          max_perf_pct ogranicza częstotliwość ogólnie, no_turbo tylko wyłącza boost.
+        – c) Histereza: trzymać ograniczenie, dopóki temp nie spadnie ≤ 70°C, potem przywrócić
+          max_perf_pct=100 (poprzedni stan, nie na sztywno 100 – jeśli user/TLP coś tam ustawił).
+        – d) Koordynacja z istniejącym: `services.throttled` (T1.15) i `TURBO_OFF_BUILD`
+          (rebuild.sh, tylko na czas buildu full) – nowy program nie może nadpisywać ich zmian
+          w złym momencie; polling co few sekund (np. 5s), lekki demon (wzorzec jak throttled.py).
+        – e) Miejsce: systemd service w `services.nix` (full – dotyczy głównie starszego
+          sprzętu jak X250) albo prosty skrypt bash + systemd timer/service, do ustalenia.
+        – f) Log aktywacji throttla (np. do journalu) – żeby było widać kiedy i jak często
+          się odpalał (przydatne do oceny, czy progi 85/70°C mają sens na tej maszynie).
+        – Priorytet: proponuję **P2** (bezpieczeństwo termiczne sprzętu, ale nie blokuje innych
+          zadań, X250 ma już throttled+TLP+turbo-off-przy-buildzie jako warstwy ochrony).
+          Do potwierdzenia/zmiany przez użytkownika.
 
 ### Bar (Quickshell)
 - [x] **T2.33** Bar – temperatura CPU (°C) przed/po fps
@@ -285,3 +307,9 @@ zrobione: fix) – crash treesitter przy .md, `highlight.disable markdown_inline
 - NvChad backup: ~/.config/nvim.nvchad-backup-20261112, ~/.local/share/nvim.nvchad-backup-20261112
 - nvim: 31 pluginów, startuje bez warningów/błędów (exit 0, puste messages i stderr)
 - Quickshell: animacje i layer_animations=1 w config.conf; `quickshell -n` w exec_once
+
+**Sesja 7 (2026-11-14, ad-hoc poza TODO – particles leaves/rain/snow naprawione (warstwa
+background zajęta przez cava-bg/awww, przeniesione na bottom/overlay), cursor particles 10x
++ limit 10, effects wpm-color/wpm-move/wpm-count rozdzielone, cava toggle, naprawiony konflikt
+wpm-global vs WpmBorder.qml o focus_color – patrz BROKEN.md):** wszystko zcommitowane.
+Jedyne niezrobione: **T2.40** (nowe, czeka na zatwierdzenie priorytetu) – throttle CPU przy 85°C.
