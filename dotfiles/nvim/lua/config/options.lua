@@ -47,3 +47,19 @@ o.spell = false
 -- Wbudowane wtyczki, których nie używamy (netrw zastępuje nvim-tree)
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
+
+-- Poddialekty YAML/Markdown/Go, które lspconfig (yamlls/marksman/gopls) deklaruje, ale nvim
+-- ich nie rozpoznaje domyślnie – bez tego :checkhealth vim.lsp pokazuje "Unknown filetype"
+-- (nieszkodliwe, ale konfiguracja jest "nieosiągalna" bez wzorca).
+vim.filetype.add({
+  extension = {
+    tmpl    = "gotmpl",
+    gotmpl  = "gotmpl",
+  },
+  pattern = {
+    ["docker%-compose.*%.ya?ml"] = "yaml.docker-compose",
+    [".*%.gitlab%-ci%.ya?ml"] = "yaml.gitlab",
+    ["values.*%.ya?ml"] = "yaml.helm-values",
+    [".*%.mdx"] = "markdown.mdx",
+  },
+})
