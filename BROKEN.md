@@ -85,3 +85,27 @@
   celu (nowe API, lepsze wsparcie) – to nie naprawi żadnego crasha w core, tylko przepisze
   config na nowszy, ale nie-kompatybilny interfejs.
 
+### wpm-global ustawiał focus_color równolegle z WpmBorder.qml
+- Kiedy: 2026-11-14
+- Profil: full (programs.nix), Quickshell (dotfiles/quickshell)
+- Objaw: `effects wpm-color`/`wpm-move`/`wpm-count` (Quickshell, dodane 2026-11-13) nie dawały
+  żadnej kontroli – obramówka zmieniała kolor niezależnie od stanu togglów, "jakby nie było
+  wpływu na ustawienia". Przy debugowaniu wczoraj `wpm-global` akurat nie działał (crash),
+  dlatego konflikt nie był widoczny – dopiero po restarcie systemu (2026-11-14, exec_once
+  wystartował go na nowo) ujawnił się w pełni.
+- Przyczyna: DWIE niezależne, nic o sobie nie wiedzące implementacje liczenia WPM i ustawiania
+  `focus_color` przez `mmsg dispatch setoption,focus_color,...`:
+  1. `WpmBorder.qml` (Quickshell, EvtestReader) – ma togle (`qs-wpm-color/move/count`)
+  2. `wpm-global` (C, `exec_once` w mango-autostart, PID zawsze żyje) – **bez żadnego toggla**
+  `wpm-global` nadpisywał/ścigał się z WpmBorder.qml o ten sam `focus_color`, całkowicie poza
+  zasięgiem `effects-ctl.sh`.
+- Status: **rozwiązane** – `wpm-global.c` już NIE ustawia koloru (usunięte `set_color()`,
+  `wpm_to_color()`, tabela `STOPS`). Zostaje tylko zapis `/tmp/nvim-wpm-$UID` dla
+  `typing_speed.lua` w nvim (T3.5, licznik w lualine) – to jedyna unikalna funkcja tego
+  binarnego, nie zduplikowana przez WpmBorder.qml, więc program NIE może być usunięty całkiem.
+  Kolor i "ruszanie się" okna – wyłącznie `WpmBorder.qml`, z pełną kontrolą przez `effects`.
+- Obejście: n/d (naprawione w kodzie, commit `37e04ed`). Po `boot`-rebuildzie wymagany restart
+  systemu, żeby `exec_once=wpm-global` załadował nową binarkę z nowej generacji (albo ręcznie
+  podmienić żywy proces na binarkę z `/nix/store/.../wpm-global-0.1.0/bin/wpm-global` – zrobione
+  tego dnia, żeby nie czekać do reboota).
+
