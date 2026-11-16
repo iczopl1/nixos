@@ -9,18 +9,26 @@ local util = require("config.util")
 
 local function pyright_settings(root_dir)
   local venv = util.python_venv(root_dir)
-  if not venv then
+  local python_path
+  if venv then
+    -- "aktywuj" venv dla nvim (terminale i narzędzia widzą jego python)
+    vim.env.VIRTUAL_ENV = venv
+    local bin = venv .. "/bin"
+    if not (vim.env.PATH or ""):find(bin, 1, true) then
+      vim.env.PATH = bin .. ":" .. (vim.env.PATH or "")
+    end
+    python_path = bin .. "/python"
+  elseif vim.env.PYTHON then
+    -- Brak venv w projekcie -> globalny python z python.nix ($PYTHON, pythonWithAiRPackages).
+    -- Bez tego pyright sam zgadnie bare "python3" (programs_minimal.nix, bez numpy/scipy/...)
+    -- i zgłosi fałszywe "reportMissingImports" dla pakietów, które SĄ, tylko globalnie.
+    python_path = vim.env.PYTHON
+  else
     return {}
-  end
-  -- "aktywuj" venv dla nvim (terminale i narzędzia widzą jego python)
-  vim.env.VIRTUAL_ENV = venv
-  local bin = venv .. "/bin"
-  if not (vim.env.PATH or ""):find(bin, 1, true) then
-    vim.env.PATH = bin .. ":" .. (vim.env.PATH or "")
   end
   return {
     python = {
-      pythonPath = bin .. "/python",
+      pythonPath = python_path,
       analysis = {
         autoSearchPaths = true,
         useLibraryCodeForTypes = true,
