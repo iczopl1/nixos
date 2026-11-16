@@ -15,7 +15,7 @@ let
   #   curl -H "User-Agent: Discord-Updater/1" \
   #     "https://updates.discord.com/distributions/app/manifests/latest?channel=stable&platform=linux&arch=x64"
   # i przeliczyć sha256 -> SRI (sha256-<base64>) dla distro + każdego modułu.
-  discord-latest = pkgs.discord.override {
+  discord-latest = (pkgs.discord.override {
     source = {
       version = "1.0.169";
       distro = {
@@ -39,7 +39,24 @@ let
         discord_rpc = { version = 1; url = "https://stable.dl2.discordapp.net/distro/app/stable/linux/x64/1.0.169/discord_rpc/1/full.distro"; hash = "sha256-qRQWU0B0Bh1u/PX96R0fifS20A6kMztNVp47dW0w6Ys="; };
       };
     };
-  };
+  }).overrideAttrs (old: {
+    # Crash "Discord Desktop Core": requireNative("discord_desktop_core") (bundle.js, webpack
+    # id 23505) tworzy Module z paths=[] i require() nie ma czego przeszukać. Jedyna droga,
+    # żeby to zadziałało, to registerLocalModulePaths(buildInfo) (webpack id 84237), który
+    # dodaje katalog modułów do Module.globalPaths – ALE tylko gdy buildInfo.localModulesRoot
+    # jest ustawione w resources/build_info.json. Oficjalny build_info.json (z API Discorda,
+    # ten sam co pobiera update.py z nixpkgs) tego pola nie ma wcale – jest przewidziane
+    # właśnie dla pakietów dystrybucyjnych typu ten, ale nixpkgs go nie ustawia, więc natywne
+    # moduły (w tym core) są nieznajdywalne mimo że stoją poprawnie wypakowane w $out.
+    # Zweryfikowane: dodanie tego pola naprawia błąd (osobny nix-build + realne odpalenie
+    # binarki – Discord dochodzi do załadowania właściwej treści z discordapp.com, zamiast
+    # "Cannot find module 'discord_desktop_core'"). $out znany już w czasie budowania, więc
+    # żadnego stage'owania per-user w runtime nie potrzeba – 2026-11-16.
+    postInstall = (old.postInstall or "") + ''
+      substituteInPlace "$out/opt/Discord/resources/build_info.json" \
+        --replace '}' ',"localModulesRoot":"'"$out"'/opt/Discord/modules"}'
+    '';
+  });
 
   # Linksy – integracja PC↔telefon (pliki, schowek, ekran, kamera, BT).
   # Nie ma w nixpkgs; binarka z oficjalnych GitHub Releases (MASTER §13 kolejność 2).
@@ -346,6 +363,7 @@ in
 
     # --- Gry ---
     prismlauncher
+    moonlight-qt          # klient Moonlight (GameStream) – `rd` w shell.nix: granie zdalne z PC z Windows + Sunshine
 
     # --- Embedded / mikrokontrolery (T3.10) ---
     arduino-ide           # IDE 2.x – Nice Nano (nRF52840) przez UF2/DFU

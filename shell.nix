@@ -242,12 +242,21 @@ in
         echo "Quickshell zrestartowany"
       }
 
-      # rd – Moonlight remote desktop do pc2
+      # rd – Moonlight stream (Desktop) do PC z Windows po LAN (moonlight-qt w programs.nix, full)
       rd() {
         if command -v moonlight &>/dev/null; then
-          moonlight stream pc2
+          moonlight stream 192.168.1.109 "Desktop"
         else
-          echo "moonlight-qt nie zainstalowany (brak w nixpkgs – pobierz ręcznie)"
+          echo "moonlight-qt nie jest w systemie – zrób ./rebuild.sh (full)"
+        fi
+      }
+
+      # rdt – RDP do tego samego PC przez Tailscale (działa też poza domową siecią LAN)
+      rdt() {
+        if command -v xfreerdp &>/dev/null; then
+          xfreerdp /v:100.102.72.72 /u:iczo /dynamic-resolution +clipboard
+        else
+          echo "freerdp nie jest w systemie – zrób ./rebuild.sh"
         fi
       }
 

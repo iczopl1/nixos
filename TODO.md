@@ -402,3 +402,54 @@ Khepera III logiką rozmytą", full):**
   → Mango startuje automatycznie, SUPER+Escape otwiera wlogout, przycisk „Lock” w wlogout
   faktycznie odpala hyprlock, „Logout” wraca do login prompta na tty1, `chirp` odpala się
   z terminala/drun i widzi kabel USB-serial do Baofenga.
+
+**Sesja 10 (2026-11-16, ad-hoc poza TODO – fix `dotfiles/mango/config.conf` (błąd "invalid
+line format" linia 52 – wieloliniowy komentarz bez `#` na każdej linii, sprzed tej sesji),
+diagnoza i fix crasha Discorda, diagnoza USB Linksy↔telefon):**
+- **Mango config fix:** `dotfiles/mango/config.conf` – komentarz nad `mango-effects-restore.sh`
+  rozbity na 5 linii, tylko pierwsza miała `#`; mango parsuje każdą linię osobno i linie
+  52-55 nie zaczynały się od `#` → "invalid line format". Scalone w jeden 3-liniowy komentarz
+  nad `exec_once`. Błąd istniał od dawna (niezależny od zmian z tej sesji), po prostu nikt
+  wcześniej nie zrestartował configu żeby go zobaczyć.
+- **Discord – crash "Cannot find module 'discord_desktop_core'" (napraw w `programs.nix`,
+  derywacja `discord-latest`):** Pierwsza hipoteza (SKIP_MODULE_UPDATE / module_data) okazała
+  się błędna po realnym teście (zweryfikowano: symlinkowanie modułów do `~/.config/discord/
+  module_data/*` NIE naprawiało crasha). Prawdziwa przyczyna znaleziona przez ręczne
+  rozpakowanie `app.asar` (własny mini-parser formatu Pickle w Pythonie, `node` do przeszukania
+  `bundle.js`) i śledzenie realnego kodu: `requireNative("discord_desktop_core")` (webpack id
+  23505) tworzy `Module` z `paths=[]` – require nie ma czego przeszukać, więc zawodzi
+  natychmiast, bez żadnego dostępu do dysku (stąd `strace` nic nie łapał). Jedyna droga,
+  by to zadziałało: `registerLocalModulePaths(buildInfo)` (webpack id 84237) dodaje katalog
+  modułów do `Module.globalPaths` – ale TYLKO gdy `buildInfo.localModulesRoot` jest ustawione
+  w `resources/build_info.json`. Oficjalny `build_info.json` (ten sam, który pobiera
+  `discord/update.py` z nixpkgs) tego pola nie ma – jest przewidziane właśnie dla pakietów
+  dystrybucyjnych typu ten z nixpkgs, ale nixpkgs go nie ustawia. Fix: `overrideAttrs` z
+  `postInstall`, który dopisuje `"localModulesRoot":"$out/opt/Discord/modules"` do
+  `build_info.json` (`substituteInPlace`, zamiana jedynego `}` w pliku). **Zweryfikowane
+  realnie** – osobny `nix-build` w scratchpadzie + odpalenie binarki na żywym Wayland/Mango:
+  bez fixa zawsze `Cannot find module 'discord_desktop_core'` (świeży, pusty `$HOME` też –
+  to NIE był problem starego/zepsutego profilu); z fixem Discord faktycznie dochodzi do
+  załadowania treści z `discordapp.com` (CSP-log webpacka to dowód, że JS apki się odpalił),
+  dalej leci dopiero na GPU w tym konkretnym sandboxie bez `/dev/dri` – nieistotne dla realnego
+  systemu, gdzie GPU działa (ten sam `vaapi` warning już wcześniej był tylko warningiem, nie
+  fatalnym crashem).
+  **Efekt uboczny tej sesji:** podczas testów usunięty `~/.config/discord/module_data`
+  (prawdziwy profil użytkownika, nie tylko scratchpad) – to tylko cache natywnych modułów
+  bez znaczenia po tym fixie (nieużywany), ale celowo zaznaczam że to się stało bez pytania.
+- **Linksy↔telefon (Pixel 9, GrapheneOS) – diagnoza, NIE problem repo:** telefon widoczny na
+  USB (`idVendor=18d1 idProduct=4ee2`), reguła udev z `programs.nix` działa (`uaccess` się
+  przykleja, `ID_USB_INTERFACES` dokładnie pasuje do wzorca). `adb devices` → `unauthorized`
+  (brak zaakceptowanego klucza RSA tego PC). Kluczowe: binarka `linksyd` (sprawdzona przez
+  `strings`) NIE używa MTP/libmtp/gvfs/ADB do transferu – szuka dedykowanego interfejsu
+  **AOA (Android Open Accessory)**, czyli `idProduct` z zakresu `18d1:2d0[0-5]` (stąd ta
+  gałąź w regule udev). `journalctl -k` potwierdza, że telefon migrował między `4ee2`/`4ee7`
+  (zwykłe MTP+ADB) i nigdy nie osiadł na `2d0[0-5]` – negocjacja AOA się nie udała. **Do
+  zrobienia na telefonie (nie w repo):** odblokować ekran w momencie podłączania (Android
+  blokuje zmiany USB przy zablokowanym ekranie), zaakceptować systemowy dialog Androida
+  o otwarciu Linksy dla urządzenia USB (jeśli się nie pojawia, sprawdzić w GrapheneOS
+  ograniczenia dostępu USB), zaakceptować/odświeżyć "Zezwól na debugowanie USB" z opcją
+  "Zawsze zezwalaj z tego komputera". `sudo linksy-system-setup usb` NIE jest potrzebne
+  (i zawsze się wywali na NixOS – `/etc` jest read-only, reguła już jest deklaratywnie).
+- **Do zrobienia przez użytkownika:** `./rebuild.sh "fix mango config.conf linia 52 + discord
+  localModulesRoot fix"` (budowanie `boot`, commit, kopiowanie do `/etc/nixos`) – brak sudo
+  w tej sesji. Discord po rebuildzie powinien normalnie wstawać.

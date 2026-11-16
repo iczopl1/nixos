@@ -16,7 +16,7 @@ in
   # Konfiguracja Mango (~/.config/mango) i quickshell - patrz SETUP.md.
   systemd.user.tmpfiles.users.iczo.rules = [
     "d %h/.config/hypr 0755 - - -"
-    "L %h/.config/hypr/hyprlock.conf - - - - ${dotfiles}/hyprlock/hyprlock.conf"
+    "L+ %h/.config/hypr/hyprlock.conf - - - - ${dotfiles}/hyprlock/hyprlock.conf"
     # T3.7: skrypty statusu telefonu i przełącznika BT
     "d %h/.config/scripts 0755 - - -"
     "L+ %h/.config/scripts/phone-status.sh - - - - ${dotfiles}/scripts/phone-status.sh"

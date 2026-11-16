@@ -64,6 +64,7 @@ in
     tcpdump               # przechwytywanie pakietów (wymaga sudo)
     nethogs               # ruch sieciowy per-proces (wymaga sudo)
     speedtest-cli         # pomiar prędkości łącza
+    freerdp               # xfreerdp – klient RDP (dostęp do PC z Windows po kablu/sieci)
 
     # --- Narzędzia terminalowe ---
     jq

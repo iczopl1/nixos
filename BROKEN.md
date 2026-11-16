@@ -19,6 +19,36 @@
  
 ## Wpisy
 
+### Linksy – extend/camera przez USB (AOA) nie działa z profilu secondary GrapheneOS (Pixel 9)
+- Kiedy: 2026-11-16
+- Profil: full (linksy w `programs.nix`), dotyczy telefonu (GrapheneOS), nie samego repo
+- Objaw: `linksy extend <telefon>` / `linksy camera <telefon>` wisi na "Asking..." i nigdy się
+  nie łączy. Log jądra (`journalctl -k`) pokazuje, że telefon przy próbie połączenia cyklicznie
+  rozłącza się i wraca, migrując tylko między dwoma zwykłymi trybami kompozytowymi USB
+  (`idProduct=4ee7` ↔ `4ee2` – MTP/ADB), nigdy nie wchodząc w tryb AOA (`idProduct=18d1:2d0[0-5]`),
+  którego Linksy wymaga do transferu danych przez USB (potwierdzone analizą binarki `linksyd`:
+  szuka dedykowanego interfejsu "accessory", nie MTP/ADB). Reguła udev w `programs.nix`
+  (linie ~374-385) jest poprawna i aktywna (`uaccess` się przykleja) – to nie jest przyczyna.
+- Przyczyna: GrapheneOS, gdy na urządzeniu jest aktywny profil **secondary** (nawet jeśli w tej
+  chwili używany jest profil main), poważnie ogranicza tryby danych USB – zgłoszony upstream
+  bug/zachowanie: po aktywowaniu drugiego profilu USB pokazuje tylko "charging", bez promptu
+  o File Transfer/PTP/MIDI/ADB, i to dotyczy **obu** profili na telefonie
+  ([GrapheneOS/os-issue-tracker#7227](https://github.com/GrapheneOS/os-issue-tracker/issues/7227)).
+  Dodatkowo, niezależnie od tego: USB debugging/ADB jest architektonicznie ograniczone
+  wyłącznie do profilu owner (main) – żadna aplikacja na profilu secondary nie dostanie
+  dostępu do ADB, co potwierdza analogiczny, znany problem w scrcpy
+  ([Genymobile/scrcpy#6201](https://github.com/Genymobile/scrcpy/issues/6201)). Użytkownik
+  świadomie nie chce instalować/uruchamiać Linksy na profilu main (chce trzymać go tylko
+  na secondary) – to wyklucza obejście przez przełączenie profilu.
+- Status: **zablokowane** – to ograniczenie/zamierzone zachowanie bezpieczeństwa GrapheneOS
+  (wielu użytkowników uważa to za security feature, nie bug – mało prawdopodobne, że zostanie
+  "naprawione"), nie problem konfiguracji NixOS ani samej aplikacji Linksy. Nie próbować
+  naprawiać tego przez zmiany w `programs.nix`/udev – to się dzieje poniżej poziomu, na który
+  Nix ma wpływ.
+- Obejście: żadne, dopóki profil secondary jest aktywny na telefonie. Funkcje Linksy po Wi-Fi
+  (pliki, schowek, powiadomienia – nie wymagają ADB/AOA) powinny działać normalnie na secondary.
+  Extend/camera przez USB wymaga profilu main.
+
 ### webots – bundlowany plugin Qt6 "xcb" (QT_QPA_PLATFORM=xcb wymuszony przez launcher)
 - Kiedy: 2026-11-16, nixpkgs: 26.05 (unstable dla buildInputs webots.nix)
 - Profil: full
