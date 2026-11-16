@@ -108,7 +108,11 @@ return {
       vim.lsp.config("pyright", {
         root_markers = { "pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", ".git" },
         before_init = function(_, config)
-          config.settings = vim.tbl_deep_extend("force", config.settings or {}, pyright_settings(config.root_dir))
+          -- root_dir bywa nil (brak .git/pyproject.toml – zwykłe w projektach kursowych
+          -- bez packagingu) – wtedy cwd jako fallback, inaczej python_venv nigdy się nie uruchomi.
+          config.settings = vim.tbl_deep_extend(
+            "force", config.settings or {}, pyright_settings(config.root_dir or vim.fn.getcwd())
+          )
         end,
       })
 

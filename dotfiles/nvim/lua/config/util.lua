@@ -1,24 +1,32 @@
 -- Pomocnicze funkcje: bufory, terminale, Python.
 local M = {}
 
--- Znajdź działający venv Linuksa w folderze projektu (.venv, potem venv).
+-- Znajdź działający venv Linuksa dla pliku w root_dir – .venv/venv w tym folderze,
+-- a jeśli nie ma, SZUKA W GÓRĘ drzewa katalogów (max 10 poziomów) – żeby jeden venv
+-- na cały kurs/projekt (w folderze nadrzędnym) działał też dla plików w podfolderach
+-- (np. .../projekt/venv obsługuje .../projekt/lab1/cw1.py).
 -- Waliduje, że bin/python NAPRAWDĘ istnieje – inaczej "venv/" zsynchronizowany
 -- z Windows (venv/Scripts/python.exe) zostałby błędnie wzięty za linuksowy
 -- (tak zepsuty był debugger: pythonPath wskazywał na nieistniejący plik).
 -- Zwraca ścieżkę do folderu venv (nie do pliku python) albo nil.
 function M.python_venv(root_dir)
-  local candidates = {}
-  if vim.env.VIRTUAL_ENV and vim.env.VIRTUAL_ENV ~= "" then
-    table.insert(candidates, vim.env.VIRTUAL_ENV)
+  if vim.env.VIRTUAL_ENV and vim.env.VIRTUAL_ENV ~= ""
+      and vim.fn.executable(vim.env.VIRTUAL_ENV .. "/bin/python") == 1 then
+    return vim.env.VIRTUAL_ENV
   end
-  if root_dir then
-    table.insert(candidates, root_dir .. "/.venv")
-    table.insert(candidates, root_dir .. "/venv")
-  end
-  for _, path in ipairs(candidates) do
-    if vim.fn.executable(path .. "/bin/python") == 1 then
-      return path
+  local dir = root_dir
+  local depth = 0
+  while dir and dir ~= "" and depth < 10 do
+    for _, name in ipairs({ ".venv", "venv" }) do
+      local path = dir .. "/" .. name
+      if vim.fn.executable(path .. "/bin/python") == 1 then
+        return path
+      end
     end
+    local parent = vim.fn.fnamemodify(dir, ":h")
+    if parent == dir then break end
+    dir = parent
+    depth = depth + 1
   end
 end
 
