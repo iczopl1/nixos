@@ -22,6 +22,8 @@ let
     scipy
     sympy
     pandas
+    networkx
+    scikit-fuzzy
    # statsmodels
 
     # Plots and notebooks

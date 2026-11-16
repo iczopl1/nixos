@@ -30,6 +30,7 @@ in
       # --- Nawigacja ---
       ".."  = "cd ..";
       "..." = "cd ../..";
+      cdd   = "cd /dane/sync/Dane/";  # wspólna partycja NTFS (local.nix) – szybkie wejście
 
       # --- ls → eza ---
       ls = "eza --group-directories-first";
