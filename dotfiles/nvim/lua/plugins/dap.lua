@@ -1,5 +1,9 @@
 -- Debugger (DAP). Adaptery z NixOS zamiast Masona:
---   Python  -> debugpy z python.nix (`python3 -m debugpy`)
+--   Python  -> debugpy z python.nix (`python3 -m debugpy`); interpreter projektu wykrywany
+--              tak samo jak w LSP (lua/config/util.lua: .venv/ -> venv/ -> globalny python).
+--              Walidacja bin/python (nie samo istnienie folderu) – inaczej np. "venv/"
+--              zsynchronizowany z Windows (venv/Scripts/python.exe) zostałby błędnie użyty.
+--              <leader>dr z >1 konfiguracją pyta który plik odpalić (aktualny / main.py).
 --   C / C++ -> lldb-dap z pakietu lldb (programs.nix)
 --   STM32   -> arm-none-eabi-gdb w trybie DAP (gdb >= 14) + st-util (stlink, :4242)
 --              Konfiguracja "STM32" sama odpala `make debug` w katalogu projektu
@@ -30,8 +34,31 @@ return {
       dap.listeners.before.event_terminated["dapui_config"] = function() dapui.close() end
       dap.listeners.before.event_exited["dapui_config"] = function() dapui.close() end
 
-      -- Python: interpreter z python.nix ma debugpy
-      require("dap-python").setup("python3")
+      -- Python: adapter (debugpy) odpalany globalnym python3 z python.nix.
+      -- Interpreter PROGRAMU (pythonPath) – osobna sprawa, patrz resolve_python niżej.
+      local dap_python = require("dap-python")
+      dap_python.setup("python3")
+
+      -- Interpreter projektu: .venv/ -> venv/ -> nil (nil = dap-python nie ustawia
+      -- pythonPath, debugpy używa interpretera adaptera, czyli globalnego python3).
+      -- Ta sama logika co pyright (lsp.lua) – LSP i debugger zawsze się zgadzają.
+      local util = require("config.util")
+      dap_python.resolve_python = function()
+        local venv = util.python_venv(vim.fn.getcwd())
+        return venv and (venv .. "/bin/python") or nil
+      end
+
+      -- Dodatkowa konfiguracja: odpal main.py w katalogu projektu (obok domyślnej
+      -- "file" = aktualny bufor z dap-python). Z >1 konfiguracją <leader>dr pyta, którą
+      -- odpalić – to jest to pytanie "main.py czy aktualny plik".
+      -- pythonPath celowo pominięty – enrich_config dap-python i tak go dopełni
+      -- przez resolve_python ustawiony wyżej (ta sama ścieżka co w "file" domyślnym).
+      table.insert(require("dap").configurations.python, 2, {
+        type = "python",
+        request = "launch",
+        name = "main.py",
+        program = "${workspaceFolder}/main.py",
+      })
 
       -- C / C++ na tym komputerze
       dap.adapters.lldb = { type = "executable", command = "lldb-dap", name = "lldb" }

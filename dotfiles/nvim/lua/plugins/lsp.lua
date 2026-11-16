@@ -3,25 +3,12 @@
 -- full:    + java_language_server, ts_ls, html/cssls/jsonls, rust_analyzer, gopls, kotlin_language_server
 -- nvim-lspconfig dostarcza tylko gotowe ustawienia (komendy, root_markers).
 
--- Python: użyj venv projektu ($VIRTUAL_ENV, .venv/, venv/) - jak w starej konfiguracji.
-local function python_venv(root_dir)
-  local candidates = {}
-  if vim.env.VIRTUAL_ENV and vim.env.VIRTUAL_ENV ~= "" then
-    table.insert(candidates, vim.env.VIRTUAL_ENV)
-  end
-  if root_dir then
-    table.insert(candidates, root_dir .. "/.venv")
-    table.insert(candidates, root_dir .. "/venv")
-  end
-  for _, path in ipairs(candidates) do
-    if vim.fn.executable(path .. "/bin/python") == 1 then
-      return path
-    end
-  end
-end
+-- Python: użyj venv projektu ($VIRTUAL_ENV, .venv/, venv/) - współdzielone z dap.lua
+-- (lua/config/util.lua), żeby debugger i LSP zgadzały się co do interpretera.
+local util = require("config.util")
 
 local function pyright_settings(root_dir)
-  local venv = python_venv(root_dir)
+  local venv = util.python_venv(root_dir)
   if not venv then
     return {}
   end

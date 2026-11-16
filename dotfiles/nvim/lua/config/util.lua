@@ -1,5 +1,26 @@
--- Pomocnicze funkcje: bufory i terminale.
+-- Pomocnicze funkcje: bufory, terminale, Python.
 local M = {}
+
+-- Znajdź działający venv Linuksa w folderze projektu (.venv, potem venv).
+-- Waliduje, że bin/python NAPRAWDĘ istnieje – inaczej "venv/" zsynchronizowany
+-- z Windows (venv/Scripts/python.exe) zostałby błędnie wzięty za linuksowy
+-- (tak zepsuty był debugger: pythonPath wskazywał na nieistniejący plik).
+-- Zwraca ścieżkę do folderu venv (nie do pliku python) albo nil.
+function M.python_venv(root_dir)
+  local candidates = {}
+  if vim.env.VIRTUAL_ENV and vim.env.VIRTUAL_ENV ~= "" then
+    table.insert(candidates, vim.env.VIRTUAL_ENV)
+  end
+  if root_dir then
+    table.insert(candidates, root_dir .. "/.venv")
+    table.insert(candidates, root_dir .. "/venv")
+  end
+  for _, path in ipairs(candidates) do
+    if vim.fn.executable(path .. "/bin/python") == 1 then
+      return path
+    end
+  end
+end
 
 -- Nowy bufor z terminalem (powłoka w bieżącym katalogu).
 -- opts.focus = true -> przełącz się na niego i wejdź w tryb wpisywania.
