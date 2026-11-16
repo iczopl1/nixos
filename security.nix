@@ -30,7 +30,7 @@
   # T2.38: dnscrypt-proxy – DNS over HTTPS (szyfrowany, blokada reklam/trackerów)
   # Nasłuchuje na 127.0.0.1:53; NetworkManager przekierowany na localhost.
   # Lista blokad: odblokowane – pozwolone domeny (syncthing, tailscale, avahi pracują normalnie).
-  services.dnscrypt-proxy2 = {
+  services.dnscrypt-proxy = {
     enable = true;
     settings = {
       listen_addresses   = [ "127.0.0.1:53" ];

@@ -71,6 +71,15 @@ let
       mkdir -p $out/opt
       cp -r . $out/opt/webots
 
+      # Launcher wymusza QT_QPA_PLATFORM=xcb "dla kompatybilności" (zawsze XWayland).
+      # Na Mango (czysty wlroots) bundlowany plugin xcb ma niezgodność ABI z libxcb
+      # z nixpkgs (brak libxcb-cursor przy starcie -> Fatal/core dumped – sprawdzone
+      # 2026-11-16). Bundlowany plugin "wayland-egl" działa natywnie i stabilnie –
+      # default zmieniony na wayland, ale zmienna środowiskowa nadal nadpisywalna.
+      substituteInPlace $out/opt/webots/webots \
+        --replace-fail 'export QT_QPA_PLATFORM="xcb"' \
+                        'export QT_QPA_PLATFORM="''${QT_QPA_PLATFORM:-wayland}"'
+
       mkdir -p $out/bin
       makeWrapper $out/opt/webots/webots $out/bin/webots \
         --set WEBOTS_HOME "$out/opt/webots"

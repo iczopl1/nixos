@@ -19,6 +19,28 @@
  
 ## Wpisy
 
+### webots – bundlowany plugin Qt6 "xcb" (QT_QPA_PLATFORM=xcb wymuszony przez launcher)
+- Kiedy: 2026-11-16, nixpkgs: 26.05 (unstable dla buildInputs webots.nix)
+- Profil: full
+- Objaw: `webots` startuje przez `webots/webots` (launcher bash), który bezwarunkowo
+  robi `export QT_QPA_PLATFORM="xcb"`. Na Mango (czysty wlroots, bez XWayland forsowanego
+  explicite) kończy się: `Warning: ... xcb-cursor0 or libxcb-cursor0 is needed...` →
+  `Fatal: ... no Qt platform plugin could be initialized` → `Aborted (core dumped)`.
+  Plik `libxcb-cursor.so.0` FAKTYCZNIE jest bundlowany w `lib/webots/` i ma poprawny RPATH
+  (sprawdzone `readelf -d`) – to nie brak pliku, tylko prawdopodobny mismatch ABI między
+  bundlowanym `libxcb-cursor.so.0` (zbudowanym przez Cyberbotics pod starszy `libxcb`)
+  a `libxcb` z nixpkgs (buildInputs webots.nix), którego linkuje przez autoPatchelf.
+- Przyczyna: wymuszanie XWayland przez launcher ("dla kompatybilności") zamiast natywnego
+  Wayland, mimo że tarball zawiera też bundlowany, sprawny plugin `wayland-egl`.
+- Status: **obejście** (działa) – `substituteInPlace` w `webots.nix` zmienia
+  `export QT_QPA_PLATFORM="xcb"` na `export QT_QPA_PLATFORM="''${QT_QPA_PLATFORM:-wayland}"`
+  (default wayland, ale nadal nadpisywalne zmienną środowiskową, gdyby ktoś jednak
+  potrzebował wymusić xcb). Zweryfikowane: `nix-build` + realny `result/bin/webots --minimize`
+  bez ręcznych exportów – proces startuje i żyje, log pusty, zero crashy.
+- Obejście: n/d (naprawione w kodzie, commit po tej sesji). Jeśli po aktualizacji Webots
+  (nowa wersja tarballa) problem z xcb zniknie – można usunąć ten substituteInPlace i wrócić
+  do oryginalnego launchera.
+
 ### android-studio
 - Kiedy: 2026-11-11, nixpkgs: 26.11pre
 - Profil: full

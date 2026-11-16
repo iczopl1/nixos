@@ -345,11 +345,18 @@ Khepera III logiką rozmytą", full):**
   Niezwiązane z tą sesją (webots.nix/python.nix nie dotykają Quickshell). Odpalony ręcznie
   tą samą komendą co autostart (`quickshell -n`) – wstał czysto, `Configuration Loaded`,
   zero błędów.
-- Nie commitowane przeze mnie (brak sudo w tej sesji) – zmiany gotowe w working tree,
-  `/etc/nixos` już zsynchronizowane i działające z poprawkami poza ostatnim
-  xorg.libX11→libx11 (trywialna, bez wpływu na działanie – te same pakiety pod starą nazwą).
-  Do zrobienia: `./rebuild.sh "env do ćwiczenia Khepera III: webots + python hiPrio fix"`
-  (albo ręczny `git add`+`commit`, skoro build już zweryfikowany na żywym systemie).
+- Użytkownik uruchomił `./rebuild.sh` samodzielnie – build `boot` przeszedł, auto-commit
+  `a37e1b9` (2026-11-16 13:14), `/etc/nixos` zsynchronizowane. To generacja 35 – **nieaktywna
+  do restartu** (`/run/current-system` to wciąż gen. 34, sprzed tej sesji, bez webots/fixa
+  pythona – `nixos-rebuild boot` nie przełącza działającego systemu, tylko ustawia domyślny
+  wpis GRUB-a na następny start, zgodnie z MASTER). Po restarcie: sprawdzić że działa.
 - **Po rebuildzie sprawdzić:** `webots` odpala się z drun/terminala, otwiera scenę
   `khepera3.wbt`, kontroler Python (`from controller import Robot`) działa bez ręcznego
   ustawiania `WEBOTS_HOME`.
+- **Dogrywka (ten sam dzień, po restarcie na gen. 35):** `webots` faktycznie crashował
+  (`Fatal: no Qt platform plugin` – xcb plugin, ABI mismatch libxcb-cursor, launcher wymuszał
+  XWayland na czystym Wayland/Mango) – patrz BROKEN.md. Naprawione: `substituteInPlace`
+  w `webots.nix`, default `QT_QPA_PLATFORM=wayland` (nadpisywalny). Zweryfikowane lokalnym
+  `nix-build` + realnym uruchomieniem wrappera (`result/bin/webots --minimize`, zero ręcznych
+  exportów) – proces startuje i żyje, zero crashy. Wymaga kolejnego `./rebuild.sh` +
+  restartu żeby trafić na żywy system (nie zrobione przeze mnie – brak sudo w tej sesji).
