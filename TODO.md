@@ -360,3 +360,45 @@ Khepera III logiką rozmytą", full):**
   `nix-build` + realnym uruchomieniem wrappera (`result/bin/webots --minimize`, zero ręcznych
   exportów) – proces startuje i żyje, zero crashy. Wymaga kolejnego `./rebuild.sh` +
   restartu żeby trafić na żywy system (nie zrobione przeze mnie – brak sudo w tej sesji).
+
+**Sesja 9 (2026-11-16, ad-hoc poza TODO – login w TTY + logout manager, CHIRP dla Baofenga):**
+- **Login w TTY (zamiast auto-startu Mango przez greetd):** `services.nix` –
+  `services.greetd.enable = false` (był `true`, odpalał Mango bezpośrednio jako `iczo`).
+  System wraca do standardowego `getty@tty1` – login/password prompt w konsoli przy starcie.
+- **Auto-start Mango po zalogowaniu:** `shell.nix` – nowy `programs.bash.loginShellInit`:
+  jeśli brak `$WAYLAND_DISPLAY`/`$DISPLAY` i tty to `/dev/tty1` → `exec mango` (klasyczny
+  wzorzec `.bash_profile: exec startx`; `exec` podstawia proces Mango pod shella, więc po
+  wylogowaniu wracamy prosto do login prompta na tty1, bez zombie-shella). Dotyczy TYLKO
+  login shelli (tty), nie każdego nowego terminala w Mango (`interactiveShellInit` to
+  osobne pole, bez zmian).
+- **Logout manager – SUPER+Escape:** `wlogout` (GTK layer-shell, ~140 KiB, czysto z cache –
+  zweryfikowane dry-buildem obu profili) dodany do `programs_minimal.nix` (działa w obu
+  profilach, nie tylko full). Bind w `dotfiles/mango/config.conf`:
+  `bind=SUPER,Escape,spawn,wlogout`. **SUPER+L zostaje bez zmian** (`focusdir,right`) –
+  użytkownik zdecydował nie przenosić go.
+- Własny layout `dotfiles/wlogout/layout` (symlink przez `dotfiles.nix`) – przycisk „lock”
+  woła `hyprlock` bezpośrednio (domyślne `loginctl lock-session` nic by nie zrobiło – Mango
+  nie obsługuje sygnału Lock z logind). Reszta (logout/suspend/hibernate/reboot/shutdown)
+  jak w domyślnym layout wlogout. **`style.css` NIE skopiowany** – zostaje domyślny z pakietu
+  (ikony wskazują na własny `/nix/store/.../wlogout-.../share/...`, więc zawsze zgodny
+  z zainstalowaną wersją; kopia starego style.css groziłaby złym hashem po aktualizacji).
+- **CHIRP (programowanie Baofeng/radiotelefonów przez USB-serial):** `pkgs.chirp` dodany do
+  `programs.nix` (full) – w nixpkgs, 29 MiB download, zero kompilacji lokalnej (dry-build
+  zweryfikowany). Dostęp do `/dev/ttyUSB*` już jest przez grupę `dialout`
+  (`nixos-base.nix`, użytkownik `iczo` już w tej grupie od T3.10) – żadna nowa reguła udev
+  nie była potrzebna.
+- Zweryfikowane: składnia (`nix-instantiate --parse`) wszystkich zmienionych plików, `statix`/
+  `deadnix` (same stare, niezwiązane ostrzeżenia – zero nowych od tych zmian), dry-build
+  `configuration_minimal.nix` i `configuration.nix` (oba: wszystko z cache, zero nowych
+  lokalnych kompilacji poza standardowymi małymi derywacjami systemowymi jak przy każdym
+  rebuildzie).
+- **NIE zrobione przeze mnie – brak sudo w tej sesji (`sudo -n true` → "a password is
+  required"):** `./rebuild.sh` (build `boot` + commit + kopiowanie do `/etc/nixos`).
+  Zmiany leżą tylko w working tree repo, nie commitowane (MASTER §6 – bez buildu nie
+  commitujemy). **Do zrobienia przez użytkownika:** `./rebuild.sh "tty login + wlogout
+  (SUPER+Escape) + chirp"`, potem restart żeby auto-login-w-TTY i wlogout faktycznie
+  zadziałały (obecny `/run/current-system` wciąż ma stare `greetd`).
+- **Po rebuildzie i restarcie sprawdzić:** boot pokazuje tty1 login prompt (nie GUI), login
+  → Mango startuje automatycznie, SUPER+Escape otwiera wlogout, przycisk „Lock” w wlogout
+  faktycznie odpala hyprlock, „Logout” wraca do login prompta na tty1, `chirp` odpala się
+  z terminala/drun i widzi kabel USB-serial do Baofenga.

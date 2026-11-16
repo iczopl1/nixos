@@ -1,4 +1,4 @@
-# Usługi: greetd+Mango, PipeWire, Tailscale (tailnet A), Syncthing.
+# Usługi: logowanie w TTY (bez greetd), PipeWire, Tailscale (tailnet A), Syncthing.
 { config, pkgs, ... }:
 
 {
@@ -10,18 +10,12 @@
     variant = "";
   };
 
-  # Menedżer sesji: startuje od razu Mango jako iczo (wcześniej Hyprland).
-  # Mango jest instalowany przez mango.nix (z łatką slidefade).
-  services.greetd = {
-    enable = true;
-    settings.default_session = {
-      command = "/run/current-system/sw/bin/mango";
-      user = "iczo";
-    };
-  };
-  # Alternatywa z ekranem logowania i wyborem sesji (mango.nix rejestruje sesję "mango"):
-  # services.greetd.settings.default_session.command =
-  #   "${pkgs.tuigreet}/bin/tuigreet --time --remember --sessions ${config.services.displayManager.sessionData.desktops}/share/wayland-sessions";
+  # Logowanie przez standardowy getty na tty1 (bez greetd/autologin) – przy starcie
+  # systemu widać login/password prompt w konsoli. Mango startuje automatycznie
+  # dopiero PO zalogowaniu (shell.nix, programs.bash.loginShellInit) – klasyczny
+  # wzorzec "exec startx" z .bash_profile. Wylogowanie z Mango (przez wlogout,
+  # SUPER+... – programs_minimal.nix) wraca do tego samego login prompta na tty1.
+  services.greetd.enable = false;
 
   services.pipewire = {
     enable = true;

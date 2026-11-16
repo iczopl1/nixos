@@ -358,6 +358,10 @@ in
     platformio            # PlatformIO CLI – ESP32, AVR, STM32, nRF (framework+upload)
     esptool               # esptool.py – flash ESP32/ESP8266 przez UART
     bear                  # `bear -- make` generuje compile_commands.json dla clangd (projekty z Makefile)
+
+    # --- Radio / krótkofalarstwo ---
+    chirp                 # programowanie radiotelefonów (Baofeng itp.) przez kabel USB-serial
+                           # (CP2102/CH340) – /dev/ttyUSB*, dostęp przez grupę "dialout" (nixos-base.nix)
   ];
 
   # Steam – moduł NixOS: obsługuje 32-bit libs, udev, gamescope opcjonalnie

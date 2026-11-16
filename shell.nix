@@ -102,6 +102,15 @@ in
       throttle = "bash ~/.config/scripts/throttle.sh";  # T3.11: ograniczanie prędkości (tc)
     };
 
+    # Login na tty1 (po wyłączeniu greetd – services.nix) → auto-start Mango, jak klasyczne
+    # ".bash_profile: exec startx". `exec` zastępuje proces shellu, więc wyjście z Mango
+    # (wylogowanie) wraca prosto do login prompta na tty1, bez zombie-shella pod spodem.
+    loginShellInit = ''
+      if [ -z "$WAYLAND_DISPLAY" ] && [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
+        exec mango
+      fi
+    '';
+
     interactiveShellInit = ''
       export FZF_DEFAULT_OPTS="--height=40% --layout=reverse --border"
 

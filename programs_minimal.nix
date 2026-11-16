@@ -46,6 +46,8 @@ in
     yad                   # dialogi GUI dla skryptów
     udiskie               # auto-mount USB/dysków (frontend dla udisks2)
     wlopm                 # wyłączanie ekranu przez wlr-output-power-management (T2.5)
+    wlogout               # menu wylogowania/zasilania po SUPER+ESCAPE – lekki (GTK layer-shell,
+                           # ~140 KiB), bez dodatkowych zależności poza tym co już jest (gtk3)
 
     evtest                # czytanie raw input events (T3.13 – WPM border w Quickshell)
 

@@ -29,5 +29,12 @@ in
     # Mako: powiadomienia – timeout 5 s (domyślnie 0 = zostają na zawsze)
     "d %h/.config/mako 0755 - - -"
     "L+ %h/.config/mako/config - - - - ${dotfiles}/mako/config"
+    # wlogout (SUPER+Escape, config.conf): tylko layout – "lock" woła hyprlock bezpośrednio
+    # (loginctl lock-session nie ma w Mango nic, co by go obsłużyło). style.css NIE linkowany
+    # celowo – pakiet ma własny domyślny style.css z ikonami wskazującymi na jego własną
+    # ścieżkę w /nix/store, zawsze zgodną z zainstalowaną wersją (bez ryzyka złego hasha po
+    # aktualizacji wlogout, gdyby skopiować style.css ze starej wersji).
+    "d %h/.config/wlogout 0755 - - -"
+    "L+ %h/.config/wlogout/layout - - - - ${dotfiles}/wlogout/layout"
   ];
 }
