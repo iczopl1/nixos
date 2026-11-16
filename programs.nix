@@ -4,6 +4,43 @@
 { pkgs, lib, config, unstable, ... }:
 
 let
+  # Discord – nixpkgs utknął na 1.0.159, serwery Discorda odrzucają zbyt stare klientów
+  # (SKIP_HOST_UPDATE=true już ustawione przez samą derywację nixpkgs, nie pomaga – to
+  # twardy mur wersji, nie dobrowolny nag). `nix-channel --update` sprawdzone, nic nowszego.
+  # GIT: discord – powód: nieaktualna wersja odrzucana przez serwer – dodano: 2026-11-16
+  # Źródło (host + moduły natywne, wersjowo sprzężone) z oficjalnego distro-API Discorda,
+  # ten sam sposób co skrypt aktualizujący nixpkgs (discord/update.py) – TYLKO `source`
+  # nadpisany, cała reszta derywacji (deps, wrapper, patching) zostaje z nixpkgs.
+  # Odświeżenie przy kolejnym "za stary klient": pobrać
+  #   curl -H "User-Agent: Discord-Updater/1" \
+  #     "https://updates.discord.com/distributions/app/manifests/latest?channel=stable&platform=linux&arch=x64"
+  # i przeliczyć sha256 -> SRI (sha256-<base64>) dla distro + każdego modułu.
+  discord-latest = pkgs.discord.override {
+    source = {
+      version = "1.0.169";
+      distro = {
+        url = "https://stable.dl2.discordapp.net/distro/app/stable/linux/x64/1.0.169/full.distro";
+        hash = "sha256-IAkuyMzLOG33LPmh3T99f5Ipg0Ouqc6oZ4+tg5WBXJc=";
+      };
+      modules = {
+        discord_erlpack = { version = 1; url = "https://stable.dl2.discordapp.net/distro/app/stable/linux/x64/1.0.169/discord_erlpack/1/full.distro"; hash = "sha256-cew9vLHZ30So5qMEs6fL1jLVE/FVrwFHrYLxTuudlT0="; };
+        discord_dispatch = { version = 1; url = "https://stable.dl2.discordapp.net/distro/app/stable/linux/x64/1.0.169/discord_dispatch/1/full.distro"; hash = "sha256-hivM5Sgt0fL2cCgg5GfhsbbAG0KwvcPkB9QXBv27rE8="; };
+        discord_spellcheck = { version = 1; url = "https://stable.dl2.discordapp.net/distro/app/stable/linux/x64/1.0.169/discord_spellcheck/1/full.distro"; hash = "sha256-+0EFULASRYGxbkzycBSuLHQmQIBMjsAm5UQiDOSs30M="; };
+        discord_utils = { version = 1; url = "https://stable.dl2.discordapp.net/distro/app/stable/linux/x64/1.0.169/discord_utils/1/full.distro"; hash = "sha256-Nh/ygerPKxtn64wgwKn3s7l+u6K6e0/OqRpGwhOQmxc="; };
+        discord_voice = { version = 1; url = "https://stable.dl2.discordapp.net/distro/app/stable/linux/x64/1.0.169/discord_voice/1/full.distro"; hash = "sha256-v6DL02c5LKcVxnYSY5BAv181PLkmOgOcLi4IlYxiqEg="; };
+        discord_sysimg = { version = 1; url = "https://stable.dl2.discordapp.net/distro/app/stable/linux/x64/1.0.169/discord_sysimg/1/full.distro"; hash = "sha256-8BAO7R2YP1/+4S+NOuk0BM1n2r3xR5JjiAi+isGJ16M="; };
+        discord_krisp = { version = 1; url = "https://stable.dl2.discordapp.net/distro/app/stable/linux/x64/1.0.169/discord_krisp/1/full.distro"; hash = "sha256-1FZwARTPkUqLFMtVHNS/I4nonMGnwcAEKKtgx85x3fA="; };
+        discord_zstd = { version = 1; url = "https://stable.dl2.discordapp.net/distro/app/stable/linux/x64/1.0.169/discord_zstd/1/full.distro"; hash = "sha256-iMasJBM6qeGdLuTO72jGofk5ElZjUiFUmnh1Ygu9GDo="; };
+        discord_desktop_core = { version = 1; url = "https://stable.dl2.discordapp.net/distro/app/stable/linux/x64/1.0.169/discord_desktop_core/1/full.distro"; hash = "sha256-7y12YdLYQA0+xquZdja+bfKX15TiqvmB9vlU+sunKj4="; };
+        discord_game_utils = { version = 1; url = "https://stable.dl2.discordapp.net/distro/app/stable/linux/x64/1.0.169/discord_game_utils/1/full.distro"; hash = "sha256-gXdch5OEgWEptzJqRnsswA568j/w8Vt5Zi4z0mbLQn0="; };
+        discord_cloudsync = { version = 1; url = "https://stable.dl2.discordapp.net/distro/app/stable/linux/x64/1.0.169/discord_cloudsync/1/full.distro"; hash = "sha256-Z3r7cO3sE/YdgnpQyaLHpu3na7v/CZsxkKCnVuMtNnk="; };
+        discord_modules = { version = 1; url = "https://stable.dl2.discordapp.net/distro/app/stable/linux/x64/1.0.169/discord_modules/1/full.distro"; hash = "sha256-qcFNB95uU52/K8Az/6BJ4fRGqX/MsHNqwgNAwm0mgZs="; };
+        discord_ndi = { version = 1; url = "https://stable.dl2.discordapp.net/distro/app/stable/linux/x64/1.0.169/discord_ndi/1/full.distro"; hash = "sha256-N75zy3IRyADIudxQEOlONh/sfVTcXWQKH8NEvSG/Xhg="; };
+        discord_rpc = { version = 1; url = "https://stable.dl2.discordapp.net/distro/app/stable/linux/x64/1.0.169/discord_rpc/1/full.distro"; hash = "sha256-qRQWU0B0Bh1u/PX96R0fifS20A6kMztNVp47dW0w6Ys="; };
+      };
+    };
+  };
+
   # Linksy – integracja PC↔telefon (pliki, schowek, ekran, kamera, BT).
   # Nie ma w nixpkgs; binarka z oficjalnych GitHub Releases (MASTER §13 kolejność 2).
   # GIT: linksy – powód: brak w nixpkgs – dodano: 2026-11-12
@@ -242,7 +279,7 @@ in
     linksy
     wpm-global          # T3.13: globalny WPM → kolor obramówki w Mango
     google-chrome
-    discord
+    discord-latest
     thunderbird     # T1.8: klient e-mail (wolny, z nixpkgs)
     beeper          # T1.9: komunikator all-in-one (Signal, WhatsApp, Telegram…) – unfree
     grayjay          # T1.10: agregator wideo FUTO; oficjalna binarka zip (CEF bundlowany, NIE kompilowany)
