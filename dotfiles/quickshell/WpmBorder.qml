@@ -41,6 +41,40 @@ Singleton {
     readonly property int    baseBorder: 2   // border_px default (config.conf)
     readonly property string defaultColor: "0x9eeaf9ff"
 
+    // --- Trwały zapis stanu togglów (jak particle-effect) – bez tego colorEnabled/
+    // moveEnabled/countingEnabled resetowały się do "true" przy każdym restarcie QS,
+    // mimo ustawień zmienionych przez `effects wpm-color/wpm-move/wpm-count`. ---
+    readonly property string stateFile: Quickshell.env("HOME") + "/.config/wpm-effects"
+
+    Process {
+        command: ["bash", "-c", "cat " + root.stateFile + " 2>/dev/null || true"]
+        running: true
+        stdout: SplitParser {
+            onRead: line => {
+                var m = line.trim().match(/^(color|move|count)=([01])$/)
+                if (!m) return
+                var val = m[2] === "1"
+                if (m[1] === "color") root.colorEnabled = val
+                else if (m[1] === "move") root.moveEnabled = val
+                else if (m[1] === "count") root.countingEnabled = val
+            }
+        }
+    }
+
+    Process { id: saveEffectsProc }
+    function saveEffectsState() {
+        var c = root.colorEnabled ? 1 : 0
+        var m = root.moveEnabled ? 1 : 0
+        var n = root.countingEnabled ? 1 : 0
+        saveEffectsProc.command = ["bash", "-c",
+            "printf 'color=%s\\nmove=%s\\ncount=%s\\n' " + c + " " + m + " " + n + " > " + root.stateFile]
+        saveEffectsProc.running = false
+        saveEffectsProc.running = true
+    }
+    onColorEnabledChanged: saveEffectsState()
+    onMoveEnabledChanged: saveEffectsState()
+    onCountingEnabledChanged: saveEffectsState()
+
     // --- Toggle on/off (effects-ctl.sh) ---
     SocketServer {
         id: colorToggleServer
