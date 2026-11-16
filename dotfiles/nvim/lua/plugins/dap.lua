@@ -34,10 +34,13 @@ return {
       dap.listeners.before.event_terminated["dapui_config"] = function() dapui.close() end
       dap.listeners.before.event_exited["dapui_config"] = function() dapui.close() end
 
-      -- Python: adapter (debugpy) odpalany globalnym python3 z python.nix.
+      -- Python: adapter (debugpy) odpalany globalnym pythonem z python.nix ($PYTHON,
+      -- pythonWithAiRPackages) – NIE bare "python3"! Kolizja w environment.systemPackages:
+      -- i python.nix (pythonWithAiRPackages, ma debugpy) i programs_minimal.nix (goły
+      -- python3) dają bin/python3 – PATH wygrywa goły, bez debugpy -> adapter exit 1.
       -- Interpreter PROGRAMU (pythonPath) – osobna sprawa, patrz resolve_python niżej.
       local dap_python = require("dap-python")
-      dap_python.setup("python3")
+      dap_python.setup(vim.env.PYTHON or "python3")
 
       -- Interpreter projektu: .venv/ -> venv/ -> nil (nil = dap-python nie ustawia
       -- pythonPath, debugpy używa interpretera adaptera, czyli globalnego python3).
