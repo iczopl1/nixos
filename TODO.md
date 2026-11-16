@@ -313,3 +313,43 @@ background zajęta przez cava-bg/awww, przeniesione na bottom/overlay), cursor p
 + limit 10, effects wpm-color/wpm-move/wpm-count rozdzielone, cava toggle, naprawiony konflikt
 wpm-global vs WpmBorder.qml o focus_color – patrz BROKEN.md):** wszystko zcommitowane.
 Jedyne niezrobione: **T2.40** (nowe, czeka na zatwierdzenie priorytetu) – throttle CPU przy 85°C.
+
+**Sesja 8 (2026-11-16, ad-hoc poza TODO – środowisko do ćwiczenia 2 "Sterowanie robotem
+Khepera III logiką rozmytą", full):**
+- Python (python.nix): `pyserial` i `scikit-fuzzy` już były w `pythonWithAiRPackages` –
+  nic nie trzeba było dodawać do listy pakietów.
+- **Znaleziony i naprawiony bug:** `programs_minimal.nix` instaluje gołe `python3`, a
+  `python.nix` (full) dokłada `pythonWithAiRPackages` – obie derywacje dają `bin/python3`
+  z tym samym domyślnym priorytetem. Na żywym systemie (`/run/current-system`) wygrywał
+  goły python3 bez numpy/pyserial/scikit-fuzzy – potwierdzone empirycznie
+  (`readlink -f $(which python3)` → plain `python3-3.13.17`, `import numpy` ⇒ ModuleNotFoundError).
+  Fix: `(lib.hiPrio pythonWithAiRPackages)` w `python.nix` (ten sam wzorzec co
+  `lib.hiPrio unstable.quickshell` w programs.nix dla analogicznej kolizji).
+- **webots.nix (nowy plik, full):** symulator Webots R2025a – nie ma w nixpkgs (sprawdzone:
+  `pkgs.webots` nie istnieje), Apache-2.0 (bez unfree). Oficjalna binarka z GitHub Releases
+  (`.tar.bz2`, ~150 MB), MASTER §13 kolejność 2. Zależności ustalone realnym `readelf -d`
+  na webots-bin + bundlowanych `.so` (Qt6/ODE/assimp/OpenAL/OIS bundlowane – autoPatchelf
+  znajduje je sam w `$out`, nie w buildInputs). Zweryfikowane lokalnym `nix-build` +
+  uruchomieniem `webots-bin --help` – ładuje się i działa; autoPatchelf ignoruje tylko
+  opcjonalne pluginy (motyw GTK3, druk CUPS, SSH/gcrypt, OpenEXR – żaden nie blokuje
+  symulatora). `WEBOTS_HOME` ustawiony systemowo (`environment.variables`) – wymagany przez
+  `from controller import Robot` (czyste ctypes w `lib/controller/python`, bez kompilowanego
+  rozszerzenia per-wersja Pythona, więc działa z dowolnym python3).
+- Zaimportowany do `configuration.nix` (full, nowa linia `./webots.nix`).
+- Użytkownik ręcznie zsynchronizował `/etc/nixos` i zrobił `sudo nixos-rebuild switch` –
+  build przeszedł (tylko ostrzeżenia: `xorg.libX11`/`xorg.libxcb` deprecated – poprawione na
+  `libx11`/`libxcb`; `services.dnscrypt-proxy2` deprecated – niezwiązane z tą sesją, już
+  wcześniej w `security.nix`, oba tylko warningi, nie błędy).
+- **Pasek Quickshell padł po switchu** (zero procesów `quickshell`, stare gniazda `qs-*.sock`
+  po martwym procesie) – `nixos-rebuild switch` nie restartuje procesów z `exec_once` Mango.
+  Niezwiązane z tą sesją (webots.nix/python.nix nie dotykają Quickshell). Odpalony ręcznie
+  tą samą komendą co autostart (`quickshell -n`) – wstał czysto, `Configuration Loaded`,
+  zero błędów.
+- Nie commitowane przeze mnie (brak sudo w tej sesji) – zmiany gotowe w working tree,
+  `/etc/nixos` już zsynchronizowane i działające z poprawkami poza ostatnim
+  xorg.libX11→libx11 (trywialna, bez wpływu na działanie – te same pakiety pod starą nazwą).
+  Do zrobienia: `./rebuild.sh "env do ćwiczenia Khepera III: webots + python hiPrio fix"`
+  (albo ręczny `git add`+`commit`, skoro build już zweryfikowany na żywym systemie).
+- **Po rebuildzie sprawdzić:** `webots` odpala się z drun/terminala, otwiera scenę
+  `khepera3.wbt`, kontroler Python (`from controller import Robot`) działa bez ręcznego
+  ustawiania `WEBOTS_HOME`.

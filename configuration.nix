@@ -14,6 +14,7 @@
     ./brave.nix                  # Brave Browser (binarka z GitHub Releases – nixpkgs 26.05 usunął)
     ./programs.nix               # programy tylko dla full (IDE, biuro, grafika, Java)
     ./python.nix                 # Python 3.13 + pakiety naukowe (numpy, scipy, casadi)
+    ./webots.nix                 # Symulator Webots (Khepera III – ćwiczenie logiki rozmytej)
     # ros2.nix – włącz w /etc/nixos/local.nix na maszynie z ROS (MASTER §14)
   ];
 }

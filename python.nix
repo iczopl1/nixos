@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 let
   pythonWithAiRPackages = pkgs.python313.withPackages (ps: with ps; [
@@ -58,7 +58,10 @@ let
 in
 {
   environment.systemPackages = with pkgs; [
-    pythonWithAiRPackages
+    # lib.hiPrio: programs_minimal.nix instaluje gołe `python3` (bin/python3 koliduje
+    # z tym wrapperem o tym samym priorytecie – bez hiPrio wygrywał nieprzewidywalnie
+    # goły python3 bez numpy/pyserial/scikit-fuzzy, mimo że full go nadpisuje).
+    (lib.hiPrio pythonWithAiRPackages)
     pyright
 
     # Allows installing and selecting other Python versions per project.
