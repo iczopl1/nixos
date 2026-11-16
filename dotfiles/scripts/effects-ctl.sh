@@ -21,15 +21,36 @@
 set -euo pipefail
 
 CONF="$HOME/.config/mango/config.conf"
+STATE="$HOME/.config/mango-effects"
 SOCK_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 WL="${WAYLAND_DISPLAY:-wayland-1}"
 
-mango_get() { grep -m1 "^$1=" "$CONF" 2>/dev/null | cut -d= -f2; }
+# UWAGA: config.conf to symlink (L+ w dotfiles.nix) wprost do repo – wraca do wartości
+# wpisanych tam na stałe przy każdym starcie mango. Dlatego stan blur/shadows/animations/
+# layer_animations NIE jest już zapisywany sed-em do config.conf (zostawało to zgubione przy
+# restarcie), tylko w ~/.config/mango-effects + stosowany od razu przez mmsg dispatch.
+# Przywracane po starcie mango przez mango-effects-restore.sh (exec_once w config.conf).
+mango_state_get() { grep -m1 "^$1=" "$STATE" 2>/dev/null | cut -d= -f2; }
+
+mango_state_set() {
+  local key="$1" val="$2"
+  touch "$STATE"
+  if grep -q "^$key=" "$STATE" 2>/dev/null; then
+    sed -i "s/^$key=.*/$key=$val/" "$STATE"
+  else
+    echo "$key=$val" >> "$STATE"
+  fi
+}
+
+mango_get() {
+  local v; v=$(mango_state_get "$1")
+  if [ -n "$v" ]; then echo "$v"; else grep -m1 "^$1=" "$CONF" 2>/dev/null | cut -d= -f2; fi
+}
 
 mango_set() {
   local key="$1" val="$2"
-  sed -i "s/^$key=.*/$key=$val/" "$CONF"
-  mmsg dispatch reloadconfig >/dev/null 2>&1 || true
+  mmsg dispatch "setoption,$key,$val" >/dev/null 2>&1 || true
+  mango_state_set "$key" "$val"
 }
 
 mango_toggle() {
