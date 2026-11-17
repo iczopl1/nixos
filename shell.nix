@@ -242,10 +242,39 @@ in
         echo "Quickshell zrestartowany"
       }
 
-      # rd – Moonlight stream (Desktop) do PC z Windows po LAN (moonlight-qt w programs.nix, full)
+      # rd – Moonlight remote desktop do pc2 (moonlight-qt w programs.nix, full)
       rd() {
         if command -v moonlight &>/dev/null; then
-          moonlight stream 192.168.1.109 "Desktop"
+          moonlight stream pc2
+        else
+          echo "moonlight-qt nie jest w systemie – zrób ./rebuild.sh (full)"
+        fi
+      }
+
+      # Flagi Moonlight dopasowane do X250 (Broadwell/i5-5300U, iGPU HD 5500):
+      # - H.264, nie HEVC/AV1 – Broadwell ma sprzętowe dekodowanie (VAAPI) TYLKO dla H.264;
+      #   HEVC/AV1 na tym iGPU oznaczałoby wolne dekodowanie programowe = lag i rwanie obrazu.
+      # - --video-decoder hardware – wymusza VAAPI, zero szansy na cichy fallback do software.
+      # - --no-vsync, --no-frame-pacing – najmniejsze możliwe opóźnienie (kosztem ew. mikro-
+      #   rwania przy przeciążeniu, co przy H.264+VAAPI na Cat5 LAN nie powinno się zdarzać).
+      # - --no-yuv444, --no-hdr – Broadwell nie dekoduje 4:4:4/HDR sprzętowo, i tak by spadło
+      #   do software; wyłączone z góry, żeby nie było błędów/fallbacku w trakcie streamu.
+      # - --absolute-mouse – kursor 1:1 (do pracy na pulpicie/TwinCAD, nie granie padem).
+      MOONLIGHT_FLAGS="--video-codec H.264 --video-decoder hardware --no-yuv444 --no-hdr --no-vsync --no-frame-pacing --fps 60 --bitrate 20000 --absolute-mouse"
+
+      # rdm – Moonlight stream (Desktop) do PC z Windows po LAN (najmniejszy lag, w tej samej sieci)
+      rdm() {
+        if command -v moonlight &>/dev/null; then
+          moonlight stream 192.168.1.109 "Desktop" $MOONLIGHT_FLAGS
+        else
+          echo "moonlight-qt nie jest w systemie – zrób ./rebuild.sh (full)"
+        fi
+      }
+
+      # rdmt – to samo co rdm, ale przez Tailscale (działa też poza domową siecią LAN)
+      rdmt() {
+        if command -v moonlight &>/dev/null; then
+          moonlight stream 100.102.72.72 "Desktop" $MOONLIGHT_FLAGS
         else
           echo "moonlight-qt nie jest w systemie – zrób ./rebuild.sh (full)"
         fi

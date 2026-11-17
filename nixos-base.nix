@@ -71,6 +71,22 @@
   # iio-sensor-proxy przy starcie; ta opcja zapewnia, że usługa w ogóle istnieje.
   hardware.sensor.iio.enable = true;
 
+  # Sprzętowe dekodowanie/kodowanie wideo (VAAPI) – iGPU Intel HD 5500 (Broadwell, X250).
+  # Bez tego Discord/Brave/mpv/Moonlight itp. cicho spadają na dekodowanie programowe
+  # (stąd np. nieszkodliwie wyglądający warning "vaInitialize failed" u Discorda – to
+  # NIE było niegroźne, tylko brak sterownika w ogóle).
+  # Zweryfikowane realnym `vainfo` na tym GPU (2026-11-17):
+  #   - intel-media-driver (iHD) – DZIAŁA, pełne VAProfileH264Main/VAEntrypointVLD.
+  #   - intel-vaapi-driver (i965, starszy) – `init failed`, vaInitialize -1. Nie dodany,
+  #     żeby auto-detekcja nigdy nie trafiła na zepsuty sterownik.
+  # LIBVA_DRIVER_NAME przypięty na pewniaka (zamiast auto-detekcji) z tego samego powodu.
+  # Wymagane dla najmniejszego opóźnienia w Moonlight (shell.nix: rd/rdm).
+  hardware.graphics = {
+    enable = true;
+    extraPackages = with pkgs; [ intel-media-driver libvdpau-va-gl ];
+  };
+  environment.sessionVariables.LIBVA_DRIVER_NAME = "iHD";
+
   # flutter setup
   environment.sessionVariables = {
     XDG_DATA_DIRS = [ "/run/current-system/sw/share" ];
