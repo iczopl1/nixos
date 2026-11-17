@@ -442,5 +442,10 @@ in
   environment.variables = {
     JAVA_HOME = "${pkgs.jdk17}";
     CHROME_EXECUTABLE = "${pkgs.google-chrome}/bin/google-chrome";
+    # Wymagane przez narzędzia .NET zainstalowane jako "global tool" (np. `dotnet tool
+    # install --global dotnet-ef`) – ich apphost na NixOS sam nie znajduje libhostfxr.so
+    # (brak FHS-owych /usr/share/dotnet), stąd "You must install .NET to run this application"
+    # mimo że `dotnet` samo działa (ma to ustawione tylko we własnym wrapperze).
+    DOTNET_ROOT = "${pkgs.dotnet-sdk_8}/share/dotnet";
   };
 }
