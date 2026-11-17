@@ -365,6 +365,13 @@ in
     prismlauncher
     moonlight-qt          # klient Moonlight (GameStream) – `rd` w shell.nix: granie zdalne z PC z Windows + Sunshine
 
+    # --- C# / .NET ---
+    dotnet-sdk_8           # LTS; ASP.NET Core, Razor Pages, EF Core – `dotnet new/run/watch`,
+                            # `dotnet add package`, `dotnet tool install --global dotnet-ef`
+                            # (zamiast NuGet/Add-Migration z GUI Visual Studio – tylko na Windows)
+    csharp-ls               # LSP dla nvim (lua/plugins/lsp.lua: csharp_ls) – lekki, Roslyn
+    csharpier                # formatowanie C# na zapis (lua/plugins/format.lua, T2.13)
+
     # --- Embedded / mikrokontrolery (T3.10) ---
     arduino-ide           # IDE 2.x – Nice Nano (nRF52840) przez UF2/DFU
     arduino-cli           # CLI – `arduino-cli core/lib install ...` bez GUI, do skryptów/CI

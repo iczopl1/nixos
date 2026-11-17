@@ -15,7 +15,7 @@ return {
         -- Języki (minimal)
         "python", "c", "cpp",
         -- Języki (full)
-        "java", "kotlin", "go", "rust", "typescript", "javascript",
+        "java", "kotlin", "go", "rust", "typescript", "javascript", "c_sharp",
         -- Dane / konfiguracja
         "json", "yaml", "toml", "xml", "sql",
         -- Web

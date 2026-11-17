@@ -1,7 +1,7 @@
 -- Formatowanie przy zapisie (conform). Formatery z NixOS:
 --   stylua (programs.nix), black (python.nix), clang-format (clang-tools),
 --   google-java-format (programs.nix), nixfmt-rfc-style (programs_minimal.nix),
---   prettier (programs.nix/full).
+--   prettier (programs.nix/full), csharpier (programs.nix/full).
 return {
   {
     "stevearc/conform.nvim",
@@ -20,6 +20,7 @@ return {
         json       = { "prettier" },
         css        = { "prettier" },
         html       = { "prettier" },
+        cs         = { "csharpier" },
       },
       format_on_save = {
         timeout_ms = 500,

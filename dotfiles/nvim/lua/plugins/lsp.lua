@@ -1,6 +1,7 @@
 -- LSP. Serwery są instalowane przez NixOS (nie Mason):
 -- minimal: lua_ls, pyright, clangd, texlab, nil_ls, bashls, yamlls, marksman, cmake
--- full:    + java_language_server, ts_ls, html/cssls/jsonls, rust_analyzer, gopls, kotlin_language_server
+-- full:    + java_language_server, ts_ls, html/cssls/jsonls, rust_analyzer, gopls,
+--            kotlin_language_server, csharp_ls
 -- nvim-lspconfig dostarcza tylko gotowe ustawienia (komendy, root_markers).
 
 -- Python: użyj venv projektu ($VIRTUAL_ENV, .venv/, venv/) - współdzielone z dap.lua
@@ -162,6 +163,7 @@ return {
       })
       vim.lsp.config("gopls", {})
       vim.lsp.config("kotlin_language_server", {})
+      vim.lsp.config("csharp_ls", {})
       -- config "cmake" = cmake-language-server (ta binarka jest w programs_minimal.nix).
       -- "neocmake" (inny, niezainstalowany serwer neocmakelsp) było tu błędnie wcześniej –
       -- :checkhealth vim.lsp pokazywało "'neocmakelsp' is not executable".

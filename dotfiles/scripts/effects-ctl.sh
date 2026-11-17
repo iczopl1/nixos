@@ -15,6 +15,8 @@
 #   effects wpm-move                 przełącz "ruszanie się" okna (border_px/gap + puls) przy pisaniu
 #   effects cava       [on|off]      wizualizator muzyki na pulpicie (cava-bg, na środku)
 #   effects bar                      przełącz widoczność baru (SUPER+F11)
+#   effects opacity    [on|off]      przezroczystość okien (Brave, terminal...) – off = pełna
+#                                    nieprzezroczystość (np. do filmów, żeby tapeta nie przebijała)
 #
 # Bez argumentu do blur/shadows/animations/layer: przełącza (toggle).
 
@@ -115,12 +117,54 @@ cava_set() {
   esac
 }
 
+# Domyślne wartości przezroczystości z config.conf (dotfiles/mango/config.conf) – "on" wraca
+# do nich, "off" wymusza 1 (pełna nieprzezroczystość) na oknach aktywnych i nieaktywnych.
+OPACITY_FOCUSED_NORMAL=0.97
+OPACITY_UNFOCUSED_NORMAL=0.87
+
+opacity_set() {
+  local mode="${1:-toggle}"
+  case "$mode" in
+    off)
+      mango_set focused_opacity 1
+      mango_set unfocused_opacity 1
+      echo "opacity: off (pełna nieprzezroczystość – tapeta nie przebija)"
+      ;;
+    on)
+      mango_set focused_opacity "$OPACITY_FOCUSED_NORMAL"
+      mango_set unfocused_opacity "$OPACITY_UNFOCUSED_NORMAL"
+      echo "opacity: on (normalna przezroczystość)"
+      ;;
+    *)
+      if [[ "$(mango_get focused_opacity)" == "1" ]]; then opacity_set on; else opacity_set off; fi
+      return
+      ;;
+  esac
+  reapply_opacity_to_open_windows
+}
+
+# Mango przelicza focused_opacity/unfocused_opacity per-okno tylko w momencie zmiany
+# fokusu (client_set_focus_opacity w binarce) – setoption sam nie odświeża już otwartych
+# okien. Przełącz fokus przez każde z nich i wróć do tego, co było, żeby zmiana była
+# widoczna od razu, bez ręcznego klikania po oknach.
+reapply_opacity_to_open_windows() {
+  command -v jq >/dev/null 2>&1 || return 0
+  local focused ids id
+  focused=$(mmsg get focusing-client 2>/dev/null | jq -r '.id // empty')
+  ids=$(mmsg get all-clients 2>/dev/null | jq -r '.clients[].id')
+  for id in $ids; do
+    mmsg dispatch "focusid,$id" >/dev/null 2>&1 || true
+  done
+  [ -n "$focused" ] && mmsg dispatch "focusid,$focused" >/dev/null 2>&1
+}
+
 status() {
   echo "--- Mango (config.conf) ---"
   printf "  blur:              %s\n" "$(mango_get blur)"
   printf "  shadows:           %s\n" "$(mango_get shadows)"
   printf "  animations:        %s\n" "$(mango_get animations)"
   printf "  layer_animations:  %s\n" "$(mango_get layer_animations)"
+  printf "  opacity:           %s\n" "$([ "$(mango_get focused_opacity)" = "1" ] && echo off || echo on)"
   echo "--- Quickshell ---"
   printf "  particles:         %s\n" "$(cat "$HOME/.config/particle-effect" 2>/dev/null || echo off)"
   echo "  wpm-count:         (socket toggle – zatrzymuje evtest, stan tylko w QS)"
@@ -148,6 +192,7 @@ case "$cmd" in
   wpm-move)    socket_ping qs-wpm-move ;;
   cava)        cava_set "${2:-toggle}" ;;
   bar)         socket_ping qs-bar ;;
+  opacity)     opacity_set "${2:-toggle}" ;;
   help|-h|--help) usage ;;
   menu)
     while true; do
@@ -161,7 +206,8 @@ case "$cmd" in
       echo " 7) particles: rain    8) particles: snow"
       echo " 9) particles: sparks  p) particles: cursor (piksele za myszką)"
       echo " n) wpm liczenie toggle (CPU)  k) wpm kolor toggle   r) wpm ruch toggle"
-      echo " m) cava (muzyka) toggle       b) bar toggle          q) wyjście"
+      echo " m) cava (muzyka) toggle       b) bar toggle          o) opacity toggle"
+      echo " q) wyjście"
       read -rp "> " choice
       case "$choice" in
         1) mango_onoff blur ;;
@@ -179,6 +225,7 @@ case "$cmd" in
         r) socket_ping qs-wpm-move ;;
         m) cava_set toggle ;;
         b) socket_ping qs-bar ;;
+        o) opacity_set toggle ;;
         q) exit 0 ;;
         *) ;;
       esac
