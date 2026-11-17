@@ -260,7 +260,12 @@ in
       # - --no-yuv444, --no-hdr – Broadwell nie dekoduje 4:4:4/HDR sprzętowo, i tak by spadło
       #   do software; wyłączone z góry, żeby nie było błędów/fallbacku w trakcie streamu.
       # - --absolute-mouse – kursor 1:1 (do pracy na pulpicie/TwinCAD, nie granie padem).
-      MOONLIGHT_FLAGS="--video-codec H.264 --video-decoder hardware --no-yuv444 --no-hdr --no-vsync --no-frame-pacing --fps 60 --bitrate 20000 --absolute-mouse"
+      # - --fps 30 (2026-11-17, na prośbę użytkownika – przyzwyczajony do 30 fps w grach,
+      #   nie potrzebuje 60). Przy tym samym --bitrate 20000 każda ramka dostaje 2x więcej
+      #   bitów niż przy 60fps = lepsza jakość obrazu, nie gorsza. Mniej ramek do zdekodowania
+      #   na X250 (audio Opus + VAAPI wideo) też zmniejsza obciążenie CPU, co pomaga na
+      #   artefakty audio (patrz security.rtkit.enable w services.nix).
+      MOONLIGHT_FLAGS="--video-codec H.264 --video-decoder hardware --no-yuv444 --no-hdr --no-vsync --no-frame-pacing --fps 30 --bitrate 20000 --absolute-mouse"
 
       # rdm – Moonlight stream (Desktop) do PC z Windows po LAN (najmniejszy lag, w tej samej sieci)
       rdm() {
@@ -271,10 +276,24 @@ in
         fi
       }
 
+      # Flagi Moonlight dla rdmt (Tailscale) – osobne od MOONLIGHT_FLAGS (LAN), bo link
+      # przez Tailscale ma dużo mniej pasma (budżet ~400 kbit/s, ustalony z użytkownikiem
+      # 2026-11-17). --bitrate 250 (Kbps) zostawia ~150 kbit/s zapasu na audio Opus
+      # (niekonfigurowalne przez CLI, zwykle ~96-128 kbit/s) i narzut protokołu/FEC – reszta
+      # przy 250 Kbps dla wideo byłaby zjedzona przez audio i link by się zapychał.
+      # Niższa rozdzielczość (640x360) i 15 fps (2026-11-17, na prośbę użytkownika – obniżone
+      # z 30), żeby przy tak niskim bitrate każda ramka miała więcej bitów na piksel (mniej
+      # bloczków), kosztem płynności, nie rozdzielczości.
+      # --packet-size niższy niż domyślny – mniejsze pakiety, mniej strat przy zagubieniu
+      # jednego pakietu na niestabilnym łączu (Tailscale poza LAN, czasem przez DERP relay).
+      MOONLIGHT_FLAGS_TAILSCALE="--video-codec H.264 --video-decoder hardware --no-yuv444 --no-hdr --no-vsync --no-frame-pacing --resolution 640x360 --fps 15 --bitrate 250 --packet-size 1024 --absolute-mouse"
+
       # rdmt – to samo co rdm, ale przez Tailscale (działa też poza domową siecią LAN)
+      # – własne, dużo niższe flagi (MOONLIGHT_FLAGS_TAILSCALE), bo łącze przez Tailscale
+      #   nie ma pasma LAN-u (patrz komentarz wyżej)
       rdmt() {
         if command -v moonlight &>/dev/null; then
-          moonlight stream 100.102.72.72 "Desktop" $MOONLIGHT_FLAGS
+          moonlight stream 100.102.72.72 "Desktop" $MOONLIGHT_FLAGS_TAILSCALE
         else
           echo "moonlight-qt nie jest w systemie – zrób ./rebuild.sh (full)"
         fi

@@ -24,6 +24,12 @@
     wireplumber.enable = true;
   };
 
+  # Realtime priority dla wątków PipeWire/WirePlumber (polecane w dokumentacji PipeWire).
+  # Bez tego pod obciążeniem CPU (np. odbiór strumienia Moonlight – dekodowanie wideo VAAPI
+  # + dekodowanie audio Opus w moonlight-qt) wątek audio może zostać wywłaszczony przez
+  # scheduler, co słyszalne jest jako okresowe trzaski/wycinki – "co chwilę", nie co ramkę.
+  security.rtkit.enable = true;
+
   # Tailscale = tailnet A (tailscale0). tailnet-b.nix uruchamia obok drugi demon.
   services.tailscale.enable = true;
 
