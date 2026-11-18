@@ -33,7 +33,7 @@ let
 
     # Optimization, control and robotics
     casadi
-   # control
+    control
    # ortools
    # pinocchio
 
