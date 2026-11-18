@@ -387,6 +387,14 @@ in
     # --- Radio / krótkofalarstwo ---
     chirp                 # programowanie radiotelefonów (Baofeng itp.) przez kabel USB-serial
                            # (CP2102/CH340) – /dev/ttyUSB*, dostęp przez grupę "dialout" (nixos-base.nix)
+
+    # --- Druk 3D (Bambu Lab P1S) ---
+    orca-slicer            # slicer (fork Bambu Studio, otwarty AGPL-3.0, zero unfree) – profile P1S
+                            # wbudowane; z nixpkgs, cały closure z cache (dry-build: 0 lokalnych buildów)
+    bambu-studio            # oficjalny slicer Bambu Lab – unfree (allowUnfreePredicate), z nixpkgs,
+                            # ale dry-build: 4 derywacje lokalnie (wxwidgets 3.1.7 + sama paczka) –
+                            # binarny cache nie ma unfree pakietów, więc kompiluje się przy pierwszym
+                            # buildzie full (jednorazowo, potem z /nix/store); nie z git (MASTER §13)
   ];
 
   # Steam – moduł NixOS: obsługuje 32-bit libs, udev, gamescope opcjonalnie

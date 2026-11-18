@@ -45,5 +45,6 @@
       "steam-run"
       "beeper"             # T1.9: komunikator all-in-one
       # "grayjay"           # T1.10: usunięty – nixpkgs kompiluje ze źródeł (JustCef/CEF) – patrz BROKEN.md
+      "bambu-studio"       # slicer Bambu Lab (P1S) – unfree w nixpkgs, stąd lokalny build (programs.nix, full)
     ];
 }
