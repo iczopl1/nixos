@@ -24,7 +24,7 @@ let
     pandas
     networkx
     scikit-fuzzy
-   # statsmodels
+    statsmodels
 
     # Plots and notebooks
     matplotlib
