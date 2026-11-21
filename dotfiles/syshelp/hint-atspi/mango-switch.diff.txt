@@ -1,0 +1,7 @@
+# Proposed edits to ~/.config/mango/config.conf (NOT applied)
+line 55  exec_once=setsid hintd >/dev/null 2>&1
+line 267 bind=SUPER,d,spawn,socat -u /dev/null UNIX-CONNECT:$XDG_RUNTIME_DIR/qs-menu-hints-$WAYLAND_DISPLAY.sock
+line 301 bind=NONE,Escape,spawn_shell,ydotool click 0x80; socat -t1 - UNIX-CONNECT:$XDG_RUNTIME_DIR/hintd.sock <<< release; mmsg dispatch setkeymode,default
+line 302 bind=SUPER,c,spawn_shell,ydotool click 0x80; socat -t1 - UNIX-CONNECT:$XDG_RUNTIME_DIR/hintd.sock <<< release; mmsg dispatch setkeymode,default
+# optional timing toggle
+bind=SUPER+ALT,d,spawn,socat -u /dev/null UNIX-CONNECT:$XDG_RUNTIME_DIR/qs-menu-hints-time-$WAYLAND_DISPLAY.sock

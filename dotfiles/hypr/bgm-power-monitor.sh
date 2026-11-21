@@ -12,14 +12,13 @@ FADE_SECONDS="${BGM_FADE_SECONDS:-3}"
 HOTKEY_FADE_SECONDS="${BGM_HOTKEY_FADE_SECONDS:-1}"
 SKIP_FADE_SECONDS="${BGM_SKIP_FADE_SECONDS:-0.5}"
 VOLUME="${BGM_VOLUME:-50}"
-POLL_SECONDS="${BGM_POLL_SECONDS:-5}"
+POLL_SECONDS="${BGM_POLL_SECONDS:-300}"  # fallback re-check; udev events drive changes
 LOCK_DIR="${XDG_RUNTIME_DIR:-/tmp}/bgm-monitor.lock"
 CAVA_LAUNCHER="$SCRIPT_DIR/launch-cava-bg.sh"
 
 start_visualizer() {
-  if [ -x "$CAVA_LAUNCHER" ]; then
-    "$CAVA_LAUNCHER" >/dev/null 2>&1 &
-  fi
+  # Disabled: cava bars no longer start on plug/unplug.
+  return 0
 }
 
 stop_visualizer() {
@@ -34,16 +33,10 @@ log() {
 mkdir -p "$STATE_DIR"
 
 ac_online() {
-  local power_supply
-  for power_supply in /sys/class/power_supply/*; do
-    [ -d "$power_supply" ] || continue
-    case "$(cat "$power_supply/type" 2>/dev/null || true)" in
-      Mains|USB|USB_C)
-        if [ "$(cat "$power_supply/online" 2>/dev/null || echo 0)" = "1" ]; then
-          return 0
-        fi
-        ;;
-    esac
+  local ps t o
+  for ps in /sys/class/power_supply/*; do
+    { read -r t < "$ps/type" && read -r o < "$ps/online"; } 2>/dev/null || continue
+    case "$t" in Mains|USB|USB_C) [ "$o" = 1 ] && return 0 ;; esac
   done
   return 1
 }

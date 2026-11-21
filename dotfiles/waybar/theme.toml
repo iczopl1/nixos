@@ -1,0 +1,7 @@
+[brightness]
+background = 0.28
+text = 1
+gradient = 1
+
+[gradient]
+min_complement_distance = 0.22

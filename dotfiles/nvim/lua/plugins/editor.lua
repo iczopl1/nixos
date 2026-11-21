@@ -1,0 +1,151 @@
+-- Edytor: szukanie, drzewo plików, git, nawiasy, terminale, nawigacja, diagnostyka.
+return {
+  -- Surround: cs"' zmień, ys dodaj, ds usuń (np. ysiw" owija słowo cudzysłowem)
+  {
+    "kylechui/nvim-surround",
+    version = "*",
+    event = "VeryLazy",
+    opts = {},
+  },
+
+  -- Flash: szybka nawigacja po ekranie – s/S wyszukuje i skacze jednym ruchem
+  {
+    "folke/flash.nvim",
+    event = "VeryLazy",
+    opts = {
+      modes = {
+        search = { enabled = false }, -- nie zastępuje /
+      },
+    },
+    keys = {
+      { "s",     function() require("flash").jump() end,              mode = { "n", "x", "o" }, desc = "Flash: skocz" },
+      { "S",     function() require("flash").treesitter() end,        mode = { "n", "x", "o" }, desc = "Flash: Treesitter" },
+      { "r",     function() require("flash").remote() end,            mode = "o",               desc = "Flash: zdalne" },
+      { "<C-s>", function() require("flash").toggle() end,            mode = "c",               desc = "Flash: toggle" },
+    },
+  },
+
+  -- Trouble: panel błędów LSP, quickfix, loclist (<leader>xx i <leader>d*)
+  {
+    "folke/trouble.nvim",
+    cmd = "Trouble",
+    opts = { focus = true },
+  },
+
+  -- TODO-komentarze: podświetla TODO/FIXME/NOTE + Telescope (<leader>ft)
+  {
+    "folke/todo-comments.nvim",
+    event = { "BufReadPre", "BufNewFile" },
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = { signs = true },
+  },
+
+  -- Szukanie plików / tekstu
+  {
+    "nvim-telescope/telescope.nvim",
+    cmd = "Telescope",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = {
+      defaults = {
+        prompt_prefix = "   ",
+        sorting_strategy = "ascending",
+        layout_config = { horizontal = { prompt_position = "top" } },
+      },
+    },
+  },
+
+  -- Oil: edytor plików jak bufor tekstu (zmień nazwę/przesuń/usuń przez edycję linii, – otwiera bieżący katalog)
+  {
+    "stevearc/oil.nvim",
+    lazy = false,
+    opts = {
+      default_file_explorer = false, -- NvimTree pozostaje jako główny (Ctrl+n)
+      view_options = { show_hidden = true },
+      keymaps = {
+        ["<CR>"] = "actions.select",
+        ["<BS>"]  = "actions.parent",
+        ["-"]     = "actions.parent",
+        ["_"]     = "actions.open_cwd",
+        ["q"]     = "actions.close",
+        ["gs"]    = "actions.change_sort",
+        ["g?"]    = "actions.show_help",
+      },
+    },
+  },
+
+  -- Lazygit: lazygit w pływającym oknie nvim (<leader>gg)
+  {
+    "kdheepak/lazygit.nvim",
+    cmd = "LazyGit",
+    dependencies = { "nvim-lua/plenary.nvim" },
+  },
+
+  -- Git blame: inline blame (kto/kiedy napisał linię) – <leader>gB toggle
+  {
+    "f-person/git-blame.nvim",
+    event = { "BufReadPre", "BufNewFile" },
+    opts = {
+      enabled = false, -- domyślnie wyłączony, toggle przez <leader>gB
+      display_virtual_text = true,
+      date_format = "%Y-%m-%d %H:%M",
+    },
+  },
+
+  -- Mini.splitjoin: gS/gJ split/join argumentów funkcji (bez konfiguracji)
+  {
+    "echasnovski/mini.splitjoin",
+    version = false,
+    event = "VeryLazy",
+    opts = {},
+  },
+
+  -- Drzewo plików
+  {
+    "nvim-tree/nvim-tree.lua",
+    version = "*",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    opts = {
+      hijack_netrw = true,
+      -- `nvim .` obsługuje config/autocmds.lua (pusty bufor + terminal), nie drzewo
+      hijack_directories = { enable = false },
+      sync_root_with_cwd = true,
+      update_focused_file = { enable = true, update_root = false },
+      view = { width = 30, preserve_window_proportions = true },
+      renderer = { root_folder_label = false, highlight_git = true },
+      filters = { dotfiles = false },
+      git = { ignore = false },
+    },
+  },
+
+  -- Oznaczenia zmian git przy numerach linii
+  {
+    "lewis6991/gitsigns.nvim",
+    event = { "BufReadPre", "BufNewFile" },
+    opts = {},
+  },
+
+  -- Automatyczne domykanie nawiasów i cudzysłowów
+  {
+    "windwp/nvim-autopairs",
+    event = "InsertEnter",
+    opts = { fast_wrap = {}, disable_filetype = { "TelescopePrompt", "vim" } },
+  },
+
+  -- Terminale wysuwane (Alt+h / Alt+v / Alt+i, patrz config/terms.lua)
+  {
+    "akinsho/toggleterm.nvim",
+    version = "*",
+    lazy = true,
+    opts = {
+      size = function(term)
+        if term.direction == "horizontal" then
+          return 15
+        elseif term.direction == "vertical" then
+          return math.floor(vim.o.columns * 0.4)
+        end
+      end,
+      shade_terminals = false,
+      float_opts = { border = "rounded" },
+    },
+  },
+}

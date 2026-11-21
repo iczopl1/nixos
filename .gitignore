@@ -1,2 +1,22 @@
-agentAI.md
-/modules/programs/TestLocal.nix
+# Per-maszyna – nigdy nie commitować (MASTER.md §1)
+hardware-configuration.nix
+
+# Znaczniki per-maszyna w /etc/nixos (tu nie powinny trafić, ale na wszelki wypadek)
+PROFILE
+TURBO_OFF_BUILD
+local.nix
+
+# Vendor (duże pliki – nvim cache, snapshoty)
+vendor/
+
+# Logi i pliki tymczasowe
+*.log
+result
+result-*
+.direnv/
+
+# Zipa robionego przez make-zip.sh
+nixos-config-*.zip
+
+# Pliki generowane automatycznie przez pywal
+*-wal.conf

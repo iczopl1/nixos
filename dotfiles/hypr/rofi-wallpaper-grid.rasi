@@ -1,0 +1,72 @@
+* {
+    bg:              #40382EF2;
+    panel:           #6A5D4C80;
+    panel-strong:    #D0B88AF2;
+    border:          #C1A181;
+    border-soft:     #AC875E;
+    text:            #ECEFF4;
+    text-dim:        #D8DEE9;
+    text-faint:      #A89483;
+    accent:          #D0B088;
+    active:          #52473B;
+    font:            "JetBrainsMono Nerd Font 12";
+
+    background-color: transparent;
+    text-color:       @text;
+    margin:           0px;
+    padding:          0px;
+    spacing:          0px;
+}
+
+window {
+    anchor:           center;
+    location:         center;
+    width:            80%;
+    border:           2px;
+    border-color:     @border-soft;
+    border-radius:    26px;
+    background-color: @bg;
+}
+
+mainbox {
+    background-color: transparent;
+    children:         [ listview ];
+    padding:          18px;
+    spacing:          0px;
+}
+
+listview {
+    background-color: transparent;
+    columns:          6;
+    lines:            3;
+    fixed-height:     true;
+    fixed-columns:    true;
+    cycle:            false;
+    dynamic:          false;
+    expand:           false;
+    layout:           vertical;
+    spacing:          12px;
+    scrollbar:        false;
+}
+
+element {
+    orientation:      vertical;
+    children:         [ element-icon ];
+    background-color: @panel;
+    border:           2px;
+    border-color:     transparent;
+    border-radius:    20px;
+    padding:          6px;
+    spacing:          0px;
+}
+
+element selected {
+    background-color: @panel-strong;
+    border-color:     @accent;
+}
+
+element-icon {
+    background-color: transparent;
+    size:             12.5em;
+    border-radius:    16px;
+}

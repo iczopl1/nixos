@@ -1,0 +1,11 @@
+# built program (power-fx.sh rebuilds it)
+ptrwatch
+# backup copies
+*.bak
+*.bak-*
+*.orig-backup
+*.png
+# ptrdrive build output
+ptrdrive/target/
+# raw cursor recordings (mimic/record.py)
+mimic/*.tsv

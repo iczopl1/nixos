@@ -1,0 +1,125 @@
+* {
+    bg:              #2E3440F2;
+    panel:           #4C566A80;
+    panel-strong:    #8AC0D0F2;
+    border:          #81A1C1;
+    border-soft:     #5E81AC;
+    text:            #ECEFF4;
+    text-dim:        #D8DEE9;
+    text-faint:      #7B88A1;
+    accent:          #88C0D0;
+    active:          #3B4252;
+    urgent:          #5B90B0;
+    font:            "JetBrains Mono 12, Font Awesome 7 Free Solid 12, Noto Sans Symbols 12";
+
+    background-color: transparent;
+    text-color:       @text;
+    margin:           0px;
+    padding:          0px;
+    spacing:          0px;
+}
+
+window {
+    anchor:           center;
+    location:         center;
+    width:            840px;
+    border:           2px;
+    border-color:     @border-soft;
+    border-radius:    26px;
+    background-color: @bg;
+}
+
+mainbox {
+    background-color: transparent;
+    children:         [ inputbar, listview ];
+    padding:          18px;
+    spacing:          14px;
+}
+
+inputbar {
+    background-color: @panel;
+    border:           2px;
+    border-color:     @border;
+    border-radius:    18px;
+    children:         [ prompt, entry ];
+    padding:          12px 16px;
+    spacing:          12px;
+}
+
+prompt {
+    enabled:          true;
+    background-color: @accent;
+    text-color:       #17212a;
+    border-radius:    999px;
+    padding:          5px 10px;
+    str:              "BT";
+}
+
+entry {
+    background-color: transparent;
+    text-color:       @text;
+    placeholder:      "Bluetooth devices and actions";
+    placeholder-color:@text-faint;
+}
+
+listview {
+    background-color: transparent;
+    columns:          1;
+    lines:            10;
+    cycle:            false;
+    dynamic:          true;
+    fixed-height:     false;
+    scrollbar:        false;
+    spacing:          10px;
+}
+
+element {
+    background-color: @panel;
+    border:           0px;
+    border-color:     transparent;
+    border-radius:    20px;
+    children:         [ element-text ];
+    padding:          12px 14px;
+    spacing:          14px;
+}
+
+element normal.normal {
+    background-color: @panel;
+    text-color:       @text;
+}
+
+element selected.normal {
+    background-color: @panel-strong;
+    border-color:     @accent;
+    text-color:       #17212a;
+}
+
+element selected.active {
+    background-color: @active;
+    border-color:     @border;
+    text-color:       @text;
+}
+
+element selected.urgent {
+    background-color: @urgent;
+    border-color:     @accent;
+    text-color:       #17212a;
+}
+
+element-text {
+    background-color: transparent;
+    text-color:       inherit;
+    font:             "JetBrains Mono 12, Font Awesome 7 Free 12, Font Awesome 7 Free Solid 12, Noto Sans Symbols 12";
+    vertical-align:   0.5;
+}
+
+textbox-prompt-colon {
+    enabled: false;
+}
+
+error-message {
+    background-color: @urgent;
+    text-color:       #17212a;
+    border-radius:    16px;
+    padding:          12px;
+}

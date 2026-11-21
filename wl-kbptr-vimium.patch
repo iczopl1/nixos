@@ -1,0 +1,327 @@
+diff -ruN A/src/config.c B/src/config.c
+--- a/src/config.c	2026-10-12 02:30:06.888314522 +0200
++++ b/src/config.c	2026-10-12 02:30:54.112440705 +0200
+@@ -386,7 +386,16 @@
+         MF_FIELD(label_font_size, "12 50% 100", parse_relative_font_size, noop),
+         MF_FIELD(
+             label_symbols, "abcdefghijklmnopqrstuvwxyz", parse_str, free_str
+-        )
++        ),
++        MF_FIELD(detect_min_width, "8", parse_double, noop),
++        MF_FIELD(detect_min_height, "4", parse_double, noop),
++        MF_FIELD(detect_max_width, "499", parse_double, noop),
++        MF_FIELD(detect_max_height, "49", parse_double, noop),
++        MF_FIELD(detect_merge_x, "3.5", parse_double, noop),
++        MF_FIELD(detect_merge_y, "2.5", parse_double, noop),
++        MF_FIELD(detect_edge_low, "70", parse_double, noop),
++        MF_FIELD(detect_edge_high, "220", parse_double, noop),
++        MF_FIELD(detect_overlap, "1", parse_double, noop)
+     ),
+     SECTION(
+         mode_bisect, MB_FIELD(label_color, "#fffd", parse_color, noop),
+diff -ruN A/src/config.h B/src/config.h
+--- a/src/config.h	2026-10-12 02:30:06.888314522 +0200
++++ b/src/config.h	2026-10-12 02:30:54.111440681 +0200
+@@ -43,6 +43,15 @@
+     char                     *label_font_family;
+     struct relative_font_size label_font_size;
+     char                     *label_symbols;
++    double                    detect_min_width;
++    double                    detect_min_height;
++    double                    detect_max_width;
++    double                    detect_max_height;
++    double                    detect_merge_x;
++    double                    detect_merge_y;
++    double                    detect_edge_low;
++    double                    detect_edge_high;
++    double                    detect_overlap;
+ };
+ 
+ struct mode_bisect_config {
+diff -ruN A/src/main.c B/src/main.c
+--- a/src/main.c	2026-10-12 02:30:06.888314522 +0200
++++ b/src/main.c	2026-10-12 02:40:50.374900195 +0200
+@@ -723,6 +723,9 @@
+     case CLICK_NONE:
+         click = 'n';
+     }
++    if (state->hold && state->click != CLICK_NONE) {
++        click = 'h';
++    }
+ 
+     printf(
+         "%dx%d+%d+%d +%d+%d %c\n", state->result.w, state->result.h,
+diff -ruN A/src/mode_floating.c B/src/mode_floating.c
+--- a/src/mode_floating.c	2026-10-12 02:30:06.888314522 +0200
++++ b/src/mode_floating.c	2026-10-12 02:40:50.374900195 +0200
+@@ -8,6 +8,7 @@
+ #include "utils_cairo.h"
+ 
+ #include <cairo.h>
++#include <ctype.h>
+ #include <stdbool.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -67,8 +68,9 @@
+     ms->num_areas = compute_target_from_img_buffer(
+         scrcpy_buffer->data, scrcpy_buffer->height, scrcpy_buffer->width,
+         scrcpy_buffer->stride, scrcpy_buffer->format, output_transform, area,
+-        &ms->areas
++        &state->config.mode_floating, &ms->areas
+     );
++    LOG_INFO("Detected %d targets.", ms->num_areas);
+     destroy_scrcpy_buffer(scrcpy_buffer);
+ }
+ 
+@@ -106,7 +108,7 @@
+ 
+     ms->label_font_face = cairo_toy_font_face_create(
+         state->config.mode_floating.label_font_family, CAIRO_FONT_SLANT_NORMAL,
+-        CAIRO_FONT_WEIGHT_NORMAL
++        CAIRO_FONT_WEIGHT_BOLD
+     );
+ 
+     return ms;
+@@ -130,11 +132,38 @@
+         state->running = false;
+         break;
+     default:;
++        // A digit before the label picks the button: 1 left, 2 middle,
++        // 3 right, 4 press-and-hold left (e.g. "3ab" right-clicks "ab").
++        if (ms->label_selection->next == 0 && text[1] == '\0' &&
++            text[0] >= '1' && text[0] <= '4') {
++            static const enum click buttons[] = {
++                CLICK_LEFT_BTN, CLICK_MIDDLE_BTN, CLICK_RIGHT_BTN,
++                CLICK_LEFT_BTN
++            };
++            state->config.mode_click.button = buttons[text[0] - '1'];
++            state->hold                     = text[0] == '4';
++            return false;
++        }
++
++        // Typing any label letter with Shift held turns the click into a
++        // right-click (labels are matched case-insensitively).
++        char lower[2] = {0};
++        bool shifted  = false;
++        if (text[0] != '\0' && text[1] == '\0' && isupper((unsigned char)text[0])) {
++            lower[0] = tolower((unsigned char)text[0]);
++            text     = lower;
++            shifted  = true;
++        }
++
+         int symbol_idx = label_symbols_find_idx(ms->label_symbols, text);
+         if (symbol_idx < 0) {
+             return false;
+         }
+ 
++        if (shifted) {
++            state->config.mode_click.button = CLICK_RIGHT_BTN;
++        }
++
+         label_selection_append(ms->label_selection, symbol_idx);
+ 
+         int idx = label_selection_to_idx(ms->label_selection);
+@@ -190,40 +219,46 @@
+             label_selection_is_included(curr_label, ms->label_selection);
+ 
+         if (selectable) {
+-            cairo_set_operator(cairo, CAIRO_OPERATOR_OVER);
+-            cairo_set_source_u32(cairo, config->selectable_bg_color);
+-            cairo_rectangle(cairo, a.x, a.y, a.w, a.h);
+-            cairo_fill(cairo);
+-
+-            cairo_set_operator(cairo, CAIRO_OPERATOR_SOURCE);
+-            cairo_set_source_u32(cairo, config->selectable_border_color);
+-            cairo_rectangle(cairo, a.x + .5, a.y + .5, a.w - 1, a.h - 1);
+-            cairo_set_line_width(cairo, 1);
+-            cairo_stroke(cairo);
+-
++            // Vimium-style badge: small flat tag at the area's top-left
++            // corner, uppercase bold label. Element itself is left undrawn.
+             cairo_set_font_size(
+                 cairo, compute_relative_font_size(&config->label_font_size, a.h)
+             );
+-            cairo_text_extents_t te_all;
+-            label_selection_str(curr_label, label_selected_str);
+-            cairo_text_extents(cairo, label_selected_str, &te_all);
+ 
++            label_selection_str(curr_label, label_selected_str);
+             label_selection_str_split(
+                 curr_label, label_selected_str, label_unselected_str,
+                 ms->label_selection->next
+             );
++            for (char *c = label_selected_str; *c; c++) *c = toupper(*c);
++            for (char *c = label_unselected_str; *c; c++) *c = toupper(*c);
++
++            // Size the tag to the ink of the glyphs (caps height x label
++            // width) rather than the font's line box, so it hugs the text.
++            char label_full_str[2 * label_str_max_len];
++            snprintf(
++                label_full_str, sizeof(label_full_str), "%s%s",
++                label_selected_str, label_unselected_str
++            );
++            cairo_text_extents_t te_full, te_cap;
++            cairo_text_extents(cairo, label_full_str, &te_full);
++            cairo_text_extents(cairo, "H", &te_cap);
++
++            const double pad_x = 2, pad_y = 2;
++            const double bw = te_full.width + 2 * pad_x;
++            const double bh = te_cap.height + 2 * pad_y;
++            double bx = a.x - 2, by = a.y - bh / 2;
++            if (bx < 0) bx = 0;
++            if (by < 0) by = 0;
+ 
+-            cairo_text_extents_t te_selected, te_unselected;
+-            cairo_text_extents(cairo, label_selected_str, &te_selected);
+-            cairo_text_extents(cairo, label_unselected_str, &te_unselected);
++            cairo_rectangle(cairo, bx, by, bw, bh);
++            cairo_set_operator(cairo, CAIRO_OPERATOR_OVER);
++            cairo_set_source_u32(cairo, config->selectable_bg_color);
++            cairo_fill(cairo);
+ 
+             cairo_move_to(
+-                cairo,
+-                a.x +
+-                    (a.w - te_selected.x_advance - te_unselected.x_advance) / 2,
+-                a.y + (int)((a.h + te_all.height) / 2)
++                cairo, bx + pad_x - te_full.x_bearing, by + pad_y + te_cap.height
+             );
+-            cairo_set_operator(cairo, CAIRO_OPERATOR_OVER);
+             cairo_set_source_u32(cairo, config->label_select_color);
+             cairo_show_text(cairo, label_selected_str);
+             cairo_set_source_u32(cairo, config->label_color);
+diff -ruN A/src/state.h B/src/state.h
+--- a/src/state.h	2026-10-12 02:30:06.888314522 +0200
++++ b/src/state.h	2026-10-12 02:40:50.374900195 +0200
+@@ -136,6 +136,7 @@
+     void                          *mode_states[MAX_NUM_MODES];
+     int                            current_mode;
+     enum click                     click;
++    bool                           hold; // press without release (prefix 4)
+ };
+ 
+ #endif
+diff -ruN A/src/target_detection.cpp B/src/target_detection.cpp
+--- a/src/target_detection.cpp	2026-10-12 02:30:06.889314546 +0200
++++ b/src/target_detection.cpp	2026-10-12 02:30:54.112440705 +0200
+@@ -7,6 +7,8 @@
+ #include <pixman.h>
+ #include <stdint.h>
+ #include <stdlib.h>
++#include <algorithm>
++#include <numeric>
+ #include <wayland-client.h>
+ 
+ static pixman_format_code_t get_pixman_format(enum wl_shm_format format) {
+@@ -243,15 +245,18 @@
+ 
+ static size_t filter_rects(
+     const std::vector<cv::Rect2d> &rects,
+-    const std::vector<cv::Vec4i> &hierachy, std::vector<bool> &filtered
++    const std::vector<cv::Vec4i> &hierachy, std::vector<bool> &filtered,
++    const struct mode_floating_config *cfg
+ ) {
+     filtered.assign(rects.size(), false);
+ 
+     for (size_t i = 0; i < rects.size(); i++) {
+         const auto &rect = rects[i];
+ 
+-        if (rect.height >= 50 || rect.width >= 500 || rect.height <= 3 ||
+-            rect.width <= 7) {
++        if (rect.height > cfg->detect_max_height ||
++            rect.width > cfg->detect_max_width ||
++            rect.height < cfg->detect_min_height ||
++            rect.width < cfg->detect_min_width) {
+             filtered[i] = true;
+             continue;
+         }
+@@ -317,6 +322,34 @@
+         }
+     }
+ 
++    // Drop targets mostly covered by a bigger target that's already kept:
++    // `overlap` is the fraction of the smaller target's area that has to be
++    // covered (1 disables this pass).
++    if (cfg->detect_overlap < 1) {
++        std::vector<size_t> order(rects.size());
++        std::iota(order.begin(), order.end(), 0);
++        std::sort(order.begin(), order.end(), [&](size_t a, size_t b) {
++            return rects[a].area() > rects[b].area();
++        });
++
++        std::vector<size_t> kept;
++        for (size_t i : order) {
++            if (filtered[i]) {
++                continue;
++            }
++            for (size_t k : kept) {
++                if ((rects[i] & rects[k]).area() >=
++                    cfg->detect_overlap * rects[i].area()) {
++                    filtered[i] = true;
++                    break;
++                }
++            }
++            if (!filtered[i]) {
++                kept.push_back(i);
++            }
++        }
++    }
++
+     size_t not_filtered_count = 0;
+     for (const auto &curr : filtered) {
+         if (!curr) {
+@@ -330,7 +363,8 @@
+ int compute_target_from_img_buffer(
+     void *data, uint32_t height, uint32_t width, uint32_t stride,
+     enum wl_shm_format format, enum wl_output_transform transform,
+-    struct rect initial_area, struct rect **areas
++    struct rect initial_area, const struct mode_floating_config *cfg,
++    struct rect **areas
+ ) {
+     cv::Mat m1 =
+         get_gray_scale_from_buffer(data, height, width, stride, format);
+@@ -340,9 +374,12 @@
+ 
+     cv::Mat m2;
+     cv::Mat kernel =
+-        cv::Mat::ones(round(2.5 * scale), round(3.5 * scale), CV_8U);
++        cv::Mat::ones(
++            std::max(1., round(cfg->detect_merge_y * scale)),
++            std::max(1., round(cfg->detect_merge_x * scale)), CV_8U
++        );
+ 
+-    cv::Canny(m1, m2, 70, 220);
++    cv::Canny(m1, m2, cfg->detect_edge_low, cfg->detect_edge_high);
+     cv::dilate(m2, m1, kernel);
+ 
+     std::vector<std::vector<cv::Point>> contours;
+@@ -355,7 +392,7 @@
+     std::vector<bool>       filtered;
+ 
+     compute_rects(contours, rects, scale, initial_area.x, initial_area.y);
+-    int final_rect_count = filter_rects(rects, hierachy, filtered);
++    int final_rect_count = filter_rects(rects, hierachy, filtered, cfg);
+ 
+     size_t area_i = 0;
+     *areas = (struct rect *)malloc(sizeof(struct rect) * final_rect_count);
+diff -ruN A/src/target_detection.h B/src/target_detection.h
+--- a/src/target_detection.h	2026-10-12 02:30:06.889314546 +0200
++++ b/src/target_detection.h	2026-10-12 02:30:54.112440705 +0200
+@@ -9,6 +9,7 @@
+ 
+ #if OPENCV_ENABLED
+ 
++#include "config.h"
+ #include "utils.h"
+ 
+ #include <stdint.h>
+@@ -17,7 +18,8 @@
+ EXTERNC int compute_target_from_img_buffer(
+     void *data, uint32_t height, uint32_t width, uint32_t stride,
+     enum wl_shm_format format, enum wl_output_transform transform,
+-    struct rect initial_area, struct rect **areas
++    struct rect initial_area, const struct mode_floating_config *cfg,
++    struct rect **areas
+ );
+ 
+ #endif

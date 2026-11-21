@@ -1,0 +1,19 @@
+[package]
+name = "waybar-widgets"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "wbw"
+path = "src/main.rs"
+
+[dependencies]
+serde_json = "1"
+libc = "0.2"
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

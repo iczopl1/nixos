@@ -1,0 +1,13 @@
+[package]
+name = "ptrdrive"
+version = "0.1.0"
+edition = "2021"
+
+# Moves the pointer for the bar's `mousedance` effect (bar/Fx.qml) through the wlr virtual pointer.
+[dependencies]
+wayland-client = "0.31"
+wayland-protocols-wlr = { version = "0.3", features = ["client"] }
+
+[profile.release]
+opt-level = 3
+panic = "abort"

@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tmp_dir="/tmp/cliphist"
+map_file="$tmp_dir/entries"
+image_re='^([0-9]+)[[:space:]]+\[\[[[:space:]]+binary[[:space:]]+data[[:space:]]+(.+)[[:space:]]+(jpg|jpeg|png|bmp|gif|webp)[[:space:]]+([0-9]+x[0-9]+)[[:space:]]+\]\]$'
+meta_re='^[0-9]+[[:space:]]+<meta[[:space:]]http-equiv='
+
+resolve_selection() {
+    local selection="$1"
+
+    if [[ "$selection" =~ ^[0-9]+$ && -f "$map_file" ]]; then
+        awk -v target="$selection" 'NR == target + 1 { print; exit }' "$map_file"
+        return 0
+    fi
+
+    if [[ -n "$selection" ]]; then
+        printf '%s\n' "$selection"
+        return 0
+    fi
+
+    return 1
+}
+
+consume_selection() {
+    local selection="$1"
+    local entry
+
+    entry="$(resolve_selection "$selection")"
+    if [[ -z "$entry" ]]; then
+        exit 1
+    fi
+
+    printf '%s\n' "$entry" | cliphist decode | wl-copy --foreground --sensitive
+}
+
+if [[ -n "${1-}" ]]; then
+    consume_selection "$1"
+    exit
+fi
+
+if [ ! -t 0 ]; then
+    IFS= read -r selection || true
+    if [[ -n "${selection:-}" ]]; then
+        consume_selection "$selection"
+        exit
+    fi
+fi
+
+rm -rf "$tmp_dir"
+mkdir -p "$tmp_dir"
+: > "$map_file"
+
+while IFS= read -r line; do
+    if [[ $line =~ $meta_re ]]; then
+        continue
+    fi
+
+    id="${line%%$'\t'*}"
+    text="${line#*$'\t'}"
+    if [[ "$id" == "$line" || ! "$id" =~ ^[0-9]+$ ]]; then
+        continue
+    fi
+
+    printf '%s\n' "$line" >> "$map_file"
+
+    if [[ $line =~ $image_re ]]; then
+        size="${BASH_REMATCH[2]}"
+        ext="${BASH_REMATCH[3]}"
+        dims="${BASH_REMATCH[4]}"
+        printf '%s\t' "$id" | cliphist decode > "$tmp_dir/$id.$ext"
+        printf '%s\0icon\x1f%s\n' "${ext^^} image $dims $size" "$tmp_dir/$id.$ext"
+        continue
+    fi
+
+    printf '%s\n' "$text"
+done < <(cliphist list)

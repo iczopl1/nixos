@@ -1,0 +1,188 @@
+#!/usr/bin/env bash
+# browse one level at a time: Enter on a folder enters it, Enter on a file opens its
+# actions menu; Ctrl+Enter (sent as Ctrl+J) opens the actions menu for a folder;
+# Right = Enter, Left = go up a folder; Ctrl+H toggles dotfiles; Ctrl+D jumps to a zoxide folder; Esc quits (Esc in the actions menu goes back)
+# -k: keep running after copy/open actions; -z: start in zoxide mode (both used by Super+E)
+keep= zmode=
+while getopts kz o; do case $o in k) keep=1 ;; z) zmode=1 ;; *) exit 1 ;; esac; done
+shift $((OPTIND - 1))
+dir=$(realpath "${1:-$PWD}")
+export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --color=bg:-1"   # fzf paints a solid black bg by default, which hides Alacritty's transparency
+PREVIEW=$(dirname "$(readlink -f "$0")")/th-preview   # right-hand preview pane script
+hidden=()   # set to (-H) to show dotfiles
+query=
+
+urlencode() {
+  local enc= c i
+  for ((i = 0; i < ${#1}; i++)); do
+    c=${1:i:1}; [[ $c == [a-zA-Z0-9/._~-] ]] && enc+=$c || enc+=$(printf '%%%02X' "'$c")
+  done
+  printf '%s' "$enc"
+}
+
+copy_item() {   # put a file/folder on the Wayland clipboard so it pastes as a file
+  case "${1,,}" in
+    *.png)          wl-copy -t image/png  < "$1" ;;   # images paste inline
+    *.jpg|*.jpeg)   wl-copy -t image/jpeg < "$1" ;;
+    *.gif)          wl-copy -t image/gif  < "$1" ;;
+    *.webp)         wl-copy -t image/webp < "$1" ;;
+    *)              printf 'file://%s\n' "$(urlencode "$1")" | wl-copy -t text/uri-list ;;  # paste as attachment
+  esac
+}
+
+trash() {   # freedesktop trash, so it shows up in any file manager's Trash
+  local t=${XDG_DATA_HOME:-$HOME/.local/share}/Trash name
+  mkdir -p "$t/files" "$t/info"
+  name=$(basename "$1")
+  while [[ -e $t/files/$name ]]; do name="$(basename "$1").$RANDOM"; done
+  printf '[Trash Info]\nPath=%s\nDeletionDate=%s\n' "$(urlencode "$1")" "$(date +%FT%T)" > "$t/info/$name.trashinfo"
+  mv -- "$1" "$t/files/$name"
+}
+
+# prints a status message if th should quit afterwards (or show it, with -k)
+item_menu() {
+  local path=$1 name action new preview
+  name=$(basename "$path")
+  local actions=()
+  if [[ -d $path ]]; then
+    actions=("Paste here" "Open in Thunar" "Copy folder" "Copy path" "Zip & copy" "Sync to phone" "Terminal here" "Rename" "Duplicate" "Move to trash")
+    preview="'$PREVIEW' '$path'"
+  else
+    case "${name,,}" in
+      *.mp4|*.mkv|*.webm|*.mov|*.avi|*.m4v|*.flv|*.wmv|*.mpg|*.mpeg|*.gif) actions=("Play here" "Compress video" "Copy file" "Open") ;;
+      *.zip) actions=("Unzip" "Open" "Copy file") ;;
+      *) actions=("Open" "Copy file") ;;
+    esac
+    actions+=("Copy path")
+    grep -Iq . "$path" 2>/dev/null && actions+=("Copy contents")
+    actions+=("Zip & copy" "Sync to phone" "Open in Thunar" "Edit" "View")
+    command -v ripdrag >/dev/null && actions+=("Drag")
+    actions+=("Rename" "Duplicate" "Move to trash")
+    preview="'$PREVIEW' '$path'"
+  fi
+
+  action=$(printf '%s\n' "${actions[@]}" |
+           fzf --layout=reverse --no-sort --expect=left --prompt="$name> " --header='Esc/Left: back' --preview "$preview") || return
+  [[ $(head -n1 <<<"$action") == left ]] && return   # Left closes the menu
+  action=$(sed -n 2p <<<"$action")
+
+  case $action in
+    "Copy file"|"Copy folder") copy_item "$path"; echo "copied: $path" ;;
+    "Copy path")     printf '%s' "$path" | wl-copy; echo "copied path: $path" ;;
+    "Copy contents") wl-copy < "$path"; echo "copied contents: $path" ;;
+    "Unzip")   # extract into a new folder next to the zip; never overwrites
+      local dest="$(dirname "$path")/${name%.*}" i=2
+      while [[ -e $dest ]]; do dest="$(dirname "$path")/${name%.*} $i"; ((i++)); done
+      if unzip -q -- "$path" -d "$dest"; then echo "unzipped to: $dest"
+      else rm -rf -- "$dest"; echo "unzip FAILED: $path"; fi ;;
+    "Paste here")   # copy clipboard files (or an image) into this folder; never overwrites
+      local types n=0 line src dst base b ext j
+      types=$(wl-paste -l 2>/dev/null)
+      if grep -qx 'text/uri-list' <<<"$types"; then
+        while IFS= read -r line; do
+          line=${line%$'\r'}
+          [[ $line == file://* ]] || continue
+          src=$(printf '%b' "$(sed 's/%/\\x/g' <<<"${line#file://}")")
+          [[ -e $src ]] || continue
+          b=$(basename "$src"); dst="$path/$b"; j=2
+          while [[ -e $dst ]]; do dst="$path/$b copy $j"; ((j++)); done
+          cp -a -- "$src" "$dst" && ((n++))
+        done < <(wl-paste -t text/uri-list 2>/dev/null)
+        echo "pasted $n item(s) into: $path"
+      elif ext=$(grep -m1 -o '^image/[a-z]*' <<<"$types"); [[ -n $ext ]]; then
+        dst="$path/pasted-$(date +%F_%H%M%S).${ext#image/}"
+        wl-paste -t "$ext" > "$dst" && echo "pasted image: $dst"
+      else
+        echo "nothing to paste (clipboard has no files)"
+      fi ;;
+    "Zip & copy")
+      local out="${XDG_RUNTIME_DIR:-/tmp}/th"; mkdir -p "$out"
+      rm -f "$out/$name.zip"
+      (cd "$(dirname "$path")" && zip -qr "$out/$name.zip" "$name") &&
+        copy_item "$out/$name.zip" && echo "copied zip: $out/$name.zip" ;;
+    "Sync to phone")   # zip into ~/sync (synced to the phone)
+      local sync="$HOME/sync"; mkdir -p "$sync"
+      if [[ -d $path ]]; then   # folders are zipped, files are copied as they are
+        rm -f "$sync/$name.zip"
+        (cd "$(dirname "$path")" && zip -qr "$sync/$name.zip" "$name") &&
+          echo "synced to phone: $sync/$name.zip"
+      else
+        cp -f -- "$path" "$sync/$name" && echo "synced to phone: $sync/$name"
+      fi ;;
+    "Play here")   # full terminal size by default; set TH_VW and TH_VH (pixels) to shrink it for more fps
+      local size=()
+      [[ -n $TH_VW && -n $TH_VH ]] && size=(--vo-sixel-width="$TH_VW" --vo-sixel-height="$TH_VH")
+      mpv --vo=sixel --vo-sixel-buffered=yes --vo-sixel-dither=none "${size[@]}" \
+          --profile=fast --framedrop=vo "$path" </dev/tty >/dev/tty 2>&1 ;;   # q quits, back to th
+    "Compress video")   # interactive: asks target size, codec, audio; runs in this terminal
+      local vs=${VIDSHRINK:-/home/iczo/syshelp/vidshrink.sh}
+      [[ -x $vs ]] || vs=$(command -v vidshrink.sh) || { echo "vidshrink.sh not found"; return; }
+      "$vs" "$path" </dev/tty >/dev/tty 2>&1
+      read -r -p "Press Enter to go back " new </dev/tty >/dev/tty 2>&1
+      echo "compress finished: $path" ;;
+    "Open")          setsid -f xdg-open "$path" >/dev/null 2>&1; echo "opened: $path" ;;
+    "Open in Thunar")
+      if [[ -d $path ]]; then
+        setsid -f thunar "$path" >/dev/null 2>&1
+      else   # open the parent folder with the file selected
+        dbus-send --session --type=method_call --dest=org.freedesktop.FileManager1 /org/freedesktop/FileManager1 \
+          org.freedesktop.FileManager1.ShowItems array:string:"file://$(urlencode "$path")" string:"" ||
+          setsid -f thunar "$(dirname "$path")" >/dev/null 2>&1
+      fi
+      echo "shown in Thunar: $path" ;;
+    "Terminal here") (cd "$path" && setsid -f alacritty >/dev/null 2>&1); echo "terminal opened: $path" ;;
+    "Edit")          ${EDITOR:-nano} "$path" </dev/tty >/dev/tty ;;
+    "View")          bat --paging=always "$path" </dev/tty >/dev/tty ;;
+    "Drag")          ripdrag -x "$path" >/dev/null 2>&1 ;;
+    "Rename")
+      read -r -e -p "rename to: " -i "$name" new </dev/tty >/dev/tty 2>&1
+      [[ -n $new && $new != "$name" ]] && mv -n -- "$path" "$(dirname "$path")/$new" ;;
+    "Duplicate")
+      local base=$name ext=
+      [[ -f $path && $name == ?*.* ]] && base=${name%.*} ext=".${name##*.}"
+      new="$(dirname "$path")/$base copy$ext"; local i=2
+      while [[ -e $new ]]; do new="$(dirname "$path")/$base copy $i$ext"; ((i++)); done
+      cp -a -- "$path" "$new" ;;
+    "Move to trash")
+      read -r -p "trash '$name'? [y/N] " new </dev/tty >/dev/tty 2>&1
+      [[ $new == [yY] ]] && trash "$path" ;;
+  esac
+}
+
+while :; do
+  if [[ $zmode ]]; then   # pick a frequent folder, Esc goes to the plain listing
+    zmode=
+    z=$(zoxide query -l | fzf --layout=reverse --no-sort --expect=right --prompt="zoxide> " --query="$query" \
+          --header="Enter/Right: jump  Esc: back" --preview "'$PREVIEW' {}" | sed -n 2p)
+    [[ -n $z ]] && dir=$z query=
+  fi
+
+  out=$( { printf ".\n..\n"; fd -L "${hidden[@]}" -d1 -td --strip-cwd-prefix --base-directory "$dir" . | sed 's|/*$|/|' | sort -f
+                    fd -L "${hidden[@]}" -d1 -tf -tl --strip-cwd-prefix --base-directory "$dir" . | sort -f; } |
+         fzf --layout=reverse --no-sort --print-query --expect=ctrl-h,ctrl-d,ctrl-j,left,right --query="$query" \
+             --prompt="$dir${hidden:+ [.]}> " \
+             --header="${msg:+$msg
+}Enter/Right: open/actions  Left: up  Ctrl+Enter: folder actions  Ctrl+H: dotfiles  Ctrl+D: zoxide  Esc: quit" \
+             --preview-window=right:50% --preview "'$PREVIEW' '$dir'/{}" )
+  [[ $? -eq 130 ]] && exit   # Esc / Ctrl+C
+  { read -r query; read -r key; read -r sel; } <<<"$out"
+
+  if [[ $key == ctrl-h ]]; then
+    if [[ ${#hidden[@]} -eq 0 ]]; then hidden=(-H); else hidden=(); fi
+    continue
+  fi
+  [[ $key == ctrl-d ]] && zmode=1 && continue
+  if [[ $key == left ]]; then dir=$(dirname "$dir"); zoxide add "$dir"; query=; continue; fi
+  [[ -z $sel ]] && continue   # Enter with no match
+  path=$(realpath "$dir/$sel")
+
+  if [[ -d $path && $key != ctrl-j && $sel != . ]]; then   # "." opens the current folder's menu
+    dir=$path
+    zoxide add "$dir"   # so th visits rank in zoxide too
+    query=
+    continue
+  fi
+
+  msg=$(item_menu "$path")
+  [[ -n $msg && -z $keep ]] && echo "$msg" && exit
+done

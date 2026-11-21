@@ -1,0 +1,206 @@
+# Programy dla profilu minimal.
+# Wymóg: GUI (Mango+Quickshell), nvim, przeglądarka, KeePass, Claude Code, terminal, git.
+# Bez ciężkiej kompilacji – wszystko z cache nixpkgs (MASTER §4).
+{ pkgs, lib, unstable, ... }:
+
+let
+  wbw = pkgs.rustPlatform.buildRustPackage {
+    pname = "wbw";
+    version = "0.1.0";
+    src = ./dotfiles/waybar/rust;
+    cargoLock.lockFile = ./dotfiles/waybar/rust/Cargo.lock;
+  };
+  ptrdrive = pkgs.rustPlatform.buildRustPackage {
+    pname = "ptrdrive";
+    version = "0.1.0";
+    src = ./dotfiles/syshelp/power-fx/ptrdrive;
+    cargoLock.lockFile = ./dotfiles/syshelp/power-fx/ptrdrive/Cargo.lock;
+  };
+  # Biblioteki uruchomieniowe dla binarek spoza Nix (claude-code i inne).
+  runtimeLibs = with pkgs; [
+    stdenv.cc.cc.lib
+    zlib
+    glib
+    dbus
+    fontconfig
+    freetype
+    libGL
+    libx11
+    libxext
+    libxrender
+    libxcb
+    libxcb-util
+    libxcb-image
+    libxcb-keysyms
+    libxcb-render-util
+    libxcb-wm
+    libxkbcommon
+    wayland
+  ];
+in
+{
+  environment.systemPackages = with pkgs; [
+    # --- Pulpit Wayland (Mango) ---
+    quickshell            # pasek + nakładka Hints.qml (z nixpkgs, bez kompilacji – MASTER §12)
+    cava                  # wizualizacje audio i motyw tła paska
+    hypridle              # wygaszanie i blokada w sesji Mango
+    wtype                 # wpisywanie tekstu przez menu Quickshell
+    pywal                 # motywy kolorów tapet i paska
+    librewolf             # przeglądarka ustawiona w Mango
+    kdePackages.kdeconnect-kde # integracja z telefonem
+    alacritty             # terminal główny
+    foot                  # terminal zapasowy
+    rofi                  # launcher
+    grim
+    slurp
+    wl-clipboard
+    cliphist
+    awww                  # tapety (swww przemianowany na awww w nixpkgs 26.05)
+    mako                  # powiadomienia
+    brightnessctl
+    pavucontrol
+    networkmanagerapplet
+    wvkbd                 # klawiatura ekranowa (tablet/touch)
+    yad                   # dialogi GUI dla skryptów
+    udiskie               # auto-mount USB/dysków (frontend dla udisks2)
+    wlopm                 # wyłączanie ekranu przez wlr-output-power-management (T2.5)
+    wlogout               # menu wylogowania/zasilania po SUPER+ESCAPE – lekki (GTK layer-shell,
+                           # ~140 KiB), bez dodatkowych zależności poza tym co już jest (gtk3)
+
+    evtest                # czytanie raw input events (T3.13 – WPM border w Quickshell)
+
+    # --- Diagnostyka dysków (T2.2) ---
+    smartmontools         # smartctl / smartd – SMART monitoring HDD/SSD/NVMe
+    nvme-cli              # nvme – narzędzia dla dysków NVMe
+    hdparm                # hdparm – parametry i wydajność dysków ATA/SATA
+
+    # --- Narzędzia sieciowe (T2.3) ---
+    nmap                  # skanowanie portów i sieci
+    iperf3                # pomiar przepustowości
+    bandwhich             # prędkość sieci per-proces w terminalu
+    dnsutils              # dig, nslookup – zapytania DNS
+    tcpdump               # przechwytywanie pakietów (wymaga sudo)
+    nethogs               # ruch sieciowy per-proces (wymaga sudo)
+    speedtest-cli         # pomiar prędkości łącza
+    freerdp               # xfreerdp – klient RDP (dostęp do PC z Windows po kablu/sieci)
+
+    # --- Narzędzia terminalowe ---
+    jq
+    fzf
+    zoxide
+    btop
+    socat
+    ripgrep
+    procps
+    gawk
+    coreutils
+    wget
+    curl
+    git
+    p7zip
+    tree
+    fastfetch
+    bat                   # ch: podgląd pliku z kolorami (cat z podświetlaniem)
+    eza                   # ls/ll/l: nowoczesny ls (kolory, git, ikony)
+    fd                    # fe/fo/e/o: szybkie znajdowanie plików (fd-find)
+    bc                    # ]: kalkulator (bc -l)
+    libnotify             # pp: notify-send (testowanie powiadomień mako)
+    mpv
+    vlc
+    pulseaudio            # pactl/paplay clienty zgodne z PipeWire PulseAudio (G1-Prz-Controll)
+
+    # T2.37: age – szyfrowanie plików (RSA/Ed25519 keys; prostsze niż GPG do backupów)
+    # Użycie: age -r $(cat ~/.ssh/id_ed25519.pub) plik.txt > plik.txt.age
+    age
+
+    # T2.36: satty – adnotacje na screenshotach (strzałki, tekst, blur, highlight)
+    # Użycie: grim -g "$(slurp)" - | satty -f -   (SUPER+SHIFT+A w mango.conf)
+    satty
+
+    # T2.35: wl-screenrec – nagrywanie ekranu Wayland (H.264/HEVC, Wayland native)
+    # Użycie: wl-screenrec -f ~/Videos/rec.mp4  (SUPER+F5 start/stop w mango.conf)
+    wl-screenrec
+    playerctl            # T2.34: sterowanie odtwarzaczami MPRIS (media widget w barze)
+
+    # night light – filtr niebieskiego światła wieczorem, start/stop przez `effects nightlight`
+    # (effects-ctl.sh); nie jest "specjalny" w tym pliku stanu – nie gasi go bateria
+    wlsunset
+
+    # --- Przeglądarka ---
+    # brave – usunięty z nixpkgs 26.05 (brak maintainerów); TODO: binarka z oficjalnych Releases
+    firefox
+
+    # --- Edytory ---
+    neovim
+
+    # --- AI: zasada najważniejsza (MASTER §0/§16) ---
+    claude-code
+    unstable.antigravity-cli  # agy – Antigravity CLI (MASTER §0/§16)
+
+    # --- nvim: LSP, formattery, narzędzia ---
+    lua-language-server
+    stylua
+    nixfmt              # formater .nix (T2.13; nixfmt-rfc-style → nixfmt od 26.05)
+    nil                 # Nix LSP (nil_ls) – uzupełnianie, go-to-def, diagnostyka
+    statix              # linter .nix – antywzorce (używany też w rebuild.sh)
+    deadnix             # wykrywanie martwego kodu .nix (używany też w rebuild.sh)
+    bash-language-server    # T3.4: Bash/Shell LSP
+    yaml-language-server    # T3.4: YAML LSP
+    marksman                # T3.4: Markdown LSP
+    cmake-language-server   # T3.4: CMake LSP (neocmake)
+    # hunspell.withDicts (d: [...]) → wrapper z DICPATH; argument to funkcja, nie lista
+    (hunspell.withDicts (d: [ d.pl_PL d.en_US ]))
+    zathura               # podgląd PDF (vimtex)
+    glow                  # podgląd Markdown (:Glow)
+    imagemagick
+
+    # --- Hasła ---
+    keepassxc
+
+    # --- Podstawowy toolchain (MASTER §4) ---
+    gcc
+    gnumake
+    cmake
+    python3
+
+    # T2.31: direnv + nix-direnv – auto nix-shell przy wejściu do katalogu z .envrc
+    # nix-direnv cache'uje env w /nix/store – nie przebudowuje przy każdym cd
+    direnv
+    nix-direnv
+  ] ++ runtimeLibs ++ [ wbw ptrdrive ];
+
+  # Blokada ekranu (pakiet + usługa PAM)
+  programs.hyprlock.enable = true;
+
+  # Menedżer plików
+  programs.thunar.enable = true;
+  programs.xfconf.enable = true;
+
+  # Diagnostyka sieci (setuid wrapper dla ICMP ping bez root)
+  programs.mtr.enable = true;
+
+  # GPG / SSH agent
+  programs.gnupg.agent = {
+    enable = true;
+    enableSSHSupport = true;
+  };
+
+  # Binarki spoza Nix (claude-code i inne niestandardowe)
+  programs.nix-ld.enable = true;
+
+  # GTK / dconf (Thunar, ustawienia motywu GTK)
+  programs.dconf.enable = true;
+
+  # uinput – potrzebny przez ydotool (keyboard-mouse.nix w full) i OpenTabletDriver
+  hardware.uinput.enable = true;
+  boot.kernelModules = [ "uinput" ];
+
+  environment.sessionVariables = {
+    NIXOS_OZONE_WL = "1";
+    XDG_SESSION_TYPE = "wayland";
+    # Chromium/Electron (Brave, Beeper, VSCodium…) czyta DICPATH żeby znaleźć
+    # słowniki hunspell. hunspellWithDicts ustawia DICPATH tylko dla samego
+    # binarki hunspell, a nie dla innych procesów.
+    DICPATH = "${pkgs.hunspellDicts.pl_PL}/share/hunspell:${pkgs.hunspellDicts.en_US}/share/hunspell";
+  };
+}

@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# rd [app]  - moonlight stream to my-pc (default app: desktop; `rd ww` for ww).
+# Before moonlight opens, Bluetooth is turned on (rfkill unblock + power on).
+# When the moonlight window closes (any way: quit, crash, Ctrl-C), every
+# Bluetooth game controller that is still connected gets disconnected.
+# Controllers = known devices whose Icon is input-gaming (Pro Controller,
+# 8BitDo Pro 2, Wireless Controller). Mouse and headset are left alone.
+# Devices stay paired/trusted; they reconnect when you press a button.
+
+app="${1:-desktop}"
+log="${XDG_RUNTIME_DIR:-/tmp}/rd.log"   # what rd did last time: cat $XDG_RUNTIME_DIR/rd.log
+exec 3>>"$log"
+say() { echo "$(date '+%F %T') [$$] $*" >&3; }
+say "start app=$app from=$(ps -o comm= -p $PPID) bt=$(timeout 5 bluetoothctl show 2>/dev/null | grep -o 'Powered: [a-z]*')"
+
+disconnect_pads() {
+    command -v bluetoothctl >/dev/null || return
+    local mac info
+    for mac in $(timeout 5 bluetoothctl devices | awk '/^Device /{print $2}'); do
+        info=$(timeout 5 bluetoothctl info "$mac") || continue
+        grep -q 'Icon: input-gaming' <<<"$info" || continue
+        grep -q 'Connected: yes' <<<"$info" || continue
+        timeout 10 bluetoothctl disconnect "$mac" >/dev/null 2>&1; say "disconnect $mac rc=$?"
+    done
+}
+bt_on() {
+    command -v bluetoothctl >/dev/null || return
+    # Bluetooth can be off two ways: rfkill block, or adapter powered off.
+    command -v rfkill >/dev/null && rfkill unblock bluetooth 2>/dev/null
+    local i
+    for i in 1 2 3 4 5; do   # after an unblock the adapter needs a moment to come back
+        timeout 5 bluetoothctl show 2>/dev/null | grep -q 'Powered: yes' && { say "bt on"; return; }
+        say "power on try $i"
+        timeout 5 bluetoothctl power on >/dev/null 2>&1
+        sleep 1
+    done
+    say "bt on FAILED"
+}
+
+bt_on
+trap disconnect_pads EXIT
+trap 'exit 130' INT TERM HUP
+
+moonlight stream --1080 --fps 60 --bitrate 2500 --video-codec AV1 \
+    --packet-size 1024 --display-mode fullscreen --game-optimization \
+    --frame-pacing --no-vsync --no-audio-on-host --quit-after my-pc "$app"
